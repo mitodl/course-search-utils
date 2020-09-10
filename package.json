@@ -1,0 +1,63 @@
+{
+  "name": "@mitodl/course-search-utils",
+  "version": "1.0.0",
+  "description": "JS utils for interacting with MIT Open Course search",
+  "main": "dist/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src",
+    "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi $PWD/'src/**/*.js'",
+    "fmt:check": "LOG_LEVEL= prettier-eslint --list-different --no-semi $PWD/'src/**/*.js'",
+    "build": "webpack --mode production --progress"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitodl/course-search-utils.git"
+  },
+  "keywords": [
+    "JS",
+    "React"
+  ],
+  "author": "MITOL",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/mitodl/course-search-utils/issues"
+  },
+  "homepage": "https://github.com/mitodl/course-search-utils#readme",
+  "dependencies": {
+    "query-string": "^6.13.1",
+    "ramda": "^0.27.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/polyfill": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "babel-eslint": "10.x",
+    "babel-jest": "^26.3.0",
+    "babel-loader": "^8.1.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.4",
+    "eslint": "6.x",
+    "eslint-config-google": "0.x",
+    "eslint-config-mitodl": "^0.0.8",
+    "eslint-plugin-babel": "5.x",
+    "eslint-plugin-flow-vars": "^0.5.0",
+    "eslint-plugin-flowtype": "4.x",
+    "eslint-plugin-mocha": "6.x",
+    "eslint-plugin-react": "7.x",
+    "eslint-plugin-react-hooks": "^4.1.2",
+    "jest": "^26.4.2",
+    "jest-fetch-mock": "^3.0.3",
+    "prettier-eslint-cli": "5.x",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1"
+  }
+}
