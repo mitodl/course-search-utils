@@ -7,17 +7,6 @@ export const toArray = obj =>
 
 const urlParamToArray = param => _.union(toArray(param) || [])
 
-// type URLSearchParams = {
-//   text: string,
-//   activeFacets: {
-//     audience: Array<string>,
-//     certification: Array<string>,
-//     type: Array<string>,
-//     offered_by: Array<string>,
-//     topics: Array<string>
-//   }
-// }
-
 export const deserializeSearchParams = location => {
   const { type, o, t, q, a, c } = qs.parse(location.search)
 
