@@ -61,21 +61,6 @@ export const useCourseSearch = (
     setActiveFacets(INITIAL_FACET_STATE)
   }, [setText, setActiveFacets])
 
-  // this effect here basically listens to activeFacets for changes and re-runs
-  // the search whenever it changes. we always want the facet changes to take
-  // effect immediately, so we need to either do this or call runSearch from
-  // our facet-related callbacks. this approach lets us avoid having the
-  // facet-related callbacks (toggleFacet, etc) be dependent on then value of
-  // the runSearch function, which leads to too much needless churn in the
-  // facet callbacks and then causes excessive re-rendering of the facet UI
-  useEffect(
-    () => {
-      internalRunSearch(text, activeFacets)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeFacets]
-  )
-
   const toggleFacet = useCallback(
     async (name, value, isEnabled) => {
       const newFacets = clone(activeFacets)
@@ -104,45 +89,6 @@ export const useCourseSearch = (
     },
     [setText]
   )
-
-  const clearText = useCallback(
-    event => {
-      event.preventDefault()
-      setText("")
-      internalRunSearch("", activeFacets)
-    },
-    [activeFacets, setText, internalRunSearch]
-  )
-
-  const acceptSuggestion = useCallback(
-    suggestion => {
-      setText(suggestion)
-      internalRunSearch(suggestion, activeFacets)
-    },
-    [setText, activeFacets, internalRunSearch]
-  )
-
-  // this is our 'on startup' useEffect call
-  useEffect(() => {
-    clearSearch()
-    const { text, activeFacets } = deserializeSearchParams(window.location)
-    setText(text)
-    setActiveFacets(activeFacets)
-    internalRunSearch(text, activeFacets)
-    // dependencies intentionally left blank here, because this effect
-    // needs to run only once - it's just to initialize the search state
-    // based on the value of the URL (if any)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const loadMore = useCallback(() => {
-    if (!loaded) {
-      // this function will be triggered repeatedly by <InfiniteScroll />, filter it to just once at a time
-      return
-    }
-
-    internalRunSearch(text, activeFacets, true)
-  }, [internalRunSearch, loaded, text, activeFacets])
 
   const internalRunSearch = useCallback(
     async (text, activeFacets, incremental = false) => {
@@ -190,6 +136,59 @@ export const useCourseSearch = (
     ]
   )
 
+  const clearText = useCallback(
+    event => {
+      event.preventDefault()
+      setText("")
+      internalRunSearch("", activeFacets)
+    },
+    [activeFacets, setText, internalRunSearch]
+  )
+
+  const acceptSuggestion = useCallback(
+    suggestion => {
+      setText(suggestion)
+      internalRunSearch(suggestion, activeFacets)
+    },
+    [setText, activeFacets, internalRunSearch]
+  )
+
+  // this is our 'on startup' useEffect call
+  useEffect(() => {
+    clearSearch()
+    const { text, activeFacets } = deserializeSearchParams(window.location)
+    setText(text)
+    setActiveFacets(activeFacets)
+    internalRunSearch(text, activeFacets)
+    // dependencies intentionally left blank here, because this effect
+    // needs to run only once - it's just to initialize the search state
+    // based on the value of the URL (if any)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const loadMore = useCallback(() => {
+    if (!loaded) {
+      // this function will be triggered repeatedly by <InfiniteScroll />, filter it to just once at a time
+      return
+    }
+
+    internalRunSearch(text, activeFacets, true)
+  }, [internalRunSearch, loaded, text, activeFacets])
+
+  // this effect here basically listens to activeFacets for changes and re-runs
+  // the search whenever it changes. we always want the facet changes to take
+  // effect immediately, so we need to either do this or call runSearch from
+  // our facet-related callbacks. this approach lets us avoid having the
+  // facet-related callbacks (toggleFacet, etc) be dependent on then value of
+  // the runSearch function, which leads to too much needless churn in the
+  // facet callbacks and then causes excessive re-rendering of the facet UI
+  useEffect(
+    () => {
+      internalRunSearch(text, activeFacets)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeFacets]
+  )
   const onSubmit = useCallback(
     e => {
       e.preventDefault()
@@ -210,6 +209,7 @@ export const useCourseSearch = (
     incremental,
     text,
     activeFacets,
-    onSubmit
+    onSubmit,
+    from
   }
 }
