@@ -1,3 +1,7 @@
 node_modules/
 dist/*
 *.tgz
+
+# build artifacts
+index.js
+url.js

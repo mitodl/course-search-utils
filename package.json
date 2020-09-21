@@ -2,8 +2,12 @@
   "name": "@mitodl/course-search-utils",
   "version": "1.0.1",
   "description": "JS utils for interacting with MIT Open Course search",
-  "main": "dist/index.js",
+  "main": "index.js",
   "module": "src/index.js",
+  "files": [
+    "url.js",
+    "src/"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",

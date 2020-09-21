@@ -1,14 +1,16 @@
 const path = require("path")
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: {
+    index: "./src/index.js",
+    url: "./src/url_utils",
+  },
   output: {
-    filename: "index.js",
-    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    path: __dirname,
     library: "course-search-utils",
     libraryTarget: "umd"
   },
-
   module: {
     rules: [
       {
