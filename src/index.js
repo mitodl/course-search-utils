@@ -62,7 +62,7 @@ export const useCourseSearch = (
   }, [setText, setActiveFacets])
 
   const toggleFacet = useCallback(
-    async (name, value, isEnabled) => {
+    (name, value, isEnabled) => {
       const newFacets = clone(activeFacets)
 
       if (isEnabled) {
@@ -70,6 +70,22 @@ export const useCourseSearch = (
       } else {
         newFacets[name] = _.without(newFacets[name] || [], value)
       }
+      setActiveFacets(newFacets)
+    },
+    [activeFacets, setActiveFacets]
+  )
+
+  const toggleFacets = useCallback(
+    facets => {
+      const newFacets = clone(activeFacets)
+
+      facets.forEach(([name, value, isEnabled]) => {
+        if (isEnabled) {
+          newFacets[name] = _.union(newFacets[name] || [], [value])
+        } else {
+          newFacets[name] = _.without(newFacets[name] || [], value)
+        }
+      })
       setActiveFacets(newFacets)
     },
     [activeFacets, setActiveFacets]
@@ -201,6 +217,7 @@ export const useCourseSearch = (
     facetOptions,
     clearAllFilters,
     toggleFacet,
+    toggleFacets,
     onUpdateFacets,
     updateText,
     clearText,

@@ -7,6 +7,7 @@ import {
   LR_TYPE_PODCAST,
   LR_TYPE_VIDEO,
   LR_TYPE_COURSE,
+  LR_TYPE_RESOURCEFILE,
   INITIAL_FACET_STATE
 } from "./constants"
 
@@ -15,11 +16,18 @@ import { facetMap, wait } from "./test_util"
 import { serializeSearchParams } from "./url_utils"
 
 function FacetTestComponent(props) {
-  const { toggleFacet, onUpdateFacets, clearAllFilters, facetOptions } = props
+  const {
+    toggleFacet,
+    onUpdateFacets,
+    clearAllFilters,
+    facetOptions,
+    toggleFacets
+  } = props
 
   return (
     <div className="facets-test">
       <div className="toggleFacet" onClick={toggleFacet} />
+      <div className="toggleFacets" onClick={toggleFacets} />
       <div className="onUpdateFacets" onClick={onUpdateFacets} />
       <div className="clearAllFilters" onClick={clearAllFilters} />
       <div className="facet-options" onClick={facetOptions} />
@@ -41,6 +49,7 @@ function TestComponent(props) {
     facetOptions,
     clearAllFilters,
     toggleFacet,
+    toggleFacets,
     onUpdateFacets,
     updateText,
     clearText,
@@ -69,6 +78,7 @@ function TestComponent(props) {
         clearAllFilters={clearAllFilters}
         activeFacets={activeFacets}
         toggleFacet={toggleFacet}
+        toggleFacets={toggleFacets}
         onUpdateFacets={onUpdateFacets}
         facetOptions={facetOptions}
       />
@@ -220,6 +230,42 @@ describe("useCourseSearch", () => {
       {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
+      },
+      0
+    ])
+  })
+
+  it("should let you toggle a facet", async () => {
+    const { wrapper, runSearch } = render()
+    act(() => {
+      wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
+    })
+    checkSearchCall(runSearch, [
+      undefined,
+      {
+        ...INITIAL_FACET_STATE,
+        type:  LR_TYPE_ALL,
+        topic: ["mathematics"]
+      },
+      0
+    ])
+  })
+
+  it("should let you toggle multiple facets", async () => {
+    const { wrapper, runSearch } = render()
+    act(() => {
+      wrapper.find(".toggleFacets").prop("onClick")([
+        ["topic", "mathematics", true],
+        ["type", LR_TYPE_COURSE, false],
+        ["type", LR_TYPE_RESOURCEFILE, true]
+      ])
+    })
+    checkSearchCall(runSearch, [
+      undefined,
+      {
+        ...INITIAL_FACET_STATE,
+        type:  [LR_TYPE_RESOURCEFILE],
+        topic: ["mathematics"]
       },
       0
     ])

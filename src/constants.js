@@ -6,6 +6,7 @@ export const LR_TYPE_VIDEO = "video"
 export const LR_TYPE_PODCAST = "podcast"
 export const LR_TYPE_PODCAST_EPISODE = "podcastepisode"
 export const FAVORITES_PSEUDO_LIST = "favorites"
+export const LR_TYPE_RESOURCEFILE = "resourcefile"
 
 export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
