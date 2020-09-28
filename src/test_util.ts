@@ -1,4 +1,4 @@
-export const wait = millis =>
+export const wait = (millis: number): Promise<undefined> =>
   new Promise(resolve => setTimeout(resolve, millis))
 
 export const facetMap = new Map([

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import {
   deserializeSearchParams,
   serializeSearchParams,
@@ -30,7 +32,7 @@ describe("course search library", () => {
           type:            [],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -44,7 +46,7 @@ describe("course search library", () => {
           type:            [],
           department_name: ["Philosophy"]
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -69,7 +71,7 @@ describe("course search library", () => {
           type:            [],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -83,7 +85,7 @@ describe("course search library", () => {
           type:            ["course"],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -97,7 +99,7 @@ describe("course search library", () => {
           type:            [],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -111,7 +113,7 @@ describe("course search library", () => {
           type:            [],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
 
@@ -125,7 +127,7 @@ describe("course search library", () => {
           type:            [],
           department_name: []
         },
-        text: undefined
+        text: ""
       })
     })
   })
@@ -229,7 +231,6 @@ describe("course search library", () => {
       expect(toArray(0)).toBeUndefined()
       expect(toArray(null)).toBeUndefined()
       expect(toArray(undefined)).toBeUndefined()
-      expect(toArray()).toBeUndefined()
     })
   })
 })

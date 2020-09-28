@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, MouseEvent, FormEvent, ChangeEvent } from "react"
 import { unionWith, eqBy, prop, either, isEmpty, clone, isNil } from "ramda"
 import _ from "lodash"
 
@@ -10,66 +10,85 @@ import {
   LR_TYPE_PODCAST_EPISODE,
   INITIAL_FACET_STATE
 } from "./constants"
-import { deserializeSearchParams, serializeSearchParams } from "./url_utils"
+import {
+  Facets,
+  deserializeSearchParams,
+  serializeSearchParams
+} from "./url_utils"
 import { useDidMountEffect } from "./hooks"
-
-export const mergeFacetResults = (...args) => ({
-  buckets: args
-    .map(prop("buckets"))
-    .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
-})
 
 export const emptyOrNil = either(isEmpty, isNil)
 
-// take runSearch, clearSearch as callbacks
+type Aggregation = {
+  doc_count_error_upper_bound?: number // eslint-disable-line camelcase
+  sum_other_doc_count?: number // eslint-disable-line camelcase
+  buckets: Array<{ key: string; doc_count: number }> // eslint-disable-line camelcase
+}
+
+type Aggregations = Map<string, Aggregation>
+
+export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
+  buckets: args
+    .map(prop("buckets"))
+    // @ts-ignore
+    .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
+})
+
+// disabling rule here because all functions and values returned by the hook are
+// fully typed, so writing out the explicit return type for this thing is redundant
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCourseSearch = (
-  runSearch,
-  clearSearch,
-  updateURLBar,
-  facets,
-  loaded,
-  searchPageSize
+  runSearch: (
+    text: string,
+    searchFacets: Facets,
+    nextFrom: number
+  ) => Promise<void>,
+  clearSearch: () => void,
+  updateURLBar: (newSearch: string) => void,
+  aggregations: Aggregations,
+  loaded: boolean,
+  searchPageSize: number
 ) => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
-  const [text, setText] = useState(() => {
+  const [text, setText] = useState<string>(() => {
     const { text } = deserializeSearchParams(window.location)
     return text
   })
-  const [activeFacets, setActiveFacets] = useState(() => {
+  const [activeFacets, setActiveFacets] = useState<Facets>(() => {
     const { activeFacets } = deserializeSearchParams(window.location)
     return activeFacets
   })
 
   const facetOptions = useCallback(
-    group => {
+    (group: string): Aggregation | null => {
       const emptyFacet = { buckets: [] }
       const emptyActiveFacets = {
-        buckets: (activeFacets[group] || []).map(facet => ({
+        buckets: (activeFacets[group] || []).map((facet: string) => ({
           key:       facet,
           doc_count: 0
         }))
       }
 
-      if (!facets) {
+      if (!aggregations) {
         return null
       }
 
       return mergeFacetResults(
-        facets.get(group) || emptyFacet,
+        aggregations.get(group) || emptyFacet,
         emptyActiveFacets
       )
     },
-    [facets, activeFacets]
+    [aggregations, activeFacets]
   )
 
   const clearAllFilters = useCallback(() => {
-    setText(undefined)
+    setText("")
     setActiveFacets(INITIAL_FACET_STATE)
   }, [setText, setActiveFacets])
 
   const toggleFacet = useCallback(
-    (name, value, isEnabled) => {
+    (name: string, value: string, isEnabled: boolean) => {
       const newFacets = clone(activeFacets)
 
       if (isEnabled) {
@@ -83,7 +102,7 @@ export const useCourseSearch = (
   )
 
   const toggleFacets = useCallback(
-    facets => {
+    (facets: Array<[string, string, boolean]>) => {
       const newFacets = clone(activeFacets)
 
       facets.forEach(([name, value, isEnabled]) => {
@@ -99,22 +118,26 @@ export const useCourseSearch = (
   )
 
   const onUpdateFacets = useCallback(
-    e => {
-      toggleFacet(e.target.name, e.target.value, e.target.checked)
+    (e: MouseEvent<HTMLInputElement>) => {
+      toggleFacet(
+        (e.target as HTMLInputElement).name,
+        (e.target as HTMLInputElement).value,
+        (e.target as HTMLInputElement).checked
+      )
     },
     [toggleFacet]
   )
 
   const updateText = useCallback(
-    event => {
-      const text = event ? event.target.value : ""
+    (event: ChangeEvent): void => {
+      const text = event ? (event.target as HTMLInputElement).value : ""
       setText(text)
     },
     [setText]
   )
 
   const internalRunSearch = useCallback(
-    async (text, activeFacets, incremental = false) => {
+    async (text: string, activeFacets: Facets, incremental = false) => {
       let nextFrom = from + searchPageSize
 
       if (!incremental) {
@@ -160,7 +183,7 @@ export const useCourseSearch = (
   )
 
   const clearText = useCallback(
-    event => {
+    (event: MouseEvent) => {
       event.preventDefault()
       setText("")
       internalRunSearch("", activeFacets)
@@ -169,7 +192,7 @@ export const useCourseSearch = (
   )
 
   const acceptSuggestion = useCallback(
-    suggestion => {
+    (suggestion: string) => {
       setText(suggestion)
       internalRunSearch(suggestion, activeFacets)
     },
@@ -207,7 +230,7 @@ export const useCourseSearch = (
   }, [activeFacets])
 
   const onSubmit = useCallback(
-    e => {
+    (e: FormEvent): void => {
       e.preventDefault()
       internalRunSearch(text, activeFacets)
     },

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 
-export function useDidMountEffect(fn, deps) {
+export function useDidMountEffect(fn: () => void, deps: any[]): void {
   const renderedOnce = useRef(false)
 
   useEffect(() => {

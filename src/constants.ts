@@ -1,3 +1,5 @@
+import { Facets } from "./url_utils"
+
 export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_PROGRAM = "program"
 export const LR_TYPE_USERLIST = "userlist"
@@ -19,7 +21,7 @@ export const LR_TYPE_ALL = [
   LR_TYPE_RESOURCEFILE
 ]
 
-export const INITIAL_FACET_STATE = {
+export const INITIAL_FACET_STATE: Facets = {
   audience:        [],
   certification:   [],
   offered_by:      [],

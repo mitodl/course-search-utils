@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
 
@@ -15,7 +15,7 @@ import { useCourseSearch } from "./index"
 import { facetMap, wait } from "./test_util"
 import { serializeSearchParams } from "./url_utils"
 
-function FacetTestComponent(props) {
+function FacetTestComponent(props: any) {
   const {
     toggleFacet,
     onUpdateFacets,
@@ -35,7 +35,7 @@ function FacetTestComponent(props) {
   )
 }
 
-function TestComponent(props) {
+function TestComponent(props: any) {
   const {
     runSearch,
     clearSearch,
@@ -71,7 +71,7 @@ function TestComponent(props) {
     <div className="test-component">
       <div className="clear-text" onClick={clearText} />
       <div className="load-more" onClick={loadMore} />
-      <div className="accept-suggestion" onClick={acceptSuggestion} />
+      <div className="accept-suggestion" onClick={(text: any) => acceptSuggestion(text)} />
       <input onChange={updateText} value={text || ""} />
       <div className="submit" onClick={onSubmit} />
       <FacetTestComponent
@@ -118,7 +118,7 @@ const render = (props = {}) => {
 }
 
 describe("useCourseSearch", () => {
-  const checkSearchCall = (runSearch, expectation) => {
+  const checkSearchCall = (runSearch: jest.Mock, expectation: any[]) => {
     expect(runSearch.mock.calls[runSearch.mock.calls.length - 1]).toEqual(
       expectation
     )
@@ -174,8 +174,10 @@ describe("useCourseSearch", () => {
   it("should let you set filters, clear them", async () => {
     const { wrapper, runSearch, updateURLBar } = render()
     act(() => {
+      // @ts-ignore
       wrapper.find(".onUpdateFacets").prop("onClick")({
         target: {
+          // @ts-ignore
           name:    "topics",
           value:   "Mathematics",
           checked: true
@@ -201,7 +203,7 @@ describe("useCourseSearch", () => {
     )
 
     checkSearchCall(runSearch, [
-      undefined,
+      "",
       {
         ...INITIAL_FACET_STATE,
         type:   LR_TYPE_ALL,
@@ -211,7 +213,7 @@ describe("useCourseSearch", () => {
     ])
     wrapper.find(".clearAllFilters").simulate("click")
     checkSearchCall(runSearch, [
-      undefined,
+      "",
       {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
@@ -223,6 +225,7 @@ describe("useCourseSearch", () => {
   it("should let you accept a suggestion", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
+      // @ts-ignore
       wrapper.find(".accept-suggestion").prop("onClick")("my suggestion")
     })
     checkSearchCall(runSearch, [
@@ -238,10 +241,11 @@ describe("useCourseSearch", () => {
   it("should let you toggle a facet", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
+      // @ts-ignore
       wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
     })
     checkSearchCall(runSearch, [
-      undefined,
+      "",
       {
         ...INITIAL_FACET_STATE,
         type:  LR_TYPE_ALL,
@@ -254,6 +258,7 @@ describe("useCourseSearch", () => {
   it("should let you toggle multiple facets", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
+      // @ts-ignore
       wrapper.find(".toggleFacets").prop("onClick")([
         ["topic", "mathematics", true],
         ["type", LR_TYPE_COURSE, false],
@@ -261,7 +266,7 @@ describe("useCourseSearch", () => {
       ])
     })
     checkSearchCall(runSearch, [
-      undefined,
+      "",
       {
         ...INITIAL_FACET_STATE,
         type:  [LR_TYPE_RESOURCEFILE],
@@ -277,7 +282,7 @@ describe("useCourseSearch", () => {
       wrapper.find(".load-more").simulate("click")
     })
     checkSearchCall(runSearch, [
-      undefined,
+      "",
       {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
@@ -289,6 +294,7 @@ describe("useCourseSearch", () => {
   it("should have a function for getting facet options", async () => {
     const { wrapper } = render()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
+    // @ts-ignore
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LR_TYPE_VIDEO, doc_count: 8156 },
@@ -296,14 +302,17 @@ describe("useCourseSearch", () => {
         { key: LR_TYPE_PODCAST, doc_count: 1180 }
       ]
     })
+    // @ts-ignore
     expect(facetOptions("topics").buckets.length).toEqual(137)
   })
 
   it("should merge an empty active facet into the ones from the search backend", async () => {
     const { wrapper } = render()
     act(() => {
+      // @ts-ignore
       wrapper.find(".onUpdateFacets").prop("onClick")({
         target: {
+          // @ts-ignore
           name:    "type",
           value:   "Obstacle Course",
           checked: true
@@ -312,6 +321,7 @@ describe("useCourseSearch", () => {
     })
     wrapper.update()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
+    // @ts-ignore
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LR_TYPE_VIDEO, doc_count: 8156 },
