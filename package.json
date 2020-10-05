@@ -3,10 +3,8 @@
   "version": "1.0.4",
   "description": "JS utils for interacting with MIT Open Course search",
   "main": "dist/index.js",
-  "module": "src/index.js",
   "files": [
-    "dist/",
-    "src/"
+    "dist/"
   ],
   "scripts": {
     "test": "jest",

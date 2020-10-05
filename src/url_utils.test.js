@@ -9,11 +9,12 @@ describe("course search library", () => {
     it("should deserialize text from the URL", () => {
       expect(deserializeSearchParams({ search: "q=The Best Course" })).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        [],
-          type:          []
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: []
         },
         text: "The Best Course"
       })
@@ -22,11 +23,26 @@ describe("course search library", () => {
     it("should deserialize offered by", () => {
       expect(deserializeSearchParams({ search: "o=MITx" })).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    ["MITx"],
-          topics:        [],
-          type:          []
+          audience:        [],
+          certification:   [],
+          offered_by:      ["MITx"],
+          topics:          [],
+          type:            [],
+          department_name: []
+        },
+        text: undefined
+      })
+    })
+
+    it("should deserialize department_name", () => {
+      expect(deserializeSearchParams({ search: "d=Philosophy" })).toEqual({
+        activeFacets: {
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: ["Philosophy"]
         },
         text: undefined
       })
@@ -50,7 +66,8 @@ describe("course search library", () => {
             "Computer Science",
             "Electronics"
           ],
-          type: []
+          type:            [],
+          department_name: []
         },
         text: undefined
       })
@@ -59,11 +76,12 @@ describe("course search library", () => {
     it("should deserialize type from the URL", () => {
       expect(deserializeSearchParams({ search: "type=course" })).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        [],
-          type:          ["course"]
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            ["course"],
+          department_name: []
         },
         text: undefined
       })
@@ -72,11 +90,12 @@ describe("course search library", () => {
     it("should deserialize audience from the URL", () => {
       expect(deserializeSearchParams({ search: "a=Open%20Content" })).toEqual({
         activeFacets: {
-          audience:      ["Open Content"],
-          certification: [],
-          offered_by:    [],
-          topics:        [],
-          type:          []
+          audience:        ["Open Content"],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: []
         },
         text: undefined
       })
@@ -85,11 +104,12 @@ describe("course search library", () => {
     it("should deserialize certification from the URL", () => {
       expect(deserializeSearchParams({ search: "c=Certification" })).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: ["Certification"],
-          offered_by:    [],
-          topics:        [],
-          type:          []
+          audience:        [],
+          certification:   ["Certification"],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: []
         },
         text: undefined
       })
@@ -98,11 +118,12 @@ describe("course search library", () => {
     it("should ignore unknown params", () => {
       expect(deserializeSearchParams({ search: "eeee=beeeeeep" })).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        [],
-          type:          []
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: []
         },
         text: undefined
       })
@@ -110,6 +131,10 @@ describe("course search library", () => {
   })
 
   describe("serializeSearchParams", () => {
+    it("should be ok with missing facets", () => {
+      expect(serializeSearchParams({ text: "hey!" })).toEqual("q=hey%21")
+    })
+
     it("should serialize text to URL", () => {
       expect(
         serializeSearchParams({

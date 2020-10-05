@@ -20,9 +20,10 @@ export const LR_TYPE_ALL = [
 ]
 
 export const INITIAL_FACET_STATE = {
-  audience:      [],
-  certification: [],
-  offered_by:    [],
-  topics:        [],
-  type:          []
+  audience:        [],
+  certification:   [],
+  offered_by:      [],
+  topics:          [],
+  type:            [],
+  department_name: []
 }
