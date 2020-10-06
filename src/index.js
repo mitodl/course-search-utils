@@ -11,6 +11,7 @@ import {
   INITIAL_FACET_STATE
 } from "./constants"
 import { deserializeSearchParams, serializeSearchParams } from "./url_utils"
+import { useDidMountEffect } from "./hooks"
 
 export const mergeFacetResults = (...args) => ({
   buckets: args
@@ -31,8 +32,14 @@ export const useCourseSearch = (
 ) => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
-  const [text, setText] = useState("")
-  const [activeFacets, setActiveFacets] = useState(INITIAL_FACET_STATE)
+  const [text, setText] = useState(() => {
+    const { text } = deserializeSearchParams(window.location)
+    return text
+  })
+  const [activeFacets, setActiveFacets] = useState(() => {
+    const { activeFacets } = deserializeSearchParams(window.location)
+    return activeFacets
+  })
 
   const facetOptions = useCallback(
     group => {
@@ -172,9 +179,6 @@ export const useCourseSearch = (
   // this is our 'on startup' useEffect call
   useEffect(() => {
     clearSearch()
-    const { text, activeFacets } = deserializeSearchParams(window.location)
-    setText(text)
-    setActiveFacets(activeFacets)
     internalRunSearch(text, activeFacets)
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
@@ -198,13 +202,10 @@ export const useCourseSearch = (
   // facet-related callbacks (toggleFacet, etc) be dependent on then value of
   // the runSearch function, which leads to too much needless churn in the
   // facet callbacks and then causes excessive re-rendering of the facet UI
-  useEffect(
-    () => {
-      internalRunSearch(text, activeFacets)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeFacets]
-  )
+  useDidMountEffect(() => {
+    internalRunSearch(text, activeFacets)
+  }, [activeFacets])
+
   const onSubmit = useCallback(
     e => {
       e.preventDefault()
