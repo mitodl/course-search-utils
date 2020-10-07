@@ -13,7 +13,8 @@
     "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi $PWD/'src/**/*.js'",
     "fmt:check": "LOG_LEVEL= prettier-eslint --list-different --no-semi $PWD/'src/**/*.js'",
     "babel": "babel src --ignore src/*.test.js,src/test_util.js,src/test_setup.js -d dist",
-    "prepack": "npm run babel"
+    "prepack": "npm run babel",
+    "start": "cd test-application && npm start"
   },
   "repository": {
     "type": "git",
