@@ -17,6 +17,7 @@ export interface Facets {
   offered_by: string[] // eslint-disable-line camelcase
   topics: string[]
   department_name: string[] // eslint-disable-line camelcase
+  level: string[]
 }
 
 type SearchParams = {
@@ -36,7 +37,7 @@ const handleText = (q: ParsedParam): string => {
 }
 
 export const deserializeSearchParams = (location: Location): SearchParams => {
-  const { type, o, t, q, a, c, d } = qs.parse(location.search)
+  const { type, o, t, q, a, c, d, l } = qs.parse(location.search)
 
   return {
     text:         handleText(q),
@@ -46,7 +47,8 @@ export const deserializeSearchParams = (location: Location): SearchParams => {
       type:            urlParamToArray(type),
       offered_by:      urlParamToArray(o), // eslint-disable-line camelcase
       topics:          urlParamToArray(t),
-      department_name: urlParamToArray(d) // eslint-disable-line camelcase
+      department_name: urlParamToArray(d), // eslint-disable-line camelcase
+      level:           urlParamToArray(l)
     }
   }
 }
@@ -55,9 +57,15 @@ export const serializeSearchParams = ({
   text,
   activeFacets
 }: Partial<SearchParams>): string => {
-  // eslint-disable-next-line camelcase
-  const { type, offered_by, topics, audience, certification, department_name } =
-    activeFacets ?? {}
+  const {
+    type,
+    offered_by, // eslint-disable-line camelcase
+    topics,
+    audience,
+    certification,
+    department_name, // eslint-disable-line camelcase
+    level
+  } = activeFacets ?? {}
 
   return qs.stringify({
     q: text || undefined,
@@ -66,6 +74,7 @@ export const serializeSearchParams = ({
     c: certification,
     o: offered_by,
     t: topics,
-    d: department_name
+    d: department_name,
+    l: level
   })
 }

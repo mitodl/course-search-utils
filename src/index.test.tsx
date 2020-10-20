@@ -71,7 +71,10 @@ function TestComponent(props: any) {
     <div className="test-component">
       <div className="clear-text" onClick={clearText} />
       <div className="load-more" onClick={loadMore} />
-      <div className="accept-suggestion" onClick={(text: any) => acceptSuggestion(text)} />
+      <div
+        className="accept-suggestion"
+        onClick={(text: any) => acceptSuggestion(text)}
+      />
       <input onChange={updateText} value={text || ""} />
       <div className="submit" onClick={onSubmit} />
       <FacetTestComponent

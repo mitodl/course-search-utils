@@ -12,7 +12,7 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:cache": "eslint src --ext .js,.jsx,.ts,.tsx --cache",
     "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi $PWD/'src/**/*.ts' $PWD/'src/**/*.tsx'",
-    "fmt:check": "LOG_LEVEL= prettier-eslint --list-different --no-semi $PWD/'src/**/*.js'",
+    "fmt:check": "LOG_LEVEL= prettier-eslint --list-different --no-semi $PWD/'src/**/*.ts' $PWD/'src/**/*.tsx'",
     "typescript": "rm -rf dist && rm -f .tsbuildinfo && tsc",
     "typecheck": "tsc --noEmit",
     "prepack": "npm run typescript",

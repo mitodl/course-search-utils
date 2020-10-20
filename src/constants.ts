@@ -27,5 +27,6 @@ export const INITIAL_FACET_STATE: Facets = {
   offered_by:      [],
   topics:          [],
   type:            [],
-  department_name: []
+  department_name: [],
+  level:           []
 }

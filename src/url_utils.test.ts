@@ -16,7 +16,8 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: "The Best Course"
       })
@@ -30,7 +31,8 @@ describe("course search library", () => {
           offered_by:      ["MITx"],
           topics:          [],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: ""
       })
@@ -44,7 +46,8 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            [],
-          department_name: ["Philosophy"]
+          department_name: ["Philosophy"],
+          level:           []
         },
         text: ""
       })
@@ -69,7 +72,8 @@ describe("course search library", () => {
             "Electronics"
           ],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: ""
       })
@@ -83,7 +87,8 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            ["course"],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: ""
       })
@@ -97,7 +102,8 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: ""
       })
@@ -111,7 +117,23 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
+        },
+        text: ""
+      })
+    })
+
+    it("should deserialize level from the URL", () => {
+      expect(deserializeSearchParams({ search: "l=Graduate" })).toEqual({
+        activeFacets: {
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          type:            [],
+          department_name: [],
+          level:           ["Graduate"]
         },
         text: ""
       })
@@ -125,7 +147,8 @@ describe("course search library", () => {
           offered_by:      [],
           topics:          [],
           type:            [],
-          department_name: []
+          department_name: [],
+          level:           []
         },
         text: ""
       })
@@ -171,6 +194,16 @@ describe("course search library", () => {
       ).toEqual(
         "t=Science&t=Physics&t=Chemistry&t=Computer%20Science&t=Electronics"
       )
+    })
+
+    it("should serialize level", () => {
+      expect(
+        serializeSearchParams({
+          activeFacets: {
+            level: ["Graduate"]
+          }
+        })
+      ).toEqual("l=Graduate")
     })
 
     it("should serialize offered by", () => {
