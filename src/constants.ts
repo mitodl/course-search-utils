@@ -22,11 +22,12 @@ export const LR_TYPE_ALL = [
 ]
 
 export const INITIAL_FACET_STATE: Facets = {
-  audience:        [],
-  certification:   [],
-  offered_by:      [],
-  topics:          [],
-  type:            [],
-  department_name: [],
-  level:           []
+  audience:            [],
+  certification:       [],
+  offered_by:          [],
+  topics:              [],
+  type:                [],
+  department_name:     [],
+  level:               [],
+  course_feature_tags: []
 }
