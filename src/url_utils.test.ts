@@ -11,13 +11,14 @@ describe("course search library", () => {
     it("should deserialize text from the URL", () => {
       expect(deserializeSearchParams({ search: "q=The Best Course" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           []
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: "The Best Course"
       })
@@ -26,13 +27,14 @@ describe("course search library", () => {
     it("should deserialize offered by", () => {
       expect(deserializeSearchParams({ search: "o=MITx" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      ["MITx"],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           []
+          audience:            [],
+          certification:       [],
+          offered_by:          ["MITx"],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -41,13 +43,14 @@ describe("course search library", () => {
     it("should deserialize department_name", () => {
       expect(deserializeSearchParams({ search: "d=Philosophy" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: ["Philosophy"],
-          level:           []
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     ["Philosophy"],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -71,9 +74,10 @@ describe("course search library", () => {
             "Computer Science",
             "Electronics"
           ],
-          type:            [],
-          department_name: [],
-          level:           []
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -82,13 +86,14 @@ describe("course search library", () => {
     it("should deserialize type from the URL", () => {
       expect(deserializeSearchParams({ search: "type=course" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            ["course"],
-          department_name: [],
-          level:           []
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                ["course"],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -97,13 +102,14 @@ describe("course search library", () => {
     it("should deserialize audience from the URL", () => {
       expect(deserializeSearchParams({ search: "a=Open%20Content" })).toEqual({
         activeFacets: {
-          audience:        ["Open Content"],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           []
+          audience:            ["Open Content"],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -112,13 +118,14 @@ describe("course search library", () => {
     it("should deserialize certification from the URL", () => {
       expect(deserializeSearchParams({ search: "c=Certification" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   ["Certification"],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           []
+          audience:            [],
+          certification:       ["Certification"],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -127,13 +134,40 @@ describe("course search library", () => {
     it("should deserialize level from the URL", () => {
       expect(deserializeSearchParams({ search: "l=Graduate" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           ["Graduate"]
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               ["Graduate"],
+          course_feature_tags: []
+        },
+        text: ""
+      })
+    })
+
+    it("should deserialize course feature tags from the URL", () => {
+      expect(
+        deserializeSearchParams({
+          search:
+            "f=Exams%20with%20Solutions&f=Exams&f=Media%20Assignments&f=Media%20Assignments%20with%20Examples"
+        })
+      ).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [
+            "Exams with Solutions",
+            "Exams",
+            "Media Assignments",
+            "Media Assignments with Examples"
+          ]
         },
         text: ""
       })
@@ -142,13 +176,14 @@ describe("course search library", () => {
     it("should ignore unknown params", () => {
       expect(deserializeSearchParams({ search: "eeee=beeeeeep" })).toEqual({
         activeFacets: {
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          type:            [],
-          department_name: [],
-          level:           []
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: []
         },
         text: ""
       })
@@ -244,6 +279,23 @@ describe("course search library", () => {
           }
         })
       ).toEqual("c=Certificate")
+    })
+
+    it("should serialize course_feature_tags", () => {
+      expect(
+        serializeSearchParams({
+          activeFacets: {
+            course_feature_tags: [
+              "Exams with Solutions",
+              "Exams",
+              "Media Assignments",
+              "Media Assignments with Examples"
+            ]
+          }
+        })
+      ).toEqual(
+        "f=Exams%20with%20Solutions&f=Exams&f=Media%20Assignments&f=Media%20Assignments%20with%20Examples"
+      )
     })
   })
 
