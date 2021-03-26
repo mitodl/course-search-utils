@@ -18,7 +18,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: "The Best Course"
       })
@@ -34,7 +35,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -50,7 +52,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     ["Philosophy"],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -77,7 +80,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -93,7 +97,8 @@ describe("course search library", () => {
           type:                ["course"],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -109,7 +114,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -125,7 +131,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -141,7 +148,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               ["Graduate"],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -162,12 +170,34 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
+          resource_type:       [],
           course_feature_tags: [
             "Exams with Solutions",
             "Exams",
             "Media Assignments",
             "Media Assignments with Examples"
           ]
+        },
+        text: ""
+      })
+    })
+
+    it("should deserialize resource type from the URL", () => {
+      expect(
+        deserializeSearchParams({
+          search: "r=Assignments&r=Exams&r=Lecture%20Notes"
+        })
+      ).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       ["Assignments", "Exams", "Lecture Notes"]
         },
         text: ""
       })
@@ -183,7 +213,8 @@ describe("course search library", () => {
           type:                [],
           department_name:     [],
           level:               [],
-          course_feature_tags: []
+          course_feature_tags: [],
+          resource_type:       []
         },
         text: ""
       })
@@ -296,6 +327,16 @@ describe("course search library", () => {
       ).toEqual(
         "f=Exams%20with%20Solutions&f=Exams&f=Media%20Assignments&f=Media%20Assignments%20with%20Examples"
       )
+    })
+
+    it("should serialize resource_type", () => {
+      expect(
+        serializeSearchParams({
+          activeFacets: {
+            resource_type: ["Assignments", "Exams", "Lecture Notes"]
+          }
+        })
+      ).toEqual("r=Assignments&r=Exams&r=Lecture%20Notes")
     })
   })
 
