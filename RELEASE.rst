@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 1.2.0
+Version 1.2.0 (Released May 04, 2021)
 -------------
 
 - Add to history stack on changes to search UI, and support back button (#17)
