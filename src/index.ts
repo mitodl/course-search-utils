@@ -8,6 +8,7 @@ import {
 } from "react"
 import { unionWith, eqBy, prop, either, isEmpty, clone, isNil } from "ramda"
 import _ from "lodash"
+import { createBrowserHistory } from "history"
 
 import {
   LR_TYPE_ALL,
@@ -41,6 +42,8 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
     .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
 })
 
+const history = createBrowserHistory()
+
 // disabling rule here because all functions and values returned by the hook are
 // fully typed, so writing out the explicit return type for this thing is redundant
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -51,7 +54,6 @@ export const useCourseSearch = (
     nextFrom: number
   ) => Promise<void>,
   clearSearch: () => void,
-  updateURLBar: (newSearch: string) => void,
   aggregations: Aggregations,
   loaded: boolean,
   searchPageSize: number
@@ -171,22 +173,27 @@ export const useCourseSearch = (
       await runSearch(text, searchFacets, nextFrom)
 
       // search is updated, now echo params to URL bar
-      updateURLBar(
-        serializeSearchParams({
-          text,
-          activeFacets
-        })
-      )
+      const currentSearch = window.location.search
+      const newSearch = serializeSearchParams({
+        text,
+        activeFacets
+      })
+      if (`?${newSearch}` !== currentSearch) {
+        history.push(`?${newSearch}`)
+      }
     },
-    [
-      from,
-      setFrom,
-      setIncremental,
-      clearSearch,
-      runSearch,
-      updateURLBar,
-      searchPageSize
-    ]
+    [from, setFrom, setIncremental, clearSearch, runSearch, searchPageSize]
+  )
+
+  const initSearch = useCallback(
+    (location: Location) => {
+      const { text, activeFacets } = deserializeSearchParams(location)
+      clearSearch()
+      setText(text)
+      setActiveFacets(activeFacets)
+      internalRunSearch(text, activeFacets)
+    },
+    [internalRunSearch, clearSearch, setText, setActiveFacets]
   )
 
   const clearText = useCallback(
@@ -208,13 +215,30 @@ export const useCourseSearch = (
 
   // this is our 'on startup' useEffect call
   useEffect(() => {
-    clearSearch()
-    internalRunSearch(text, activeFacets)
+    initSearch(window.location)
+
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
     // based on the value of the URL (if any)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    // We push browser state into the history when a piece of the URL changes. However
+    // pressing the back button will update the browser stack but the UI does not respond by default.
+    // So we have to trigger this change explicitly.
+    const unlisten = history.listen(({ location, action }) => {
+      if (action === "POP") {
+        // back button pressed
+        // @ts-ignore
+        initSearch(location)
+      }
+    })
+
+    return () => {
+      unlisten()
+    }
+  })
 
   const loadMore = useCallback(() => {
     if (!loaded) {

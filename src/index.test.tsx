@@ -1,6 +1,14 @@
 import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
+import { createMemoryHistory } from "history"
+
+const memoryHistory = createMemoryHistory()
+jest.mock("history", () => ({
+  // @ts-ignore
+  ...jest.requireActual("history"),
+  createBrowserHistory: () => memoryHistory
+}))
 
 import {
   LR_TYPE_ALL,
@@ -36,14 +44,7 @@ function FacetTestComponent(props: any) {
 }
 
 function TestComponent(props: any) {
-  const {
-    runSearch,
-    clearSearch,
-    updateURLBar,
-    facets,
-    loaded,
-    searchPageSize
-  } = props
+  const { runSearch, clearSearch, facets, loaded, searchPageSize } = props
 
   const {
     facetOptions,
@@ -58,14 +59,7 @@ function TestComponent(props: any) {
     text,
     activeFacets,
     onSubmit
-  } = useCourseSearch(
-    runSearch,
-    clearSearch,
-    updateURLBar,
-    facets,
-    loaded,
-    searchPageSize
-  )
+  } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize)
 
   return (
     <div className="test-component">
@@ -92,7 +86,6 @@ function TestComponent(props: any) {
 const render = (props = {}) => {
   const runSearch = jest.fn()
   const clearSearch = jest.fn()
-  const updateURLBar = jest.fn()
   const facets = facetMap
   const loaded = true
   const searchPageSize = 10
@@ -101,7 +94,6 @@ const render = (props = {}) => {
     <TestComponent
       runSearch={runSearch}
       clearSearch={clearSearch}
-      updateURLBar={updateURLBar}
       facets={facets}
       loaded={loaded}
       searchPageSize={searchPageSize}
@@ -113,7 +105,6 @@ const render = (props = {}) => {
     wrapper,
     runSearch,
     clearSearch,
-    updateURLBar,
     facets,
     loaded,
     searchPageSize
@@ -154,7 +145,7 @@ describe("useCourseSearch", () => {
 
   it("should let you run a search, which should echo to URL bar", async () => {
     const text = "My New Search Text"
-    const { wrapper, runSearch, updateURLBar } = render()
+    const { wrapper, runSearch } = render()
     wrapper.find("input").simulate("change", { target: { value: text } })
     wrapper.find(".submit").simulate("click")
     checkSearchCall(runSearch, [
@@ -167,15 +158,13 @@ describe("useCourseSearch", () => {
     ])
     wrapper.update()
     await wait(1)
-    expect(
-      updateURLBar.mock.calls[updateURLBar.mock.calls.length - 1]
-    ).toEqual([
-      serializeSearchParams({ text, activeFacets: INITIAL_FACET_STATE })
-    ])
+    expect(memoryHistory.location.search).toEqual(
+      `?${serializeSearchParams({ text, activeFacets: INITIAL_FACET_STATE })}`
+    )
   })
 
   it("should let you set filters, clear them", async () => {
-    const { wrapper, runSearch, updateURLBar } = render()
+    const { wrapper, runSearch } = render()
     act(() => {
       // @ts-ignore
       wrapper.find(".onUpdateFacets").prop("onClick")({
@@ -193,16 +182,15 @@ describe("useCourseSearch", () => {
       topics: ["Mathematics"]
     })
     await wait(1)
-    expect(updateURLBar.mock.calls[updateURLBar.mock.calls.length - 1]).toEqual(
-      [
-        serializeSearchParams({
-          text:         "",
-          activeFacets: {
-            ...INITIAL_FACET_STATE,
-            topics: ["Mathematics"]
-          }
-        })
-      ]
+
+    expect(memoryHistory.location.search).toEqual(
+      `?${serializeSearchParams({
+        text:         "",
+        activeFacets: {
+          ...INITIAL_FACET_STATE,
+          topics: ["Mathematics"]
+        }
+      })}`
     )
 
     checkSearchCall(runSearch, [
@@ -333,5 +321,25 @@ describe("useCourseSearch", () => {
         { key: "Obstacle Course", doc_count: 0 }
       ]
     })
+  })
+
+  it("should update the state when the back button is pressed", async () => {
+    const text = "My New Search Text"
+    const { wrapper } = render()
+    await act(async () => {
+      await wrapper
+        .find("input")
+        .simulate("change", { target: { value: text } })
+      await wrapper.find(".submit").simulate("click")
+    })
+    await wait(1)
+
+    expect(wrapper.find("input").prop("value")).toBe(text)
+    act(() => {
+      memoryHistory.back()
+    })
+    await wait(1)
+    wrapper.update()
+    expect(wrapper.find("input").prop("value")).toBe("")
   })
 })
