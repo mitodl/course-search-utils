@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 1.2.1
+Version 1.2.1 (Released May 05, 2021)
 -------------
 
 - Fix edge cases regarding back button behavior (#19)
