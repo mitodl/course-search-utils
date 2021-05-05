@@ -112,6 +112,22 @@ const render = (props = {}) => {
 }
 
 describe("useCourseSearch", () => {
+  // @ts-ignore
+  let memoryStack, memoryUnlisten
+  beforeEach(() => {
+    // @ts-ignore
+    window.location = "http://localhost:3000/search"
+    memoryStack = []
+    memoryUnlisten = memoryHistory.listen(location => {
+      memoryStack.push(location)
+    })
+  })
+
+  afterEach(() => {
+    // @ts-ignore
+    memoryUnlisten()
+  })
+
   const checkSearchCall = (runSearch: jest.Mock, expectation: any[]) => {
     expect(runSearch.mock.calls[runSearch.mock.calls.length - 1]).toEqual(
       expectation
@@ -341,5 +357,57 @@ describe("useCourseSearch", () => {
     await wait(1)
     wrapper.update()
     expect(wrapper.find("input").prop("value")).toBe("")
+  })
+
+  it("should initialize with search parameters from window.location", async () => {
+    // @ts-ignore
+    window.location = "http://localhost:3000/search/?q=sometext&t=Science"
+    const { wrapper } = render()
+    await wait(1)
+
+    const facets = wrapper.find(FacetTestComponent).prop("activeFacets")
+    expect(facets).toStrictEqual({
+      audience:            [],
+      certification:       [],
+      type:                [],
+      offered_by:          [],
+      topics:              ["Science"],
+      department_name:     [],
+      level:               [],
+      course_feature_tags: [],
+      resource_type:       []
+    })
+    const text = wrapper.find("input").prop("value")
+    expect(text).toBe("sometext")
+  })
+
+  it("should sanitize window.location params so no extra paths are pushed onto stack", async () => {
+    // @ts-ignore
+    window.location = "http://localhost:3000/search/?q="
+    render()
+    await wait(1)
+    // @ts-ignore
+    expect(memoryStack).toStrictEqual([])
+  })
+
+  it("should update the URL when search is rerun and parameters are different", async () => {
+    // @ts-ignore
+    const { wrapper } = render()
+    await wait(1)
+    // @ts-ignore
+    wrapper
+      .find("input")
+      .simulate("change", { target: { value: "search text goes here" } })
+    wrapper.find(".submit").simulate("click")
+    await wait(1)
+
+    // @ts-ignore
+    expect(memoryStack.length).toBe(1)
+    // @ts-ignore
+    expect(memoryStack[0].action).toBe("PUSH")
+    // @ts-ignore
+    expect(memoryStack[0].location.search).toBe(
+      "?q=search%20text%20goes%20here"
+    )
   })
 })
