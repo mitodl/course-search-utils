@@ -239,6 +239,7 @@ export const useCourseSearch = (
     return () => {
       unlisten()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const loadMore = useCallback(() => {
