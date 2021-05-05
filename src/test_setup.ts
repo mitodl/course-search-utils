@@ -22,12 +22,12 @@ Object.defineProperty(window, "location", {
     if (!value.startsWith("http")) {
       value = `http://fake${value}`
     }
-    window._URL = value
+    window._location = value
   },
 
   get: () => {
     if (window._location) {
-      return window._location
+      return new URL(window._location)
     } else {
       const location = new Location()
       window._location = location

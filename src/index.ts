@@ -173,12 +173,14 @@ export const useCourseSearch = (
       await runSearch(text, searchFacets, nextFrom)
 
       // search is updated, now echo params to URL bar
-      const currentSearch = window.location.search
+      const currentSearch = serializeSearchParams(
+        deserializeSearchParams(window.location)
+      )
       const newSearch = serializeSearchParams({
         text,
         activeFacets
       })
-      if (`?${newSearch}` !== currentSearch) {
+      if (currentSearch !== newSearch) {
         history.push(`?${newSearch}`)
       }
     },
@@ -191,9 +193,8 @@ export const useCourseSearch = (
       clearSearch()
       setText(text)
       setActiveFacets(activeFacets)
-      internalRunSearch(text, activeFacets)
     },
-    [internalRunSearch, clearSearch, setText, setActiveFacets]
+    [clearSearch, setText, setActiveFacets]
   )
 
   const clearText = useCallback(
@@ -238,7 +239,8 @@ export const useCourseSearch = (
     return () => {
       unlisten()
     }
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const loadMore = useCallback(() => {
     if (!loaded) {
