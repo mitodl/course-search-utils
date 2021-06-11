@@ -19,9 +19,12 @@ import {
   INITIAL_FACET_STATE
 } from "./constants"
 import {
+  FacetsAndSort,
   Facets,
   deserializeSearchParams,
-  serializeSearchParams
+  deserializeSort,
+  serializeSearchParams,
+  SortParam
 } from "./url_utils"
 import { useDidMountEffect } from "./hooks"
 
@@ -51,7 +54,8 @@ export const useCourseSearch = (
   runSearch: (
     text: string,
     searchFacets: Facets,
-    nextFrom: number
+    nextFrom: number,
+    sort?: SortParam | null
   ) => Promise<void>,
   clearSearch: () => void,
   aggregations: Aggregations,
@@ -64,14 +68,17 @@ export const useCourseSearch = (
     const { text } = deserializeSearchParams(window.location)
     return text
   })
-  const [activeFacets, setActiveFacets] = useState<Facets>(() => {
-    const { activeFacets } = deserializeSearchParams(window.location)
-    return activeFacets
-  })
+  const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
+    () => {
+      const { activeFacets, sort } = deserializeSearchParams(window.location)
+      return { activeFacets, sort }
+    }
+  )
 
   const facetOptions = useCallback(
     (group: string): Aggregation | null => {
       const emptyFacet = { buckets: [] }
+      const { activeFacets } = activeFacetsAndSort
       const emptyActiveFacets = {
         buckets: (activeFacets[group] || []).map((facet: string) => ({
           key:       facet,
@@ -88,16 +95,20 @@ export const useCourseSearch = (
         emptyActiveFacets
       )
     },
-    [aggregations, activeFacets]
+    [aggregations, activeFacetsAndSort]
   )
 
   const clearAllFilters = useCallback(() => {
     setText("")
-    setActiveFacets(INITIAL_FACET_STATE)
-  }, [setText, setActiveFacets])
+    setActiveFacetsAndSort({
+      activeFacets: INITIAL_FACET_STATE,
+      sort:         null
+    })
+  }, [setText, setActiveFacetsAndSort])
 
   const toggleFacet = useCallback(
     (name: string, value: string, isEnabled: boolean) => {
+      const { activeFacets, sort } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
       if (isEnabled) {
@@ -105,13 +116,14 @@ export const useCourseSearch = (
       } else {
         newFacets[name] = _.without(newFacets[name] || [], value)
       }
-      setActiveFacets(newFacets)
+      setActiveFacetsAndSort({ activeFacets: newFacets, sort })
     },
-    [activeFacets, setActiveFacets]
+    [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
   const toggleFacets = useCallback(
     (facets: Array<[string, string, boolean]>) => {
+      const { activeFacets, sort } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
       facets.forEach(([name, value, isEnabled]) => {
@@ -121,9 +133,9 @@ export const useCourseSearch = (
           newFacets[name] = _.without(newFacets[name] || [], value)
         }
       })
-      setActiveFacets(newFacets)
+      setActiveFacetsAndSort({ activeFacets: newFacets, sort })
     },
-    [activeFacets, setActiveFacets]
+    [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
   const onUpdateFacets = useCallback(
@@ -145,8 +157,22 @@ export const useCourseSearch = (
     [setText]
   )
 
+  const updateSort = useCallback(
+    (event: ChangeEvent): void => {
+      const param = event ? (event.target as HTMLSelectElement).value : ""
+      const newSort = deserializeSort(param)
+      const { activeFacets } = activeFacetsAndSort
+      setActiveFacetsAndSort({ activeFacets, sort: newSort }) // this will cause a search via useDidMountEffect
+    },
+    [setActiveFacetsAndSort, activeFacetsAndSort]
+  )
+
   const internalRunSearch = useCallback(
-    async (text: string, activeFacets: Facets, incremental = false) => {
+    async (
+      text: string,
+      activeFacetsAndSort: FacetsAndSort,
+      incremental = false
+    ) => {
       let nextFrom = from + searchPageSize
 
       if (!incremental) {
@@ -156,6 +182,7 @@ export const useCourseSearch = (
       setFrom(nextFrom)
       setIncremental(incremental)
 
+      const { activeFacets, sort } = activeFacetsAndSort
       const searchFacets = clone(activeFacets)
 
       if (emptyOrNil(searchFacets.type)) {
@@ -170,7 +197,7 @@ export const useCourseSearch = (
         }
       }
 
-      await runSearch(text, searchFacets, nextFrom)
+      await runSearch(text, searchFacets, nextFrom, sort)
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
@@ -178,7 +205,8 @@ export const useCourseSearch = (
       )
       const newSearch = serializeSearchParams({
         text,
-        activeFacets
+        activeFacets,
+        sort
       })
       if (currentSearch !== newSearch) {
         history.push(`?${newSearch}`)
@@ -189,29 +217,29 @@ export const useCourseSearch = (
 
   const initSearch = useCallback(
     (location: Location) => {
-      const { text, activeFacets } = deserializeSearchParams(location)
+      const { text, activeFacets, sort } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
-      setActiveFacets(activeFacets)
+      setActiveFacetsAndSort({ activeFacets, sort })
     },
-    [clearSearch, setText, setActiveFacets]
+    [clearSearch, setText, setActiveFacetsAndSort]
   )
 
   const clearText = useCallback(
     (event: MouseEvent) => {
       event.preventDefault()
       setText("")
-      internalRunSearch("", activeFacets)
+      internalRunSearch("", activeFacetsAndSort)
     },
-    [activeFacets, setText, internalRunSearch]
+    [activeFacetsAndSort, setText, internalRunSearch]
   )
 
   const acceptSuggestion = useCallback(
     (suggestion: string) => {
       setText(suggestion)
-      internalRunSearch(suggestion, activeFacets)
+      internalRunSearch(suggestion, activeFacetsAndSort)
     },
-    [setText, activeFacets, internalRunSearch]
+    [setText, activeFacetsAndSort, internalRunSearch]
   )
 
   // this is our 'on startup' useEffect call
@@ -248,28 +276,29 @@ export const useCourseSearch = (
       return
     }
 
-    internalRunSearch(text, activeFacets, true)
-  }, [internalRunSearch, loaded, text, activeFacets])
+    internalRunSearch(text, activeFacetsAndSort, true)
+  }, [internalRunSearch, loaded, text, activeFacetsAndSort])
 
-  // this effect here basically listens to activeFacets for changes and re-runs
-  // the search whenever it changes. we always want the facet changes to take
+  // this effect here basically listens to parts of the search UI which should cause an immediate rerun of
+  // the search whenever they change. we always want these changes to take
   // effect immediately, so we need to either do this or call runSearch from
   // our facet-related callbacks. this approach lets us avoid having the
   // facet-related callbacks (toggleFacet, etc) be dependent on then value of
   // the runSearch function, which leads to too much needless churn in the
   // facet callbacks and then causes excessive re-rendering of the facet UI
   useDidMountEffect(() => {
-    internalRunSearch(text, activeFacets)
-  }, [activeFacets])
+    internalRunSearch(text, activeFacetsAndSort)
+  }, [activeFacetsAndSort])
 
   const onSubmit = useCallback(
     (e: FormEvent): void => {
       e.preventDefault()
-      internalRunSearch(text, activeFacets)
+      internalRunSearch(text, activeFacetsAndSort)
     },
-    [internalRunSearch, text, activeFacets]
+    [internalRunSearch, text, activeFacetsAndSort]
   )
 
+  const { sort, activeFacets } = activeFacetsAndSort
   return {
     facetOptions,
     clearAllFilters,
@@ -278,10 +307,12 @@ export const useCourseSearch = (
     onUpdateFacets,
     updateText,
     clearText,
+    updateSort,
     acceptSuggestion,
     loadMore,
     incremental,
     text,
+    sort,
     activeFacets,
     onSubmit,
     from

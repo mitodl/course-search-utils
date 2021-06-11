@@ -22,9 +22,20 @@ export interface Facets {
   resource_type: string[] // eslint-disable-line camelcase
 }
 
+export interface SortParam {
+  field: string
+  option: string
+}
+
+export interface FacetsAndSort {
+  activeFacets: Facets
+  sort: SortParam | null
+}
+
 type SearchParams = {
   text: string
   activeFacets: Facets
+  sort: SortParam | null
 }
 
 const handleText = (q: ParsedParam): string => {
@@ -38,8 +49,26 @@ const handleText = (q: ParsedParam): string => {
   return q
 }
 
+export const deserializeSort = (sortParam: string): SortParam | null => {
+  if (!sortParam) {
+    return null
+  }
+
+  if (sortParam.startsWith("-")) {
+    return {
+      field:  sortParam.slice(1),
+      option: "desc"
+    }
+  } else {
+    return {
+      field:  sortParam,
+      option: "asc"
+    }
+  }
+}
+
 export const deserializeSearchParams = (location: Location): SearchParams => {
-  const { type, o, t, q, a, c, d, l, f, r } = qs.parse(location.search)
+  const { type, o, t, q, a, c, d, l, f, r, s } = qs.parse(location.search)
 
   return {
     text:         handleText(q),
@@ -53,13 +82,28 @@ export const deserializeSearchParams = (location: Location): SearchParams => {
       level:               urlParamToArray(l),
       course_feature_tags: urlParamToArray(f), // eslint-disable-line camelcase
       resource_type:       urlParamToArray(r) // eslint-disable-line camelcase
-    }
+    },
+    sort: deserializeSort(handleText(s))
+  }
+}
+
+export const serializeSort = (sort: SortParam | null): string | undefined => {
+  if (sort === null) {
+    // leave it off the params if set to default
+    return undefined
+  }
+
+  if (sort.option === "desc") {
+    return `-${sort.field}`
+  } else {
+    return sort.field
   }
 }
 
 export const serializeSearchParams = ({
   text,
-  activeFacets
+  activeFacets,
+  sort
 }: Partial<SearchParams>): string => {
   const {
     type,
@@ -83,6 +127,7 @@ export const serializeSearchParams = ({
     d: department_name,
     l: level,
     f: course_feature_tags,
-    r: resource_type
+    r: resource_type,
+    s: serializeSort(sort || null)
   })
 }
