@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 1.3.0
+-------------
+
+- Implement sort parameter (#22)
+
 Version 1.2.1 (Released May 05, 2021)
 -------------
 
