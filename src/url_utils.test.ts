@@ -21,7 +21,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: "The Best Course"
+        text: "The Best Course",
+        sort: null
       })
     })
 
@@ -38,7 +39,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -55,7 +57,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -83,7 +86,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -100,7 +104,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -117,7 +122,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -134,7 +140,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -151,7 +158,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -178,7 +186,8 @@ describe("course search library", () => {
             "Media Assignments with Examples"
           ]
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
 
@@ -199,7 +208,50 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       ["Assignments", "Exams", "Lecture Notes"]
         },
-        text: ""
+        text: "",
+        sort: null
+      })
+    })
+
+    it("should deserialize an ascending sort param", () => {
+      expect(deserializeSearchParams({ search: "s=coursenum" })).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
+        },
+        text: "",
+        sort: {
+          field:  "coursenum",
+          option: "asc"
+        }
+      })
+    })
+
+    it("should deserialize a descending sort param", () => {
+      expect(deserializeSearchParams({ search: "s=-coursenum" })).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
+        },
+        text: "",
+        sort: {
+          field:  "coursenum",
+          option: "desc"
+        }
       })
     })
 
@@ -216,7 +268,8 @@ describe("course search library", () => {
           course_feature_tags: [],
           resource_type:       []
         },
-        text: ""
+        text: "",
+        sort: null
       })
     })
   })
@@ -337,6 +390,28 @@ describe("course search library", () => {
           }
         })
       ).toEqual("r=Assignments&r=Exams&r=Lecture%20Notes")
+    })
+
+    it("should serialize sort for ascending params", () => {
+      expect(
+        serializeSearchParams({
+          sort: {
+            field:  "coursenum",
+            option: "asc"
+          }
+        })
+      ).toEqual("s=coursenum")
+    })
+
+    it("should serialize sort for descending params", () => {
+      expect(
+        serializeSearchParams({
+          sort: {
+            field:  "coursenum",
+            option: "desc"
+          }
+        })
+      ).toEqual("s=-coursenum")
     })
   })
 

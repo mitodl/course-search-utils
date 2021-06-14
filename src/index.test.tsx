@@ -21,7 +21,7 @@ import {
 
 import { useCourseSearch } from "./index"
 import { facetMap, wait } from "./test_util"
-import { serializeSearchParams } from "./url_utils"
+import { serializeSort, serializeSearchParams } from "./url_utils"
 
 function FacetTestComponent(props: any) {
   const {
@@ -58,7 +58,9 @@ function TestComponent(props: any) {
     loadMore,
     text,
     activeFacets,
-    onSubmit
+    onSubmit,
+    sort,
+    updateSort
   } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize)
 
   return (
@@ -70,6 +72,14 @@ function TestComponent(props: any) {
         onClick={(text: any) => acceptSuggestion(text)}
       />
       <input onChange={updateText} value={text || ""} />
+      <select
+        className="sort"
+        onChange={updateSort}
+        value={serializeSort(sort)}
+      >
+        <option value="coursenum">Course number</option>
+        <option value="">Relevance</option>
+      </select>
       <div className="submit" onClick={onSubmit} />
       <FacetTestComponent
         clearAllFilters={clearAllFilters}
@@ -155,7 +165,27 @@ describe("useCourseSearch", () => {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
       },
-      0
+      0,
+      null
+    ])
+  })
+
+  it("should let you update the sort", async () => {
+    const { wrapper, runSearch } = render()
+    wrapper.find(".sort").simulate("change", { target: { value: "coursenum" } })
+    wrapper.update()
+    expect(wrapper.find("select").prop("value")).toBe("coursenum")
+    checkSearchCall(runSearch, [
+      "", // empty search text
+      {
+        ...INITIAL_FACET_STATE,
+        type: LR_TYPE_ALL
+      },
+      0,
+      {
+        field:  "coursenum",
+        option: "asc"
+      }
     ])
   })
 
@@ -170,7 +200,8 @@ describe("useCourseSearch", () => {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
       },
-      0
+      0,
+      null
     ])
     wrapper.update()
     await wait(1)
@@ -216,7 +247,8 @@ describe("useCourseSearch", () => {
         type:   LR_TYPE_ALL,
         topics: ["Mathematics"]
       },
-      0
+      0,
+      null
     ])
     wrapper.find(".clearAllFilters").simulate("click")
     checkSearchCall(runSearch, [
@@ -225,7 +257,8 @@ describe("useCourseSearch", () => {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
       },
-      0
+      0,
+      null
     ])
   })
 
@@ -241,7 +274,8 @@ describe("useCourseSearch", () => {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
       },
-      0
+      0,
+      null
     ])
   })
 
@@ -258,7 +292,8 @@ describe("useCourseSearch", () => {
         type:  LR_TYPE_ALL,
         topic: ["mathematics"]
       },
-      0
+      0,
+      null
     ])
   })
 
@@ -279,7 +314,8 @@ describe("useCourseSearch", () => {
         type:  [LR_TYPE_RESOURCEFILE],
         topic: ["mathematics"]
       },
-      0
+      0,
+      null
     ])
   })
 
@@ -294,7 +330,8 @@ describe("useCourseSearch", () => {
         ...INITIAL_FACET_STATE,
         type: LR_TYPE_ALL
       },
-      10 // from value has been incremented
+      10, // from value has been incremented
+      null
     ])
   })
 
@@ -361,7 +398,8 @@ describe("useCourseSearch", () => {
 
   it("should initialize with search parameters from window.location", async () => {
     // @ts-ignore
-    window.location = "http://localhost:3000/search/?q=sometext&t=Science"
+    window.location =
+      "http://localhost:3000/search/?q=sometext&t=Science&s=sortfield"
     const { wrapper } = render()
     await wait(1)
 
@@ -379,6 +417,7 @@ describe("useCourseSearch", () => {
     })
     const text = wrapper.find("input").prop("value")
     expect(text).toBe("sometext")
+    expect(wrapper.find(".sort").prop("value")).toBe("sortfield")
   })
 
   it("should sanitize window.location params so no extra paths are pushed onto stack", async () => {
