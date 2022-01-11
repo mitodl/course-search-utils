@@ -12,10 +12,7 @@ import { createBrowserHistory } from "history"
 
 import {
   LR_TYPE_ALL,
-  LR_TYPE_LEARNINGPATH,
-  LR_TYPE_USERLIST,
-  LR_TYPE_PODCAST,
-  LR_TYPE_PODCAST_EPISODE,
+  LearningResourceType,
   INITIAL_FACET_STATE
 } from "./constants"
 import {
@@ -30,13 +27,13 @@ import { useDidMountEffect } from "./hooks"
 
 export const emptyOrNil = either(isEmpty, isNil)
 
-type Aggregation = {
+export type Aggregation = {
   doc_count_error_upper_bound?: number // eslint-disable-line camelcase
   sum_other_doc_count?: number // eslint-disable-line camelcase
   buckets: Array<{ key: string; doc_count: number }> // eslint-disable-line camelcase
 }
 
-type Aggregations = Map<string, Aggregation>
+export type Aggregations = Map<string, Aggregation>
 
 export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
   buckets: args
@@ -185,16 +182,16 @@ export const useCourseSearch = (
       const { activeFacets, sort } = activeFacetsAndSort
       const searchFacets = clone(activeFacets)
 
-      if (emptyOrNil(searchFacets.type)) {
-        searchFacets.type = LR_TYPE_ALL
-      } else {
-        if (searchFacets.type.includes(LR_TYPE_PODCAST)) {
-          searchFacets.type.push(LR_TYPE_PODCAST_EPISODE)
+      if (searchFacets.type !== undefined && searchFacets.type.length > 0) {
+        if (searchFacets.type.includes(LearningResourceType.Podcast)) {
+          searchFacets.type.push(LearningResourceType.PodcastEpisode)
         }
 
-        if (searchFacets.type.includes(LR_TYPE_USERLIST)) {
-          searchFacets.type.push(LR_TYPE_LEARNINGPATH)
+        if (searchFacets.type.includes(LearningResourceType.Userlist)) {
+          searchFacets.type.push(LearningResourceType.LearningPath)
         }
+      } else {
+        searchFacets.type = LR_TYPE_ALL
       }
 
       await runSearch(text, searchFacets, nextFrom, sort)

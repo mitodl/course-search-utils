@@ -12,10 +12,7 @@ jest.mock("history", () => ({
 
 import {
   LR_TYPE_ALL,
-  LR_TYPE_PODCAST,
-  LR_TYPE_VIDEO,
-  LR_TYPE_COURSE,
-  LR_TYPE_RESOURCEFILE,
+  LearningResourceType,
   INITIAL_FACET_STATE
 } from "./constants"
 
@@ -303,15 +300,15 @@ describe("useCourseSearch", () => {
       // @ts-ignore
       wrapper.find(".toggleFacets").prop("onClick")([
         ["topic", "mathematics", true],
-        ["type", LR_TYPE_COURSE, false],
-        ["type", LR_TYPE_RESOURCEFILE, true]
+        ["type", LearningResourceType.Course, false],
+        ["type", LearningResourceType.ResourceFile, true]
       ])
     })
     checkSearchCall(runSearch, [
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:  [LR_TYPE_RESOURCEFILE],
+        type:  [LearningResourceType.ResourceFile],
         topic: ["mathematics"]
       },
       0,
@@ -341,9 +338,9 @@ describe("useCourseSearch", () => {
     // @ts-ignore
     expect(facetOptions("type")).toEqual({
       buckets: [
-        { key: LR_TYPE_VIDEO, doc_count: 8156 },
-        { key: LR_TYPE_COURSE, doc_count: 2508 },
-        { key: LR_TYPE_PODCAST, doc_count: 1180 }
+        { key: LearningResourceType.Video, doc_count: 8156 },
+        { key: LearningResourceType.Course, doc_count: 2508 },
+        { key: LearningResourceType.Podcast, doc_count: 1180 }
       ]
     })
     // @ts-ignore
@@ -368,9 +365,9 @@ describe("useCourseSearch", () => {
     // @ts-ignore
     expect(facetOptions("type")).toEqual({
       buckets: [
-        { key: LR_TYPE_VIDEO, doc_count: 8156 },
-        { key: LR_TYPE_COURSE, doc_count: 2508 },
-        { key: LR_TYPE_PODCAST, doc_count: 1180 },
+        { key: LearningResourceType.Video, doc_count: 8156 },
+        { key: LearningResourceType.Course, doc_count: 2508 },
+        { key: LearningResourceType.Podcast, doc_count: 1180 },
         { key: "Obstacle Course", doc_count: 0 }
       ]
     })

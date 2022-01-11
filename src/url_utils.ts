@@ -11,15 +11,15 @@ const urlParamToArray = (param: ParsedParam): string[] =>
   _.union(toArray(param) || [])
 
 export interface Facets {
-  audience: string[]
-  certification: string[]
-  type: string[]
-  offered_by: string[] // eslint-disable-line camelcase
-  topics: string[]
-  department_name: string[] // eslint-disable-line camelcase
-  level: string[]
-  course_feature_tags: string[] // eslint-disable-line camelcase
-  resource_type: string[] // eslint-disable-line camelcase
+  audience?: string[]
+  certification?: string[]
+  type?: string[]
+  offered_by?: string[] // eslint-disable-line camelcase
+  topics?: string[]
+  department_name?: string[] // eslint-disable-line camelcase
+  level?: string[]
+  course_feature_tags?: string[] // eslint-disable-line camelcase
+  resource_type?: string[] // eslint-disable-line camelcase
 }
 
 export interface SortParam {
