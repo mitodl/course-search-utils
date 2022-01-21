@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 1.4.0
+Version 1.4.0 (Released January 21, 2022)
 -------------
 
 - Fix up typescript annotations a little bit
