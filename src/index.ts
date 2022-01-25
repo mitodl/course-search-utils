@@ -25,12 +25,21 @@ import {
 } from "./url_utils"
 import { useDidMountEffect } from "./hooks"
 
+export * from "./constants"
+
+export * from "./url_utils"
+
 export const emptyOrNil = either(isEmpty, isNil)
+
+export interface Bucket {
+  key: string
+  doc_count: number // eslint-disable-line camelcase
+}
 
 export type Aggregation = {
   doc_count_error_upper_bound?: number // eslint-disable-line camelcase
   sum_other_doc_count?: number // eslint-disable-line camelcase
-  buckets: Array<{ key: string; doc_count: number }> // eslint-disable-line camelcase
+  buckets: Bucket[]
 }
 
 export type Aggregations = Map<string, Aggregation>
