@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 1.5.0
+-------------
+
+- small project organization improvements
+
 Version 1.4.0 (Released January 21, 2022)
 -------------
 
