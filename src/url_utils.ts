@@ -68,7 +68,9 @@ export const deserializeSort = (sortParam: string): SortParam | null => {
 }
 
 export const deserializeSearchParams = (location: Location): SearchParams => {
-  const { type, o, t, q, a, c, d, l, f, r, s } = qs.parse(location.search)
+  const searchUrlParams = location.search.replace(/^\?/, "").split("?", 1)[0]
+
+  const { type, o, t, q, a, c, d, l, f, r, s } = qs.parse(searchUrlParams)
 
   return {
     text:         handleText(q),
