@@ -272,6 +272,31 @@ describe("course search library", () => {
         sort: null
       })
     })
+
+    it("should ignore anything after the second ?", () => {
+      expect(
+        deserializeSearchParams({
+          search: "s=-coursenum?some_tracking_string=string"
+        })
+      ).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
+        },
+        text: "",
+        sort: {
+          field:  "coursenum",
+          option: "desc"
+        }
+      })
+    })
   })
 
   describe("serializeSearchParams", () => {
