@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 1.6.0
+-------------
+
+- ignore tracking code
+
 Version 1.5.0 (Released March 21, 2022)
 -------------
 
