@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 1.6.0
+Version 1.6.0 (Released April 29, 2022)
 -------------
 
 - ignore tracking code
