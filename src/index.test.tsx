@@ -57,7 +57,8 @@ function TestComponent(props: any) {
     activeFacets,
     onSubmit,
     sort,
-    updateSort
+    updateSort,
+    updateUI
   } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize)
 
   return (
@@ -77,6 +78,7 @@ function TestComponent(props: any) {
         <option value="coursenum">Course number</option>
         <option value="">Relevance</option>
       </select>
+      <button onClick={() => updateUI("list")} className="ui"></button>
       <div className="submit" onClick={onSubmit} />
       <FacetTestComponent
         clearAllFilters={clearAllFilters}
@@ -163,6 +165,7 @@ describe("useCourseSearch", () => {
         type: LR_TYPE_ALL
       },
       0,
+      null,
       null
     ])
   })
@@ -182,7 +185,23 @@ describe("useCourseSearch", () => {
       {
         field:  "coursenum",
         option: "asc"
-      }
+      },
+      null
+    ])
+  })
+
+  it("should let you update the ui param", async () => {
+    const { wrapper, runSearch } = render()
+    wrapper.find(".ui").simulate("click")
+    checkSearchCall(runSearch, [
+      "", // empty search text
+      {
+        ...INITIAL_FACET_STATE,
+        type: LR_TYPE_ALL
+      },
+      0,
+      null,
+      "list"
     ])
   })
 
@@ -198,6 +217,7 @@ describe("useCourseSearch", () => {
         type: LR_TYPE_ALL
       },
       0,
+      null,
       null
     ])
     wrapper.update()
@@ -245,6 +265,7 @@ describe("useCourseSearch", () => {
         topics: ["Mathematics"]
       },
       0,
+      null,
       null
     ])
     wrapper.find(".clearAllFilters").simulate("click")
@@ -255,6 +276,7 @@ describe("useCourseSearch", () => {
         type: LR_TYPE_ALL
       },
       0,
+      null,
       null
     ])
   })
@@ -272,6 +294,7 @@ describe("useCourseSearch", () => {
         type: LR_TYPE_ALL
       },
       0,
+      null,
       null
     ])
   })
@@ -290,6 +313,7 @@ describe("useCourseSearch", () => {
         topic: ["mathematics"]
       },
       0,
+      null,
       null
     ])
   })
@@ -312,6 +336,7 @@ describe("useCourseSearch", () => {
         topic: ["mathematics"]
       },
       0,
+      null,
       null
     ])
   })
@@ -328,6 +353,7 @@ describe("useCourseSearch", () => {
         type: LR_TYPE_ALL
       },
       10, // from value has been incremented
+      null,
       null
     ])
   })

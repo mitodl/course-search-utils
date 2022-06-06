@@ -30,12 +30,14 @@ export interface SortParam {
 export interface FacetsAndSort {
   activeFacets: Facets
   sort: SortParam | null
+  ui: string | null
 }
 
 type SearchParams = {
   text: string
   activeFacets: Facets
   sort: SortParam | null
+  ui: string | null
 }
 
 const handleText = (q: ParsedParam): string => {
@@ -67,10 +69,18 @@ export const deserializeSort = (sortParam: string): SortParam | null => {
   }
 }
 
+export const deserializeUI = (uiParam: string): string | null => {
+  if (!uiParam) {
+    return null
+  }
+
+  return uiParam
+}
+
 export const deserializeSearchParams = (location: Location): SearchParams => {
   const searchUrlParams = location.search.replace(/^\?/, "").split("?", 1)[0]
 
-  const { type, o, t, q, a, c, d, l, f, r, s } = qs.parse(searchUrlParams)
+  const { type, o, t, q, a, c, d, l, f, r, s, u } = qs.parse(searchUrlParams)
 
   return {
     text:         handleText(q),
@@ -85,7 +95,8 @@ export const deserializeSearchParams = (location: Location): SearchParams => {
       course_feature_tags: urlParamToArray(f), // eslint-disable-line camelcase
       resource_type:       urlParamToArray(r) // eslint-disable-line camelcase
     },
-    sort: deserializeSort(handleText(s))
+    sort: deserializeSort(handleText(s)),
+    ui:   deserializeUI(handleText(u))
   }
 }
 
@@ -102,10 +113,20 @@ export const serializeSort = (sort: SortParam | null): string | undefined => {
   }
 }
 
+export const serializeUI = (ui: string | null): string | undefined => {
+  if (ui === null) {
+    // leave it off the params if set to default
+    return undefined
+  }
+
+  return ui
+}
+
 export const serializeSearchParams = ({
   text,
   activeFacets,
-  sort
+  sort,
+  ui
 }: Partial<SearchParams>): string => {
   const {
     type,
@@ -130,6 +151,7 @@ export const serializeSearchParams = ({
     l: level,
     f: course_feature_tags,
     r: resource_type,
-    s: serializeSort(sort || null)
+    s: serializeSort(sort || null),
+    u: serializeUI(ui || null)
   })
 }
