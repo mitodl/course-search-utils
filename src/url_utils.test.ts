@@ -22,7 +22,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "The Best Course",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -40,7 +41,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -58,7 +60,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -87,7 +90,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -105,7 +109,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -123,7 +128,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -141,7 +147,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -159,7 +166,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -187,7 +195,8 @@ describe("course search library", () => {
           ]
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -209,7 +218,8 @@ describe("course search library", () => {
           resource_type:       ["Assignments", "Exams", "Lecture Notes"]
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -230,7 +240,8 @@ describe("course search library", () => {
         sort: {
           field:  "coursenum",
           option: "asc"
-        }
+        },
+        ui: null
       })
     })
 
@@ -251,7 +262,27 @@ describe("course search library", () => {
         sort: {
           field:  "coursenum",
           option: "desc"
-        }
+        },
+        ui: null
+      })
+    })
+
+    it("should deserialize the ui param", () => {
+      expect(deserializeSearchParams({ search: "u=list" })).toEqual({
+        activeFacets: {
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          type:                [],
+          department_name:     [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
+        },
+        text: "",
+        sort: null,
+        ui:   "list"
       })
     })
 
@@ -269,7 +300,8 @@ describe("course search library", () => {
           resource_type:       []
         },
         text: "",
-        sort: null
+        sort: null,
+        ui:   null
       })
     })
 
@@ -294,7 +326,8 @@ describe("course search library", () => {
         sort: {
           field:  "coursenum",
           option: "desc"
-        }
+        },
+        ui: null
       })
     })
   })
@@ -437,6 +470,14 @@ describe("course search library", () => {
           }
         })
       ).toEqual("s=-coursenum")
+    })
+
+    it("should the serialize ui param", () => {
+      expect(
+        serializeSearchParams({
+          ui: "list"
+        })
+      ).toEqual("u=list")
     })
   })
 

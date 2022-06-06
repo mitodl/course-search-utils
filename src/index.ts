@@ -61,7 +61,8 @@ export const useCourseSearch = (
     text: string,
     searchFacets: Facets,
     nextFrom: number,
-    sort?: SortParam | null
+    sort?: SortParam | null,
+    ui?: string | null
   ) => Promise<void>,
   clearSearch: () => void,
   aggregations: Aggregations,
@@ -76,8 +77,10 @@ export const useCourseSearch = (
   })
   const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
     () => {
-      const { activeFacets, sort } = deserializeSearchParams(window.location)
-      return { activeFacets, sort }
+      const { activeFacets, sort, ui } = deserializeSearchParams(
+        window.location
+      )
+      return { activeFacets, sort, ui }
     }
   )
 
@@ -108,13 +111,14 @@ export const useCourseSearch = (
     setText("")
     setActiveFacetsAndSort({
       activeFacets: INITIAL_FACET_STATE,
-      sort:         null
+      sort:         null,
+      ui:           null
     })
   }, [setText, setActiveFacetsAndSort])
 
   const toggleFacet = useCallback(
     (name: string, value: string, isEnabled: boolean) => {
-      const { activeFacets, sort } = activeFacetsAndSort
+      const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
       if (isEnabled) {
@@ -122,14 +126,14 @@ export const useCourseSearch = (
       } else {
         newFacets[name] = _.without(newFacets[name] || [], value)
       }
-      setActiveFacetsAndSort({ activeFacets: newFacets, sort })
+      setActiveFacetsAndSort({ activeFacets: newFacets, sort, ui })
     },
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
   const toggleFacets = useCallback(
     (facets: Array<[string, string, boolean]>) => {
-      const { activeFacets, sort } = activeFacetsAndSort
+      const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
       facets.forEach(([name, value, isEnabled]) => {
@@ -139,7 +143,7 @@ export const useCourseSearch = (
           newFacets[name] = _.without(newFacets[name] || [], value)
         }
       })
-      setActiveFacetsAndSort({ activeFacets: newFacets, sort })
+      setActiveFacetsAndSort({ activeFacets: newFacets, sort, ui })
     },
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
@@ -167,8 +171,16 @@ export const useCourseSearch = (
     (event: ChangeEvent): void => {
       const param = event ? (event.target as HTMLSelectElement).value : ""
       const newSort = deserializeSort(param)
-      const { activeFacets } = activeFacetsAndSort
-      setActiveFacetsAndSort({ activeFacets, sort: newSort }) // this will cause a search via useDidMountEffect
+      const { activeFacets, ui } = activeFacetsAndSort
+      setActiveFacetsAndSort({ activeFacets, sort: newSort, ui: ui }) // this will cause a search via useDidMountEffect
+    },
+    [setActiveFacetsAndSort, activeFacetsAndSort]
+  )
+
+  const updateUI = useCallback(
+    (newUI: string): void => {
+      const { activeFacets, sort } = activeFacetsAndSort
+      setActiveFacetsAndSort({ activeFacets, sort, ui: newUI }) // this will cause a search via useDidMountEffect
     },
     [setActiveFacetsAndSort, activeFacetsAndSort]
   )
@@ -188,7 +200,7 @@ export const useCourseSearch = (
       setFrom(nextFrom)
       setIncremental(incremental)
 
-      const { activeFacets, sort } = activeFacetsAndSort
+      const { activeFacets, sort, ui } = activeFacetsAndSort
       const searchFacets = clone(activeFacets)
 
       if (searchFacets.type !== undefined && searchFacets.type.length > 0) {
@@ -203,7 +215,7 @@ export const useCourseSearch = (
         searchFacets.type = LR_TYPE_ALL
       }
 
-      await runSearch(text, searchFacets, nextFrom, sort)
+      await runSearch(text, searchFacets, nextFrom, sort, ui)
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
@@ -212,7 +224,8 @@ export const useCourseSearch = (
       const newSearch = serializeSearchParams({
         text,
         activeFacets,
-        sort
+        sort,
+        ui
       })
       if (currentSearch !== newSearch) {
         history.push(`?${newSearch}`)
@@ -223,10 +236,10 @@ export const useCourseSearch = (
 
   const initSearch = useCallback(
     (location: Location) => {
-      const { text, activeFacets, sort } = deserializeSearchParams(location)
+      const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
-      setActiveFacetsAndSort({ activeFacets, sort })
+      setActiveFacetsAndSort({ activeFacets, sort, ui })
     },
     [clearSearch, setText, setActiveFacetsAndSort]
   )
@@ -304,7 +317,7 @@ export const useCourseSearch = (
     [internalRunSearch, text, activeFacetsAndSort]
   )
 
-  const { sort, activeFacets } = activeFacetsAndSort
+  const { sort, activeFacets, ui } = activeFacetsAndSort
   return {
     facetOptions,
     clearAllFilters,
@@ -321,6 +334,8 @@ export const useCourseSearch = (
     sort,
     activeFacets,
     onSubmit,
-    from
+    from,
+    updateUI,
+    ui
   }
 }
