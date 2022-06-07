@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 1.7.0
+-------------
+
+- add ui search param
+
 Version 1.6.0 (Released April 29, 2022)
 -------------
 
