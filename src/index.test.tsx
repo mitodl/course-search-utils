@@ -11,9 +11,9 @@ jest.mock("history", () => ({
 }))
 
 import {
-  LR_TYPE_ALL,
   LearningResourceType,
-  INITIAL_FACET_STATE
+  INITIAL_FACET_STATE,
+  LR_TYPE_ALL
 } from "./constants"
 
 import { useCourseSearch } from "./index"

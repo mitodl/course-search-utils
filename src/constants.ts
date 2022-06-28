@@ -9,7 +9,10 @@ export enum LearningResourceType {
   Podcast = "podcast",
   PodcastEpisode = "podcastepisode",
   PseudoList = "favorites",
-  ResourceFile = "resourcefile"
+  ResourceFile = "resourcefile",
+  Post = "post",
+  Comment = "comment",
+  Profile = "profile"
 }
 
 export const LR_TYPE_ALL = [
@@ -19,8 +22,7 @@ export const LR_TYPE_ALL = [
   LearningResourceType.LearningPath,
   LearningResourceType.Video,
   LearningResourceType.Podcast,
-  LearningResourceType.PodcastEpisode,
-  LearningResourceType.ResourceFile
+  LearningResourceType.PodcastEpisode
 ]
 
 export const INITIAL_FACET_STATE: Facets = {
@@ -34,3 +36,7 @@ export const INITIAL_FACET_STATE: Facets = {
   course_feature_tags: [],
   resource_type:       []
 }
+
+export const COURSENUM_SORT_FIELD = "department_course_numbers.sort_coursenum"
+
+export type Level = "Graduate" | "Undergraduate" | null

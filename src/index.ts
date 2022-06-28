@@ -6,14 +6,14 @@ import {
   FormEvent,
   ChangeEvent
 } from "react"
-import { unionWith, eqBy, prop, either, isEmpty, clone, isNil } from "ramda"
+import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
 import { createBrowserHistory } from "history"
 
 import {
-  LR_TYPE_ALL,
   LearningResourceType,
-  INITIAL_FACET_STATE
+  INITIAL_FACET_STATE,
+  LR_TYPE_ALL
 } from "./constants"
 import {
   FacetsAndSort,
@@ -29,7 +29,7 @@ export * from "./constants"
 
 export * from "./url_utils"
 
-export const emptyOrNil = either(isEmpty, isNil)
+export { buildSearchQuery, SearchQueryParams } from "./search"
 
 export interface Bucket {
   key: string
