@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 1.8.0
+-------------
+
+- add query generation to course-search-utils
+
 Version 1.7.0 (Released June 07, 2022)
 -------------
 
