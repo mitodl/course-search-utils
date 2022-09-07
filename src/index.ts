@@ -3,12 +3,12 @@ import React, {
   useCallback,
   useEffect,
   MouseEvent,
-  FormEvent,
   ChangeEvent
 } from "react"
 import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
 import { createBrowserHistory } from "history"
+import { History as HHistory } from "history"
 
 import {
   LearningResourceType,
@@ -51,7 +51,7 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
     .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
 })
 
-const history = createBrowserHistory()
+const defaultHistory = createBrowserHistory()
 
 interface CourseSearchResult {
   facetOptions: (group: string) => Aggregation | null
@@ -85,18 +85,19 @@ export const useCourseSearch = (
   clearSearch: () => void,
   aggregations: Aggregations,
   loaded: boolean,
-  searchPageSize: number
+  searchPageSize: number,
+  history: HHistory = defaultHistory
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
   const [text, setText] = useState<string>(() => {
-    const { text } = deserializeSearchParams(window.location)
+    const { text } = deserializeSearchParams(history.location)
     return text
   })
   const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
     () => {
       const { activeFacets, sort, ui } = deserializeSearchParams(
-        window.location
+        history.location
       )
       return { activeFacets, sort, ui }
     }
@@ -171,9 +172,9 @@ export const useCourseSearch = (
     [toggleFacet]
   )
 
-  const updateText = useCallback(
-    (event: ChangeEvent): void => {
-      const text = event ? (event.target as HTMLInputElement).value : ""
+  const updateText: CourseSearchResult["updateText"] = useCallback(
+    event => {
+      const text = event ? event.target.value : ""
       setText(text)
     },
     [setText]
@@ -231,7 +232,7 @@ export const useCourseSearch = (
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
-        deserializeSearchParams(window.location)
+        deserializeSearchParams(history.location)
       )
       const newSearch = serializeSearchParams({
         text,
@@ -243,11 +244,19 @@ export const useCourseSearch = (
         history.push(`?${newSearch}`)
       }
     },
-    [from, setFrom, setIncremental, clearSearch, runSearch, searchPageSize]
+    [
+      from,
+      setFrom,
+      setIncremental,
+      clearSearch,
+      runSearch,
+      searchPageSize,
+      history
+    ]
   )
 
   const initSearch = useCallback(
-    (location: Location) => {
+    (location: { search: string }) => {
       const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
@@ -275,7 +284,7 @@ export const useCourseSearch = (
 
   // this is our 'on startup' useEffect call
   useEffect(() => {
-    initSearch(window.location)
+    initSearch(history.location)
 
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
