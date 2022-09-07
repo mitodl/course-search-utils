@@ -1,4 +1,4 @@
-import {
+import React, {
   useState,
   useCallback,
   useEffect,
@@ -53,9 +53,27 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
 
 const history = createBrowserHistory()
 
-// disabling rule here because all functions and values returned by the hook are
-// fully typed, so writing out the explicit return type for this thing is redundant
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+interface CourseSearchResult {
+  facetOptions: (group: string) => Aggregation | null
+  clearAllFilters: () => void
+  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
+  toggleFacets: (facets: [string, string, boolean][]) => void
+  onUpdateFacets: React.MouseEventHandler
+  updateText: React.ChangeEventHandler
+  clearText: React.MouseEventHandler
+  updateSort: React.ChangeEventHandler
+  acceptSuggestion: (suggestion: string) => void
+  loadMore: () => void
+  incremental: boolean
+  text: string
+  sort: SortParam | null
+  activeFacets: Facets
+  onSubmit: React.FormEventHandler
+  from: number
+  updateUI: (newUI: string) => void
+  ui: string | null
+}
+
 export const useCourseSearch = (
   runSearch: (
     text: string,
@@ -68,7 +86,7 @@ export const useCourseSearch = (
   aggregations: Aggregations,
   loaded: boolean,
   searchPageSize: number
-) => {
+): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
   const [text, setText] = useState<string>(() => {
