@@ -91,13 +91,13 @@ export const useCourseSearch = (
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
   const [text, setText] = useState<string>(() => {
-    const { text } = deserializeSearchParams(history.location)
+    const { text } = deserializeSearchParams(window.location)
     return text
   })
   const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
     () => {
       const { activeFacets, sort, ui } = deserializeSearchParams(
-        history.location
+        window.location
       )
       return { activeFacets, sort, ui }
     }
@@ -232,7 +232,7 @@ export const useCourseSearch = (
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
-        deserializeSearchParams(history.location)
+        deserializeSearchParams(window.location)
       )
       const newSearch = serializeSearchParams({
         text,
@@ -284,7 +284,7 @@ export const useCourseSearch = (
 
   // this is our 'on startup' useEffect call
   useEffect(() => {
-    initSearch(history.location)
+    initSearch(window.location)
 
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
@@ -304,9 +304,7 @@ export const useCourseSearch = (
       }
     })
 
-    return () => {
-      unlisten()
-    }
+    return unlisten
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
