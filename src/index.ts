@@ -58,8 +58,8 @@ interface CourseSearchResult {
   clearAllFilters: () => void
   toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
   toggleFacets: (facets: [string, string, boolean][]) => void
-  onUpdateFacets: React.MouseEventHandler
-  updateText: React.ChangeEventHandler
+  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
+  updateText: React.ChangeEventHandler<HTMLInputElement>
   clearText: React.MouseEventHandler
   updateSort: React.ChangeEventHandler
   acceptSuggestion: (suggestion: string) => void
@@ -134,8 +134,8 @@ export const useCourseSearch = (
     })
   }, [setText, setActiveFacetsAndSort])
 
-  const toggleFacet = useCallback(
-    (name: string, value: string, isEnabled: boolean) => {
+  const toggleFacet: CourseSearchResult["toggleFacet"] = useCallback(
+    (name, value, isEnabled) => {
       const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
@@ -149,8 +149,8 @@ export const useCourseSearch = (
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
-  const toggleFacets = useCallback(
-    (facets: Array<[string, string, boolean]>) => {
+  const toggleFacets: CourseSearchResult["toggleFacets"] = useCallback(
+    facets => {
       const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
@@ -166,14 +166,8 @@ export const useCourseSearch = (
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
-  const onUpdateFacets = useCallback(
-    (e: MouseEvent<HTMLInputElement>) => {
-      toggleFacet(
-        (e.target as HTMLInputElement).name,
-        (e.target as HTMLInputElement).value,
-        (e.target as HTMLInputElement).checked
-      )
-    },
+  const onUpdateFacets: CourseSearchResult["onUpdateFacets"] = useCallback(
+    e => toggleFacet(e.target.name, e.target.value, e.target.checked),
     [toggleFacet]
   )
 
@@ -327,8 +321,8 @@ export const useCourseSearch = (
     internalRunSearch(text, activeFacetsAndSort)
   }, [activeFacetsAndSort])
 
-  const onSubmit = useCallback(
-    (e: FormEvent): void => {
+  const onSubmit: CourseSearchResult["onSubmit"] = useCallback(
+    e => {
       e.preventDefault()
       internalRunSearch(text, activeFacetsAndSort)
     },
