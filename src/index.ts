@@ -72,6 +72,14 @@ interface CourseSearchResult {
   text: string
   sort: SortParam | null
   activeFacets: Facets
+  /**
+   * Callback that handles search submission. Pass this to your search input
+   * submission event target, e.g., `<form onSubmit={onSubmit} />` or
+   * `<button onClick={onSubmit} />`.
+   *
+   * The event target does not need to emit submit events, but if it does, the
+   * default form action will be prevented.
+   */
   onSubmit: (e: PreventableEvent) => void
   from: number
   updateUI: (newUI: string) => void
@@ -335,7 +343,6 @@ export const useCourseSearch = (
   const onSubmit: CourseSearchResult["onSubmit"] = useCallback(
     e => {
       if (e.type === "submit") {
-        console.log("Submit event. Preventing default.")
         e.preventDefault?.()
       }
 
