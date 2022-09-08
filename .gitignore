@@ -1,5 +1,5 @@
 node_modules/
-dist/*
+
 *.tgz
 
 # typescript writes this file for incremental compilation
