@@ -2,8 +2,5 @@ node_modules/
 dist/*
 *.tgz
 
-# build artifacts
-index.js
-url.js
 # typescript writes this file for incremental compilation
 .tsbuildinfo
