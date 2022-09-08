@@ -7,7 +7,6 @@ import React, {
 } from "react"
 import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
-import { createBrowserHistory } from "history"
 import { History as HHistory } from "history"
 
 import {
@@ -50,8 +49,6 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
     // @ts-ignore
     .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
 })
-
-const defaultHistory = createBrowserHistory()
 
 interface PreventableEvent {
   preventDefault?: () => void
@@ -98,18 +95,18 @@ export const useCourseSearch = (
   aggregations: Aggregations,
   loaded: boolean,
   searchPageSize: number,
-  history: HHistory = defaultHistory
+  history: HHistory
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
   const [text, setText] = useState<string>(() => {
-    const { text } = deserializeSearchParams(window.location)
+    const { text } = deserializeSearchParams(history.location)
     return text
   })
   const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
     () => {
       const { activeFacets, sort, ui } = deserializeSearchParams(
-        window.location
+        history.location
       )
       return { activeFacets, sort, ui }
     }
@@ -244,7 +241,7 @@ export const useCourseSearch = (
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
-        deserializeSearchParams(window.location)
+        deserializeSearchParams(history.location)
       )
       const newSearch = serializeSearchParams({
         text,
@@ -296,7 +293,7 @@ export const useCourseSearch = (
 
   // this is our 'on startup' useEffect call
   useEffect(() => {
-    initSearch(window.location)
+    initSearch(history.location)
 
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
