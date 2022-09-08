@@ -1,7 +1,7 @@
 import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
-import { createMemoryHistory } from "history"
+import { Update, createMemoryHistory } from "history"
 
 const memoryHistory = createMemoryHistory()
 jest.mock("history", () => ({
@@ -41,7 +41,7 @@ function FacetTestComponent(props: any) {
 }
 
 function TestComponent(props: any) {
-  const { runSearch, clearSearch, facets, loaded, searchPageSize } = props
+  const { runSearch, clearSearch, facets, loaded, searchPageSize, history } = props
 
   const {
     facetOptions,
@@ -59,7 +59,7 @@ function TestComponent(props: any) {
     sort,
     updateSort,
     updateUI
-  } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize)
+  } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize, history)
 
   return (
     <div className="test-component">
@@ -121,7 +121,9 @@ const render = (props = {}) => {
 }
 
 describe("useCourseSearch", () => {
-  let memoryStack, memoryUnlisten
+  let memoryStack: Update[],
+    memoryUnlisten: () => void
+
   beforeEach(() => {
     // @ts-expect-error
     window.location = "http://localhost:3000/search"
@@ -462,5 +464,19 @@ describe("useCourseSearch", () => {
     expect(memoryStack[0].location.search).toBe(
       "?q=search%20text%20goes%20here"
     )
+  })
+
+  it("should update the given history when search is rerun and parameters are different", async () => {
+    const history = createMemoryHistory()
+    const { wrapper } = render({ history })
+    await wait(1)
+    wrapper
+      .find("input")
+      .simulate("change", { target: { value: "search text goes here" } })
+    wrapper.find(".submit").simulate("click")
+    await wait(1)
+
+    expect(history.index).toBe(1)
+    expect(history.location.search).toBe("?q=search%20text%20goes%20here")
   })
 })
