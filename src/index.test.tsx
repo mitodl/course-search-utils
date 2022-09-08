@@ -41,7 +41,14 @@ function FacetTestComponent(props: any) {
 }
 
 function TestComponent(props: any) {
-  const { runSearch, clearSearch, facets, loaded, searchPageSize, history } = props
+  const {
+    runSearch,
+    clearSearch,
+    facets,
+    loaded,
+    searchPageSize,
+    history
+  } = props
 
   const {
     facetOptions,
@@ -59,7 +66,14 @@ function TestComponent(props: any) {
     sort,
     updateSort,
     updateUI
-  } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize, history)
+  } = useCourseSearch(
+    runSearch,
+    clearSearch,
+    facets,
+    loaded,
+    searchPageSize,
+    history
+  )
 
   return (
     <div className="test-component">
@@ -121,8 +135,7 @@ const render = (props = {}) => {
 }
 
 describe("useCourseSearch", () => {
-  let memoryStack: Update[],
-    memoryUnlisten: () => void
+  let memoryStack: Update[], memoryUnlisten: () => void
 
   beforeEach(() => {
     // @ts-expect-error
