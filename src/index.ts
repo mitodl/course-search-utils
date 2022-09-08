@@ -53,6 +53,10 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
 
 const defaultHistory = createBrowserHistory()
 
+interface PreventableEvent {
+  preventDefault?: () => void
+  type?: string
+}
 interface CourseSearchResult {
   facetOptions: (group: string) => Aggregation | null
   clearAllFilters: () => void
@@ -68,7 +72,7 @@ interface CourseSearchResult {
   text: string
   sort: SortParam | null
   activeFacets: Facets
-  onSubmit: React.FormEventHandler
+  onSubmit: (e: PreventableEvent) => void
   from: number
   updateUI: (newUI: string) => void
   ui: string | null
@@ -330,7 +334,11 @@ export const useCourseSearch = (
 
   const onSubmit: CourseSearchResult["onSubmit"] = useCallback(
     e => {
-      e.preventDefault()
+      if (e.type === "submit") {
+        console.log("Submit event. Preventing default.")
+        e.preventDefault?.()
+      }
+
       internalRunSearch(text, activeFacetsAndSort)
     },
     [internalRunSearch, text, activeFacetsAndSort]
