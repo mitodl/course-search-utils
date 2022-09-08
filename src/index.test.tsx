@@ -5,7 +5,7 @@ import { createMemoryHistory } from "history"
 
 const memoryHistory = createMemoryHistory()
 jest.mock("history", () => ({
-  // @ts-ignore
+  // @ts-expect-error
   ...jest.requireActual("history"),
   createBrowserHistory: () => memoryHistory
 }))
@@ -121,10 +121,9 @@ const render = (props = {}) => {
 }
 
 describe("useCourseSearch", () => {
-  // @ts-ignore
   let memoryStack, memoryUnlisten
   beforeEach(() => {
-    // @ts-ignore
+    // @ts-expect-error
     window.location = "http://localhost:3000/search"
     memoryStack = []
     memoryUnlisten = memoryHistory.listen(location => {
@@ -133,7 +132,6 @@ describe("useCourseSearch", () => {
   })
 
   afterEach(() => {
-    // @ts-ignore
     memoryUnlisten()
   })
 
@@ -230,10 +228,9 @@ describe("useCourseSearch", () => {
   it("should let you set filters, clear them", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
-      wrapper.find(".onUpdateFacets").prop("onClick")({
+      wrapper.find(".onUpdateFacets").prop("onClick")?.({
         target: {
-          // @ts-ignore
+          // @ts-expect-error
           name:    "topics",
           value:   "Mathematics",
           checked: true
@@ -284,7 +281,7 @@ describe("useCourseSearch", () => {
   it("should let you accept a suggestion", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".accept-suggestion").prop("onClick")("my suggestion")
     })
     checkSearchCall(runSearch, [
@@ -302,7 +299,7 @@ describe("useCourseSearch", () => {
   it("should let you toggle a facet", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
     })
     checkSearchCall(runSearch, [
@@ -321,7 +318,7 @@ describe("useCourseSearch", () => {
   it("should let you toggle multiple facets", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".toggleFacets").prop("onClick")([
         ["topic", "mathematics", true],
         ["type", LearningResourceType.Course, false],
@@ -361,7 +358,7 @@ describe("useCourseSearch", () => {
   it("should have a function for getting facet options", async () => {
     const { wrapper } = render()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LearningResourceType.Video, doc_count: 8156 },
@@ -369,17 +366,17 @@ describe("useCourseSearch", () => {
         { key: LearningResourceType.Podcast, doc_count: 1180 }
       ]
     })
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("topics").buckets.length).toEqual(137)
   })
 
   it("should merge an empty active facet into the ones from the search backend", async () => {
     const { wrapper } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".onUpdateFacets").prop("onClick")({
         target: {
-          // @ts-ignore
+          // @ts-expect-error
           name:    "type",
           value:   "Obstacle Course",
           checked: true
@@ -388,7 +385,7 @@ describe("useCourseSearch", () => {
     })
     wrapper.update()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LearningResourceType.Video, doc_count: 8156 },
@@ -420,7 +417,7 @@ describe("useCourseSearch", () => {
   })
 
   it("should initialize with search parameters from window.location", async () => {
-    // @ts-ignore
+    // @ts-expect-error
     window.location =
       "http://localhost:3000/search/?q=sometext&t=Science&s=sortfield"
     const { wrapper } = render()
@@ -444,30 +441,24 @@ describe("useCourseSearch", () => {
   })
 
   it("should sanitize window.location params so no extra paths are pushed onto stack", async () => {
-    // @ts-ignore
+    // @ts-expect-error
     window.location = "http://localhost:3000/search/?q="
     render()
     await wait(1)
-    // @ts-ignore
     expect(memoryStack).toStrictEqual([])
   })
 
   it("should update the URL when search is rerun and parameters are different", async () => {
-    // @ts-ignore
     const { wrapper } = render()
     await wait(1)
-    // @ts-ignore
     wrapper
       .find("input")
       .simulate("change", { target: { value: "search text goes here" } })
     wrapper.find(".submit").simulate("click")
     await wait(1)
 
-    // @ts-ignore
     expect(memoryStack.length).toBe(1)
-    // @ts-ignore
     expect(memoryStack[0].action).toBe("PUSH")
-    // @ts-ignore
     expect(memoryStack[0].location.search).toBe(
       "?q=search%20text%20goes%20here"
     )
