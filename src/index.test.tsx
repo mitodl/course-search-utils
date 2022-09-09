@@ -416,9 +416,12 @@ describe("useCourseSearch", () => {
   })
 
   it("should initialize with search parameters from window.location", async () => {
-    const { wrapper } = render({}, {
-      initialEntries: ["/search?q=sometext&t=Science&s=sortfield"]
-    })
+    const { wrapper } = render(
+      {},
+      {
+        initialEntries: ["/search?q=sometext&t=Science&s=sortfield"]
+      }
+    )
     await wait(1)
 
     const facets = wrapper.find(FacetTestComponent).prop("activeFacets")
@@ -439,9 +442,12 @@ describe("useCourseSearch", () => {
   })
 
   it("should sanitize window.location params so no extra paths are pushed onto stack", async () => {
-    const { history } = render({}, {
-      initialEntries: ["/search/?q="]
-    })
+    const { history } = render(
+      {},
+      {
+        initialEntries: ["/search/?q="]
+      }
+    )
     await wait(1)
     expect(history.index).toBe(0)
   })
