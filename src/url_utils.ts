@@ -77,8 +77,12 @@ export const deserializeUI = (uiParam: string): string | null => {
   return uiParam
 }
 
-export const deserializeSearchParams = (location: Location): SearchParams => {
-  const searchUrlParams = location.search.replace(/^\?/, "").split("?", 1)[0]
+export const deserializeSearchParams = ({
+  search
+}: {
+  search: string
+}): SearchParams => {
+  const searchUrlParams = search.replace(/^\?/, "").split("?", 1)[0]
 
   const { type, o, t, q, a, c, d, l, f, r, s, u } = qs.parse(searchUrlParams)
 

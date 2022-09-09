@@ -1,14 +1,13 @@
-import {
+import React, {
   useState,
   useCallback,
   useEffect,
   MouseEvent,
-  FormEvent,
   ChangeEvent
 } from "react"
 import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
-import { createBrowserHistory } from "history"
+import { History as HHistory } from "history"
 
 import {
   LearningResourceType,
@@ -51,11 +50,39 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
     .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
 })
 
-const history = createBrowserHistory()
+interface PreventableEvent {
+  preventDefault?: () => void
+  type?: string
+}
+interface CourseSearchResult {
+  facetOptions: (group: string) => Aggregation | null
+  clearAllFilters: () => void
+  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
+  toggleFacets: (facets: [string, string, boolean][]) => void
+  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
+  updateText: React.ChangeEventHandler<HTMLInputElement>
+  clearText: React.MouseEventHandler
+  updateSort: React.ChangeEventHandler
+  acceptSuggestion: (suggestion: string) => void
+  loadMore: () => void
+  incremental: boolean
+  text: string
+  sort: SortParam | null
+  activeFacets: Facets
+  /**
+   * Callback that handles search submission. Pass this to your search input
+   * submission event target, e.g., `<form onSubmit={onSubmit} />` or
+   * `<button onClick={onSubmit} />`.
+   *
+   * The event target does not need to emit submit events, but if it does, the
+   * default form action will be prevented.
+   */
+  onSubmit: (e: PreventableEvent) => void
+  from: number
+  updateUI: (newUI: string) => void
+  ui: string | null
+}
 
-// disabling rule here because all functions and values returned by the hook are
-// fully typed, so writing out the explicit return type for this thing is redundant
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCourseSearch = (
   runSearch: (
     text: string,
@@ -67,18 +94,19 @@ export const useCourseSearch = (
   clearSearch: () => void,
   aggregations: Aggregations,
   loaded: boolean,
-  searchPageSize: number
-) => {
+  searchPageSize: number,
+  history: HHistory
+): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
   const [text, setText] = useState<string>(() => {
-    const { text } = deserializeSearchParams(window.location)
+    const { text } = deserializeSearchParams(history.location)
     return text
   })
   const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
     () => {
       const { activeFacets, sort, ui } = deserializeSearchParams(
-        window.location
+        history.location
       )
       return { activeFacets, sort, ui }
     }
@@ -116,8 +144,8 @@ export const useCourseSearch = (
     })
   }, [setText, setActiveFacetsAndSort])
 
-  const toggleFacet = useCallback(
-    (name: string, value: string, isEnabled: boolean) => {
+  const toggleFacet: CourseSearchResult["toggleFacet"] = useCallback(
+    (name, value, isEnabled) => {
       const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
@@ -131,8 +159,8 @@ export const useCourseSearch = (
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
-  const toggleFacets = useCallback(
-    (facets: Array<[string, string, boolean]>) => {
+  const toggleFacets: CourseSearchResult["toggleFacets"] = useCallback(
+    facets => {
       const { activeFacets, sort, ui } = activeFacetsAndSort
       const newFacets = clone(activeFacets)
 
@@ -148,20 +176,14 @@ export const useCourseSearch = (
     [activeFacetsAndSort, setActiveFacetsAndSort]
   )
 
-  const onUpdateFacets = useCallback(
-    (e: MouseEvent<HTMLInputElement>) => {
-      toggleFacet(
-        (e.target as HTMLInputElement).name,
-        (e.target as HTMLInputElement).value,
-        (e.target as HTMLInputElement).checked
-      )
-    },
+  const onUpdateFacets: CourseSearchResult["onUpdateFacets"] = useCallback(
+    e => toggleFacet(e.target.name, e.target.value, e.target.checked),
     [toggleFacet]
   )
 
-  const updateText = useCallback(
-    (event: ChangeEvent): void => {
-      const text = event ? (event.target as HTMLInputElement).value : ""
+  const updateText: CourseSearchResult["updateText"] = useCallback(
+    event => {
+      const text = event ? event.target.value : ""
       setText(text)
     },
     [setText]
@@ -219,7 +241,7 @@ export const useCourseSearch = (
 
       // search is updated, now echo params to URL bar
       const currentSearch = serializeSearchParams(
-        deserializeSearchParams(window.location)
+        deserializeSearchParams(history.location)
       )
       const newSearch = serializeSearchParams({
         text,
@@ -231,11 +253,19 @@ export const useCourseSearch = (
         history.push(`?${newSearch}`)
       }
     },
-    [from, setFrom, setIncremental, clearSearch, runSearch, searchPageSize]
+    [
+      from,
+      setFrom,
+      setIncremental,
+      clearSearch,
+      runSearch,
+      searchPageSize,
+      history
+    ]
   )
 
   const initSearch = useCallback(
-    (location: Location) => {
+    (location: { search: string }) => {
       const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
@@ -263,7 +293,7 @@ export const useCourseSearch = (
 
   // this is our 'on startup' useEffect call
   useEffect(() => {
-    initSearch(window.location)
+    initSearch(history.location)
 
     // dependencies intentionally left blank here, because this effect
     // needs to run only once - it's just to initialize the search state
@@ -283,9 +313,7 @@ export const useCourseSearch = (
       }
     })
 
-    return () => {
-      unlisten()
-    }
+    return unlisten
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -309,9 +337,12 @@ export const useCourseSearch = (
     internalRunSearch(text, activeFacetsAndSort)
   }, [activeFacetsAndSort])
 
-  const onSubmit = useCallback(
-    (e: FormEvent): void => {
-      e.preventDefault()
+  const onSubmit: CourseSearchResult["onSubmit"] = useCallback(
+    e => {
+      if (e.type === "submit") {
+        e.preventDefault?.()
+      }
+
       internalRunSearch(text, activeFacetsAndSort)
     },
     [internalRunSearch, text, activeFacetsAndSort]

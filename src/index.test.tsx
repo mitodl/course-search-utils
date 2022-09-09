@@ -1,14 +1,7 @@
 import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
-import { createMemoryHistory } from "history"
-
-const memoryHistory = createMemoryHistory()
-jest.mock("history", () => ({
-  // @ts-ignore
-  ...jest.requireActual("history"),
-  createBrowserHistory: () => memoryHistory
-}))
+import { MemoryHistoryOptions, createMemoryHistory } from "history"
 
 import {
   LearningResourceType,
@@ -41,7 +34,14 @@ function FacetTestComponent(props: any) {
 }
 
 function TestComponent(props: any) {
-  const { runSearch, clearSearch, facets, loaded, searchPageSize } = props
+  const {
+    runSearch,
+    clearSearch,
+    facets,
+    loaded,
+    searchPageSize,
+    history
+  } = props
 
   const {
     facetOptions,
@@ -59,7 +59,14 @@ function TestComponent(props: any) {
     sort,
     updateSort,
     updateUI
-  } = useCourseSearch(runSearch, clearSearch, facets, loaded, searchPageSize)
+  } = useCourseSearch(
+    runSearch,
+    clearSearch,
+    facets,
+    loaded,
+    searchPageSize,
+    history
+  )
 
   return (
     <div className="test-component">
@@ -92,9 +99,13 @@ function TestComponent(props: any) {
   )
 }
 
-const render = (props = {}) => {
+const render = (props = {}, opts: MemoryHistoryOptions = {}) => {
   const runSearch = jest.fn()
   const clearSearch = jest.fn()
+  const history = createMemoryHistory({
+    initialEntries: ["/search"],
+    ...opts
+  })
   const facets = facetMap
   const loaded = true
   const searchPageSize = 10
@@ -106,6 +117,7 @@ const render = (props = {}) => {
       facets={facets}
       loaded={loaded}
       searchPageSize={searchPageSize}
+      history={history}
       {...props}
     />
   )
@@ -116,27 +128,12 @@ const render = (props = {}) => {
     clearSearch,
     facets,
     loaded,
-    searchPageSize
+    searchPageSize,
+    history
   }
 }
 
 describe("useCourseSearch", () => {
-  // @ts-ignore
-  let memoryStack, memoryUnlisten
-  beforeEach(() => {
-    // @ts-ignore
-    window.location = "http://localhost:3000/search"
-    memoryStack = []
-    memoryUnlisten = memoryHistory.listen(location => {
-      memoryStack.push(location)
-    })
-  })
-
-  afterEach(() => {
-    // @ts-ignore
-    memoryUnlisten()
-  })
-
   const checkSearchCall = (runSearch: jest.Mock, expectation: any[]) => {
     expect(runSearch.mock.calls[runSearch.mock.calls.length - 1]).toEqual(
       expectation
@@ -207,7 +204,7 @@ describe("useCourseSearch", () => {
 
   it("should let you run a search, which should echo to URL bar", async () => {
     const text = "My New Search Text"
-    const { wrapper, runSearch } = render()
+    const { wrapper, runSearch, history } = render()
     wrapper.find("input").simulate("change", { target: { value: text } })
     wrapper.find(".submit").simulate("click")
     checkSearchCall(runSearch, [
@@ -222,18 +219,17 @@ describe("useCourseSearch", () => {
     ])
     wrapper.update()
     await wait(1)
-    expect(memoryHistory.location.search).toEqual(
+    expect(history.location.search).toEqual(
       `?${serializeSearchParams({ text, activeFacets: INITIAL_FACET_STATE })}`
     )
   })
 
   it("should let you set filters, clear them", async () => {
-    const { wrapper, runSearch } = render()
+    const { wrapper, runSearch, history } = render()
     act(() => {
-      // @ts-ignore
-      wrapper.find(".onUpdateFacets").prop("onClick")({
+      wrapper.find(".onUpdateFacets").prop("onClick")?.({
         target: {
-          // @ts-ignore
+          // @ts-expect-error
           name:    "topics",
           value:   "Mathematics",
           checked: true
@@ -247,7 +243,7 @@ describe("useCourseSearch", () => {
     })
     await wait(1)
 
-    expect(memoryHistory.location.search).toEqual(
+    expect(history.location.search).toEqual(
       `?${serializeSearchParams({
         text:         "",
         activeFacets: {
@@ -284,7 +280,7 @@ describe("useCourseSearch", () => {
   it("should let you accept a suggestion", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".accept-suggestion").prop("onClick")("my suggestion")
     })
     checkSearchCall(runSearch, [
@@ -302,7 +298,7 @@ describe("useCourseSearch", () => {
   it("should let you toggle a facet", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
     })
     checkSearchCall(runSearch, [
@@ -321,7 +317,7 @@ describe("useCourseSearch", () => {
   it("should let you toggle multiple facets", async () => {
     const { wrapper, runSearch } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".toggleFacets").prop("onClick")([
         ["topic", "mathematics", true],
         ["type", LearningResourceType.Course, false],
@@ -361,7 +357,7 @@ describe("useCourseSearch", () => {
   it("should have a function for getting facet options", async () => {
     const { wrapper } = render()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LearningResourceType.Video, doc_count: 8156 },
@@ -369,17 +365,17 @@ describe("useCourseSearch", () => {
         { key: LearningResourceType.Podcast, doc_count: 1180 }
       ]
     })
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("topics").buckets.length).toEqual(137)
   })
 
   it("should merge an empty active facet into the ones from the search backend", async () => {
     const { wrapper } = render()
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       wrapper.find(".onUpdateFacets").prop("onClick")({
         target: {
-          // @ts-ignore
+          // @ts-expect-error
           name:    "type",
           value:   "Obstacle Course",
           checked: true
@@ -388,7 +384,7 @@ describe("useCourseSearch", () => {
     })
     wrapper.update()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
-    // @ts-ignore
+    // @ts-expect-error
     expect(facetOptions("type")).toEqual({
       buckets: [
         { key: LearningResourceType.Video, doc_count: 8156 },
@@ -401,7 +397,7 @@ describe("useCourseSearch", () => {
 
   it("should update the state when the back button is pressed", async () => {
     const text = "My New Search Text"
-    const { wrapper } = render()
+    const { wrapper, history } = render()
     await act(async () => {
       await wrapper
         .find("input")
@@ -412,7 +408,7 @@ describe("useCourseSearch", () => {
 
     expect(wrapper.find("input").prop("value")).toBe(text)
     act(() => {
-      memoryHistory.back()
+      history.back()
     })
     await wait(1)
     wrapper.update()
@@ -420,10 +416,12 @@ describe("useCourseSearch", () => {
   })
 
   it("should initialize with search parameters from window.location", async () => {
-    // @ts-ignore
-    window.location =
-      "http://localhost:3000/search/?q=sometext&t=Science&s=sortfield"
-    const { wrapper } = render()
+    const { wrapper } = render(
+      {},
+      {
+        initialEntries: ["/search?q=sometext&t=Science&s=sortfield"]
+      }
+    )
     await wait(1)
 
     const facets = wrapper.find(FacetTestComponent).prop("activeFacets")
@@ -444,32 +442,26 @@ describe("useCourseSearch", () => {
   })
 
   it("should sanitize window.location params so no extra paths are pushed onto stack", async () => {
-    // @ts-ignore
-    window.location = "http://localhost:3000/search/?q="
-    render()
+    const { history } = render(
+      {},
+      {
+        initialEntries: ["/search/?q="]
+      }
+    )
     await wait(1)
-    // @ts-ignore
-    expect(memoryStack).toStrictEqual([])
+    expect(history.index).toBe(0)
   })
 
   it("should update the URL when search is rerun and parameters are different", async () => {
-    // @ts-ignore
-    const { wrapper } = render()
+    const { wrapper, history } = render()
     await wait(1)
-    // @ts-ignore
     wrapper
       .find("input")
       .simulate("change", { target: { value: "search text goes here" } })
     wrapper.find(".submit").simulate("click")
     await wait(1)
 
-    // @ts-ignore
-    expect(memoryStack.length).toBe(1)
-    // @ts-ignore
-    expect(memoryStack[0].action).toBe("PUSH")
-    // @ts-ignore
-    expect(memoryStack[0].location.search).toBe(
-      "?q=search%20text%20goes%20here"
-    )
+    expect(history.index).toBe(1)
+    expect(history.location.search).toBe("?q=search%20text%20goes%20here")
   })
 })
