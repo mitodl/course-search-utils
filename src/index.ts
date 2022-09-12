@@ -50,6 +50,24 @@ export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
     .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
 })
 
+/**
+ * Accounts for a difference in the listener API for v4 and v5.
+ * See https://github.com/remix-run/history/issues/811
+ */
+const history4or5Listen = (
+  history: HHistory,
+  listener: (loc: Location, action: string) => void
+): (() => void) => {
+  // @ts-ignore
+  return history.listen((e1: any, e2: any) => {
+    if (e2) {
+      listener(e1, e2)
+    } else {
+      listener(e1.location, e1.action)
+    }
+  })
+}
+
 interface PreventableEvent {
   preventDefault?: () => void
   type?: string
@@ -305,7 +323,7 @@ export const useCourseSearch = (
     // We push browser state into the history when a piece of the URL changes. However
     // pressing the back button will update the browser stack but the UI does not respond by default.
     // So we have to trigger this change explicitly.
-    const unlisten = history.listen(({ location, action }) => {
+    const unlisten = history4or5Listen(history, (location, action) => {
       if (action === "POP") {
         // back button pressed
         // @ts-ignore
