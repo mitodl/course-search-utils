@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 2.0.0
+Version 2.0.0 (Released September 12, 2022)
 -------------
 
 - fmt
