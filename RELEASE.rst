@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+Version 2.0.0
+-------------
+
+- fmt
+- [breaking change]: history is not optional
+- format
+- add a comment
+- remove two erroneous gitignores
+- type adjustment
+- specify yarn version
+- add test for new history arg
+- use expect-error not ignore
+- read location from window.location
+- pass history to useCourseSearch
+- improve some typings
+- add explicit return type for useCourseSearch
+
 Version 1.8.0 (Released July 07, 2022)
 -------------
 
