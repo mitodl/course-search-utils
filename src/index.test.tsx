@@ -93,6 +93,16 @@ function TestComponent(props: any) {
   )
 }
 
+const goBack = (history4or5: { back?: () => void; goBack?: () => void }) => {
+  if (history4or5.back) {
+    return history4or5.back()
+  }
+  if (history4or5.goBack) {
+    return history4or5.goBack()
+  }
+  throw new Error("Could not find back method.")
+}
+
 const render = (props = {}, opts: MemoryHistoryOptions = {}) => {
   const runSearch = jest.fn()
   const clearSearch = jest.fn()
@@ -402,7 +412,7 @@ describe("useCourseSearch", () => {
 
     expect(wrapper.find("input").prop("value")).toBe(text)
     act(() => {
-      history.back()
+      goBack(history)
     })
     await wait(1)
     wrapper.update()
