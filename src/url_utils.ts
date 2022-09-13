@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import * as _ from "lodash"
 import * as qs from "query-string"
 
@@ -14,12 +15,12 @@ export interface Facets {
   audience?: string[]
   certification?: string[]
   type?: string[]
-  offered_by?: string[] // eslint-disable-line camelcase
+  offered_by?: string[]
   topics?: string[]
-  department_name?: string[] // eslint-disable-line camelcase
+  department_name?: string[]
   level?: string[]
-  course_feature_tags?: string[] // eslint-disable-line camelcase
-  resource_type?: string[] // eslint-disable-line camelcase
+  course_feature_tags?: string[]
+  resource_type?: string[]
 }
 
 export interface SortParam {
@@ -92,12 +93,12 @@ export const deserializeSearchParams = ({
       audience:            urlParamToArray(a),
       certification:       urlParamToArray(c),
       type:                urlParamToArray(type),
-      offered_by:          urlParamToArray(o), // eslint-disable-line camelcase
+      offered_by:          urlParamToArray(o),
       topics:              urlParamToArray(t),
-      department_name:     urlParamToArray(d), // eslint-disable-line camelcase
+      department_name:     urlParamToArray(d),
       level:               urlParamToArray(l),
-      course_feature_tags: urlParamToArray(f), // eslint-disable-line camelcase
-      resource_type:       urlParamToArray(r) // eslint-disable-line camelcase
+      course_feature_tags: urlParamToArray(f),
+      resource_type:       urlParamToArray(r)
     },
     sort: deserializeSort(handleText(s)),
     ui:   deserializeUI(handleText(u))
@@ -134,14 +135,14 @@ export const serializeSearchParams = ({
 }: Partial<SearchParams>): string => {
   const {
     type,
-    offered_by, // eslint-disable-line camelcase
+    offered_by,
     topics,
     audience,
     certification,
-    department_name, // eslint-disable-line camelcase
+    department_name,
     level,
-    course_feature_tags, // eslint-disable-line camelcase
-    resource_type // eslint-disable-line camelcase
+    course_feature_tags,
+    resource_type
   } = activeFacets ?? {}
 
   return qs.stringify({
