@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 2.0.1
+-------------
+
+- support history v4 and v5 (#41)
+- update a bunch of development dependencies (#40)
+
 Version 2.0.0 (Released September 12, 2022)
 -------------
 
