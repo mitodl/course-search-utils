@@ -34,8 +34,14 @@ function FacetTestComponent(props: any) {
 }
 
 function TestComponent(props: any) {
-  const { runSearch, clearSearch, facets, loaded, searchPageSize, history } =
-    props
+  const {
+    runSearch,
+    clearSearch,
+    facets,
+    loaded,
+    searchPageSize,
+    history
+  } = props
 
   const {
     facetOptions,
