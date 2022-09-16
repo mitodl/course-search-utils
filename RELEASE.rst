@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 2.0.2
+-------------
+
+- downgrade eslint to 7 (#43)
+
 Version 2.0.1 (Released September 14, 2022)
 -------------
 
