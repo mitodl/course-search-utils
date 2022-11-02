@@ -43,6 +43,8 @@ export type Aggregation = {
 
 export type Aggregations = Map<string, Aggregation>
 
+export type GetSearchPageSize = (ui: string | null) => number
+
 export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
   buckets: args
     .map(prop("buckets"))
@@ -97,7 +99,7 @@ interface CourseSearchResult {
    */
   onSubmit: (e: PreventableEvent) => void
   from: number
-  updateUI: (newUI: string) => void
+  updateUI: (newUI: string | null) => void
   ui: string | null
 }
 
@@ -112,7 +114,7 @@ export const useCourseSearch = (
   clearSearch: () => void,
   aggregations: Aggregations,
   loaded: boolean,
-  searchPageSize: number,
+  searchPageSize: number | GetSearchPageSize,
   history: HHistory
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
@@ -218,7 +220,7 @@ export const useCourseSearch = (
   )
 
   const updateUI = useCallback(
-    (newUI: string): void => {
+    (newUI: string | null): void => {
       const { activeFacets, sort } = activeFacetsAndSort
       setActiveFacetsAndSort({ activeFacets, sort, ui: newUI }) // this will cause a search via useDidMountEffect
     },
@@ -231,7 +233,12 @@ export const useCourseSearch = (
       activeFacetsAndSort: FacetsAndSort,
       incremental = false
     ) => {
-      let nextFrom = from + searchPageSize
+      const { activeFacets, sort, ui } = activeFacetsAndSort
+
+      const currentPageSize =
+        typeof searchPageSize === "number" ? searchPageSize : searchPageSize(ui)
+
+      let nextFrom = from + currentPageSize
 
       if (!incremental) {
         clearSearch()
@@ -240,7 +247,6 @@ export const useCourseSearch = (
       setFrom(nextFrom)
       setIncremental(incremental)
 
-      const { activeFacets, sort, ui } = activeFacetsAndSort
       const searchFacets = clone(activeFacets)
 
       if (searchFacets.type !== undefined && searchFacets.type.length > 0) {
