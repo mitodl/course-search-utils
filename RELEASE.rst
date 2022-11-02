@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 2.0.3
+-------------
+
+- Revert "support variable page size"
+- support variable page size
+
 Version 2.0.2 (Released September 16, 2022)
 -------------
 
