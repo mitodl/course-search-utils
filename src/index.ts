@@ -12,8 +12,7 @@ import { History as HHistory } from "history"
 import {
   LearningResourceType,
   INITIAL_FACET_STATE,
-  LR_TYPE_ALL,
-  DEFAULT_PAGE_SIZE
+  LR_TYPE_ALL
 } from "./constants"
 import {
   FacetsAndSort,
@@ -113,9 +112,8 @@ export const useCourseSearch = (
   clearSearch: () => void,
   aggregations: Aggregations,
   loaded: boolean,
-  searchPageSize: number | null,
-  history: HHistory,
-  getPageSizeFromUIParam: ((ui: string| null) => number) | null = null
+  searchPageSize: number,
+  history: HHistory
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
@@ -233,14 +231,6 @@ export const useCourseSearch = (
       activeFacetsAndSort: FacetsAndSort,
       incremental = false
     ) => {
-      const { activeFacets, sort, ui } = activeFacetsAndSort
-
-      if(getPageSizeFromUIParam){ 
-        searchPageSize = getPageSizeFromUIParam(ui)
-      } else if (!searchPageSize){
-        searchPageSize = DEFAULT_PAGE_SIZE
-      }
-
       let nextFrom = from + searchPageSize
 
       if (!incremental) {
@@ -250,6 +240,7 @@ export const useCourseSearch = (
       setFrom(nextFrom)
       setIncremental(incremental)
 
+      const { activeFacets, sort, ui } = activeFacetsAndSort
       const searchFacets = clone(activeFacets)
 
       if (searchFacets.type !== undefined && searchFacets.type.length > 0) {
