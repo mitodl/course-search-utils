@@ -40,3 +40,5 @@ export const INITIAL_FACET_STATE: Facets = {
 export const COURSENUM_SORT_FIELD = "department_course_numbers.sort_coursenum"
 
 export type Level = "Graduate" | "Undergraduate" | null
+
+export const DEFAULT_PAGE_SIZE = 10

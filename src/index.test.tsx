@@ -40,7 +40,8 @@ function TestComponent(props: any) {
     facets,
     loaded,
     searchPageSize,
-    history
+    history,
+    getPageSizeFromUIParam
   } = props
 
   const {
@@ -65,7 +66,8 @@ function TestComponent(props: any) {
     facets,
     loaded,
     searchPageSize,
-    history
+    history,
+    getPageSizeFromUIParam
   )
 
   return (
@@ -119,6 +121,7 @@ const render = (props = {}, opts: MemoryHistoryOptions = {}) => {
   const facets = facetMap
   const loaded = true
   const searchPageSize = 10
+  const getPageSizeFromUIParam = null
 
   const wrapper = mount(
     <TestComponent
@@ -128,6 +131,7 @@ const render = (props = {}, opts: MemoryHistoryOptions = {}) => {
       loaded={loaded}
       searchPageSize={searchPageSize}
       history={history}
+      getPageSizeFromUIParam = {getPageSizeFromUIParam}
       {...props}
     />
   )
@@ -474,4 +478,28 @@ describe("useCourseSearch", () => {
     expect(history.index).toBe(1)
     expect(history.location.search).toBe("?q=search%20text%20goes%20here")
   })
+
+  it("should correctly iterate from when getPageSizeFromUIParam is set", async () => {
+    const pageSizeFunc = (ui) => {
+      return 50
+    }
+
+    const { wrapper, runSearch } = render({searchPageSize: null, getPageSizeFromUIParam: pageSizeFunc})
+
+    act(() => {
+      wrapper.find(".load-more").simulate("click")
+    })
+    checkSearchCall(runSearch, [
+      "",
+      {
+        ...INITIAL_FACET_STATE,
+        type: LR_TYPE_ALL
+      },
+      50, 
+      null,
+      null
+    ])
+  })
 })
+
+
