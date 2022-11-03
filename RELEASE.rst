@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 2.0.4
+Version 2.0.4 (Released November 03, 2022)
 -------------
 
 - support variable page size (#45)
