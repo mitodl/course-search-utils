@@ -474,4 +474,48 @@ describe("useCourseSearch", () => {
     expect(history.index).toBe(1)
     expect(history.location.search).toBe("?q=search%20text%20goes%20here")
   })
+
+  it("should set the correct from value when searchPageSize is a number", async () => {
+    const { wrapper, runSearch } = render({
+      searchPageSize: 50
+    })
+
+    act(() => {
+      wrapper.find(".load-more").simulate("click")
+    })
+    checkSearchCall(runSearch, [
+      "",
+      {
+        ...INITIAL_FACET_STATE,
+        type: LR_TYPE_ALL
+      },
+      50,
+      null,
+      null
+    ])
+  })
+
+  it("should set the correct from value when searchPageSize is a function", async () => {
+    const pageSizeFunc = () => {
+      return 50
+    }
+
+    const { wrapper, runSearch } = render({
+      searchPageSize: pageSizeFunc
+    })
+
+    act(() => {
+      wrapper.find(".load-more").simulate("click")
+    })
+    checkSearchCall(runSearch, [
+      "",
+      {
+        ...INITIAL_FACET_STATE,
+        type: LR_TYPE_ALL
+      },
+      50,
+      null,
+      null
+    ])
+  })
 })
