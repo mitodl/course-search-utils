@@ -70,55 +70,28 @@ const history4or5Listen = (
   })
 }
 
-interface PreventableEvent {
-  preventDefault?: () => void
-  type?: string
-}
-interface CourseSearchResult {
-  facetOptions: (group: string) => Aggregation | null
-  clearAllFilters: () => void
-  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
-  toggleFacets: (facets: [string, string, boolean][]) => void
-  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
-  updateText: React.ChangeEventHandler<HTMLInputElement>
-  clearText: React.MouseEventHandler
-  updateSort: React.ChangeEventHandler
-  acceptSuggestion: (suggestion: string) => void
-  loadMore: () => void
-  incremental: boolean
-  text: string
-  sort: SortParam | null
-  activeFacets: Facets
-  /**
-   * Callback that handles search submission. Pass this to your search input
-   * submission event target, e.g., `<form onSubmit={onSubmit} />` or
-   * `<button onClick={onSubmit} />`.
-   *
-   * The event target does not need to emit submit events, but if it does, the
-   * default form action will be prevented.
-   */
-  onSubmit: (e: PreventableEvent) => void
-  from: number
-  updateUI: (newUI: string | null) => void
-  ui: string | null
+export const getFacetOptions = (aggregations: Aggregations, activeFacets: Facets, group: string): Aggregation | null => {
+  const emptyFacet = { buckets: [] }
+  const emptyActiveFacets = {
+    buckets: (activeFacets[group] || []).map((facet: string) => ({
+      key:       facet,
+      doc_count: 0
+    }))
+  }
+
+  if (!aggregations) {
+    return null
+  }
+
+  return mergeFacetResults(
+    aggregations.get(group) || emptyFacet,
+    emptyActiveFacets
+  )
 }
 
-export const useCourseSearch = (
-  runSearch: (
-    text: string,
-    searchFacets: Facets,
-    nextFrom: number,
-    sort?: SortParam | null,
-    ui?: string | null
-  ) => Promise<void>,
-  clearSearch: () => void,
-  aggregations: Aggregations,
-  loaded: boolean,
-  searchPageSize: number | GetSearchPageSize,
-  history: HHistory
-): CourseSearchResult => {
-  const [incremental, setIncremental] = useState(false)
-  const [from, setFrom] = useState(0)
+export const useSearchInputs = (
+  history: HHistory,
+) => {
   const [text, setText] = useState<string>(() => {
     const { text } = deserializeSearchParams(history.location)
     return text
@@ -130,29 +103,6 @@ export const useCourseSearch = (
       )
       return { activeFacets, sort, ui }
     }
-  )
-
-  const facetOptions = useCallback(
-    (group: string): Aggregation | null => {
-      const emptyFacet = { buckets: [] }
-      const { activeFacets } = activeFacetsAndSort
-      const emptyActiveFacets = {
-        buckets: (activeFacets[group] || []).map((facet: string) => ({
-          key:       facet,
-          doc_count: 0
-        }))
-      }
-
-      if (!aggregations) {
-        return null
-      }
-
-      return mergeFacetResults(
-        aggregations.get(group) || emptyFacet,
-        emptyActiveFacets
-      )
-    },
-    [aggregations, activeFacetsAndSort]
   )
 
   const clearAllFilters = useCallback(() => {
@@ -227,6 +177,113 @@ export const useCourseSearch = (
     [setActiveFacetsAndSort, activeFacetsAndSort]
   )
 
+  const setLocation = useCallback(() => {
+    // search is updated, now echo params to URL bar
+    const currentSearch = serializeSearchParams(
+      deserializeSearchParams(history.location)
+    )
+    const { activeFacets, sort, ui } = activeFacetsAndSort
+    const newSearch = serializeSearchParams({
+      text,
+      activeFacets,
+      sort,
+      ui
+    })
+    if (currentSearch !== newSearch) {
+      history.push(`?${newSearch}`)
+    }
+  }, [history, activeFacetsAndSort, text])
+
+  const { sort, activeFacets, ui } = activeFacetsAndSort
+  return {
+    text,
+    setText,
+    activeFacetsAndSort,
+    setActiveFacetsAndSort,
+    clearAllFilters,
+    toggleFacet,
+    toggleFacets,
+    onUpdateFacets,
+    updateText,
+    updateSort,
+    updateUI,
+    setLocation,
+    sort,
+    activeFacets,
+    ui
+  }
+}
+
+
+interface PreventableEvent {
+  preventDefault?: () => void
+  type?: string
+}
+interface CourseSearchResult {
+  facetOptions: (group: string) => Aggregation | null
+  clearAllFilters: () => void
+  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
+  toggleFacets: (facets: [string, string, boolean][]) => void
+  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
+  updateText: React.ChangeEventHandler<HTMLInputElement>
+  clearText: React.MouseEventHandler
+  updateSort: React.ChangeEventHandler
+  acceptSuggestion: (suggestion: string) => void
+  loadMore: () => void
+  incremental: boolean
+  text: string
+  sort: SortParam | null
+  activeFacets: Facets
+  /**
+   * Callback that handles search submission. Pass this to your search input
+   * submission event target, e.g., `<form onSubmit={onSubmit} />` or
+   * `<button onClick={onSubmit} />`.
+   *
+   * The event target does not need to emit submit events, but if it does, the
+   * default form action will be prevented.
+   */
+  onSubmit: (e: PreventableEvent) => void
+  from: number
+  updateUI: (newUI: string | null) => void
+  ui: string | null
+}
+
+export const useCourseSearch = (
+  runSearch: (
+    text: string,
+    searchFacets: Facets,
+    nextFrom: number,
+    sort?: SortParam | null,
+    ui?: string | null
+  ) => Promise<void>,
+  clearSearch: () => void,
+  aggregations: Aggregations,
+  loaded: boolean,
+  searchPageSize: number | GetSearchPageSize,
+  history: HHistory
+): CourseSearchResult => {
+  const [incremental, setIncremental] = useState(false)
+  const [from, setFrom] = useState(0)
+
+  const {
+    text,
+    setText,
+    activeFacetsAndSort,
+    setActiveFacetsAndSort,
+    clearAllFilters,
+    toggleFacet,
+    toggleFacets,
+    onUpdateFacets,
+    updateText,
+    updateSort,
+    updateUI,
+    setLocation
+  } = useSearchInputs(history)
+  const facetOptions = useCallback(
+    (group: string) => getFacetOptions(aggregations, activeFacetsAndSort.activeFacets, group),
+    [aggregations, activeFacetsAndSort.activeFacets]
+  )
+
   const internalRunSearch = useCallback(
     async (
       text: string,
@@ -263,19 +320,7 @@ export const useCourseSearch = (
 
       await runSearch(text, searchFacets, nextFrom, sort, ui)
 
-      // search is updated, now echo params to URL bar
-      const currentSearch = serializeSearchParams(
-        deserializeSearchParams(history.location)
-      )
-      const newSearch = serializeSearchParams({
-        text,
-        activeFacets,
-        sort,
-        ui
-      })
-      if (currentSearch !== newSearch) {
-        history.push(`?${newSearch}`)
-      }
+      setLocation()
     },
     [
       from,
@@ -284,7 +329,7 @@ export const useCourseSearch = (
       clearSearch,
       runSearch,
       searchPageSize,
-      history
+      setLocation
     ]
   )
 
