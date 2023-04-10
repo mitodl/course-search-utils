@@ -34,7 +34,7 @@ export interface FacetsAndSort {
   ui: string | null
 }
 
-type SearchParams = {
+export type SearchParams = {
   text: string
   activeFacets: Facets
   sort: SortParam | null
@@ -142,8 +142,12 @@ export const serializeSearchParams = ({
     department_name,
     level,
     course_feature_tags,
-    resource_type
+    resource_type,
+    ...others
   } = activeFacets ?? {}
+  if (Object.keys(others).length > 0) {
+    console.warn('Unrecognized facets:', others)
+  }
 
   return qs.stringify({
     q: text || undefined,

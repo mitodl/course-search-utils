@@ -1,14 +1,17 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 
-export function useDidMountEffect(fn: () => void, deps: any[]): void {
-  const renderedOnce = useRef(false)
+/**
+ * Like `useEffect`, but only runs after component has rendered at least once.
+ */
+export function useEffectAfterMount(fn: () => void, deps: any[]): void {
+  const [hasRendered, setHasRendered] = useState(false)
 
   useEffect(() => {
-    if (renderedOnce.current) {
+    if (hasRendered) {
       fn()
     } else {
-      renderedOnce.current = true
+      setHasRendered(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+  }, [hasRendered, ...deps])
 }
