@@ -146,7 +146,7 @@ export const serializeSearchParams = ({
     ...others
   } = activeFacets ?? {}
   if (Object.keys(others).length > 0) {
-    console.warn('Unrecognized facets:', others)
+    console.warn("Unrecognized facets:", others)
   }
 
   return qs.stringify({

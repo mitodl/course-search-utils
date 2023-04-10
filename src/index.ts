@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useEffect,
   MouseEvent,
-  ChangeEvent,
   useMemo,
   useRef
 } from "react"
@@ -76,25 +75,28 @@ const history4or5Listen = (
 export const useFacetOptions = (
   aggregations: Aggregations,
   activeFacets: Facets
-): (group: string) => Aggregation | null => {
-  return useCallback((group: string) => {
-    const emptyFacet = { buckets: [] }
-    const emptyActiveFacets = {
-      buckets: (activeFacets[group] || []).map((facet: string) => ({
-        key:       facet,
-        doc_count: 0
-      }))
-    }
+): ((group: string) => Aggregation | null) => {
+  return useCallback(
+    (group: string) => {
+      const emptyFacet = { buckets: [] }
+      const emptyActiveFacets = {
+        buckets: (activeFacets[group] || []).map((facet: string) => ({
+          key:       facet,
+          doc_count: 0
+        }))
+      }
 
-    if (!aggregations) {
-      return null
-    }
+      if (!aggregations) {
+        return null
+      }
 
-    return mergeFacetResults(
-      aggregations.get(group) || emptyFacet,
-      emptyActiveFacets
-    )
-  }, [aggregations, activeFacets])
+      return mergeFacetResults(
+        aggregations.get(group) || emptyFacet,
+        emptyActiveFacets
+      )
+    },
+    [aggregations, activeFacets]
+  )
 }
 
 type UseSearchInputsResult = {
@@ -120,17 +122,21 @@ type UseSearchInputsResult = {
    */
   clearAllFilters: () => void
   /**
-   * Toggle a single facet; also sets text -> searchParams.text. 
+   * Toggle a single facet; also sets text -> searchParams.text.
    */
   toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
   /**
-   * Toggle multiple facets; also sets text -> searchParams.text. 
+   * Toggle multiple facets; also sets text -> searchParams.text.
    */
   toggleFacets: (facets: [string, string, boolean][]) => void
   /**
    * Event handler for toggling a single facet; also sets text -> searchParams.text.
    */
-  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
+  onUpdateFacet: ({
+    target
+  }: {
+    target: Pick<HTMLInputElement, "value" | "checked" | "name">
+  }) => void
   /**
    * Input handler for updating `text` (des NOT update `searchParams.text`).
    */
@@ -138,11 +144,11 @@ type UseSearchInputsResult = {
   /**
    * Event handler for clearing `text`; also clears searchParams.text.
    */
-  clearText: React.MouseEventHandler
+  clearText: () => void
   /**
    * Event handler for updating `searchParams.sort`; also sets text -> searchParams.text.
    */
-  updateSort: React.ChangeEventHandler
+  updateSort: (event: { target: { value: string } }) => void
   /**
    * Updates `searchParams.sort`; also sets text -> searchParams.text.
    */
@@ -170,8 +176,8 @@ type UseSearchInputsResult = {
  * facets) sync `text` -> `searchParams.text`.
  */
 export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
-  const [searchParamsInternal, setSearchParams] = useState<SearchParams>(
-    () => deserializeSearchParams(history.location)
+  const [searchParamsInternal, setSearchParams] = useState<SearchParams>(() =>
+    deserializeSearchParams(history.location)
   )
 
   const searchParams = useMemo(() => {
@@ -197,7 +203,7 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
     setText("")
   }, [setText])
 
-  const toggleFacet: CourseSearchResult["toggleFacet"] = useCallback(
+  const toggleFacet: UseSearchInputsResult["toggleFacet"] = useCallback(
     (name, value, isEnabled) => {
       setSearchParams(current => {
         const { activeFacets, sort, ui } = current
@@ -213,14 +219,14 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
           activeFacets: newFacets,
           sort,
           ui,
-          text:         textRef.current,
+          text:         textRef.current
         }
       })
     },
     []
   )
 
-  const toggleFacets: CourseSearchResult["toggleFacets"] = useCallback(
+  const toggleFacets: UseSearchInputsResult["toggleFacets"] = useCallback(
     facets => {
       setSearchParams(current => {
         const { activeFacets, sort, ui } = current
@@ -233,18 +239,24 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
             newFacets[name] = _.without(newFacets[name] || [], value)
           }
         })
-        return { ...current, activeFacets: newFacets, sort, ui, text: textRef.current, }
+        return {
+          ...current,
+          activeFacets: newFacets,
+          sort,
+          ui,
+          text:         textRef.current
+        }
       })
     },
     []
   )
 
-  const onUpdateFacets: CourseSearchResult["onUpdateFacets"] = useCallback(
+  const onUpdateFacet: UseSearchInputsResult["onUpdateFacet"] = useCallback(
     e => toggleFacet(e.target.name, e.target.value, e.target.checked),
     [toggleFacet]
   )
 
-  const updateText: CourseSearchResult["updateText"] = useCallback(
+  const updateText: UseSearchInputsResult["updateText"] = useCallback(
     event => {
       const text = event ? event.target.value : ""
       setText(text)
@@ -252,30 +264,31 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
     [setText]
   )
 
-  const updateSort = useCallback(
-    (event: ChangeEvent): void => {
+  const updateSort: UseSearchInputsResult["updateSort"] = useCallback(
+    (event): void => {
       const param = event ? (event.target as HTMLSelectElement).value : ""
       const newSort = deserializeSort(param)
-      setSearchParams(current => ({...current, sort: newSort, text: textRef.current }))
+      setSearchParams(current => ({
+        ...current,
+        sort: newSort,
+        text: textRef.current
+      }))
     },
     []
   )
 
-  const updateUI = useCallback(
-    (newUI: string | null): void => {
-      setSearchParams(current => ({ ...current, ui: newUI, text: textRef.current }))
-    },
-    []
-  )
+  const updateUI = useCallback((newUI: string | null): void => {
+    setSearchParams(current => ({
+      ...current,
+      ui:   newUI,
+      text: textRef.current
+    }))
+  }, [])
 
-  const clearText = useCallback(
-    (event: MouseEvent) => {
-      event.preventDefault()
-      setText("")
-      setSearchParams(current => ({ ...current, text: "" }))
-    },
-    [setText, setSearchParams]
-  )
+  const clearText = useCallback(() => {
+    setText("")
+    setSearchParams(current => ({ ...current, text: "" }))
+  }, [setText, setSearchParams])
 
   const submitText = useCallback(() => {
     setSearchParams(current => ({
@@ -292,7 +305,7 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
     clearAllFilters,
     toggleFacet,
     toggleFacets,
-    onUpdateFacets,
+    onUpdateFacet,
     updateText,
     updateSort,
     clearText,
@@ -313,7 +326,8 @@ const setLocation = (history: HHistory, searchParams: SearchParams) => {
     ui
   })
   if (currentSearch !== newSearch) {
-    history.push(`?${newSearch}`)
+    const prefix = newSearch ? "?" : ""
+    history.push(`${prefix}${newSearch}`)
   }
 }
 
@@ -323,12 +337,7 @@ export const useSyncUrlAndSearch = (
     searchParams,
     setSearchParams,
     setText
-  }: Pick<
-    UseSearchInputsResult,
-    | "searchParams"
-    | "setSearchParams"
-    | "setText"
-  >
+  }: Pick<UseSearchInputsResult, "searchParams" | "setSearchParams" | "setText">
 ) => {
   // sync URL to search
   useEffect(() => {
@@ -351,10 +360,10 @@ interface PreventableEvent {
 }
 interface CourseSearchResult {
   facetOptions: (group: string) => Aggregation | null
-  clearAllFilters: () => void
+  clearAllFilters: UseSearchInputsResult["clearAllFilters"]
   toggleFacet: UseSearchInputsResult["toggleFacet"]
   toggleFacets: UseSearchInputsResult["toggleFacets"]
-  onUpdateFacets: UseSearchInputsResult["onUpdateFacets"]
+  onUpdateFacets: UseSearchInputsResult["onUpdateFacet"]
   updateText: UseSearchInputsResult["updateText"]
   clearText: React.MouseEventHandler
   updateSort: UseSearchInputsResult["updateSort"]
@@ -404,13 +413,17 @@ export const useCourseSearch = (
     clearAllFilters,
     toggleFacet,
     toggleFacets,
-    onUpdateFacets,
+    onUpdateFacet: onUpdateFacets,
     updateText,
     updateSort,
     updateUI
   } = seachUI
   const { activeFacets, sort, ui } = searchParams
-  const activeFacetsAndSort = useMemo(() => ({ activeFacets, sort, ui }), [activeFacets, sort, ui])
+  const activeFacetsAndSort = useMemo(() => ({ activeFacets, sort, ui }), [
+    activeFacets,
+    sort,
+    ui
+  ])
   const facetOptions = useFacetOptions(aggregations, activeFacets)
 
   const internalRunSearch = useCallback(
@@ -467,7 +480,7 @@ export const useCourseSearch = (
       const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
-      setSearchParams(current => ({...current, activeFacets, sort, ui }))
+      setSearchParams(current => ({ ...current, activeFacets, sort, ui }))
     },
     [clearSearch, setText, setSearchParams]
   )

@@ -1,7 +1,8 @@
 import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
-import { MemoryHistoryOptions, createMemoryHistory } from "history"
+import { renderHook } from "@testing-library/react-hooks/dom"
+import { MemoryHistoryOptions, createMemoryHistory, InitialEntry } from "history"
 
 import {
   LearningResourceType,
@@ -9,7 +10,7 @@ import {
   LR_TYPE_ALL
 } from "./constants"
 
-import { useCourseSearch } from "./index"
+import { useCourseSearch, useSearchInputs, useSyncUrlAndSearch } from "./index"
 import { facetMap, wait } from "./test_util"
 import { serializeSort, serializeSearchParams } from "./url_utils"
 
@@ -309,14 +310,14 @@ describe("useCourseSearch", () => {
     const { wrapper, runSearch } = render()
     act(() => {
       // @ts-expect-error
-      wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
+      wrapper.find(".toggleFacet").prop("onClick")("topics", "mathematics", true)
     })
     checkSearchCall(runSearch, [
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:  LR_TYPE_ALL,
-        topic: ["mathematics"]
+        type:   LR_TYPE_ALL,
+        topics: ["mathematics"]
       },
       0,
       null,
@@ -329,7 +330,7 @@ describe("useCourseSearch", () => {
     act(() => {
       // @ts-expect-error
       wrapper.find(".toggleFacets").prop("onClick")([
-        ["topic", "mathematics", true],
+        ["topics", "mathematics", true],
         ["type", LearningResourceType.Course, false],
         ["type", LearningResourceType.ResourceFile, true]
       ])
@@ -338,8 +339,8 @@ describe("useCourseSearch", () => {
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:  [LearningResourceType.ResourceFile],
-        topic: ["mathematics"]
+        type:   [LearningResourceType.ResourceFile],
+        topics: ["mathematics"]
       },
       0,
       null,
@@ -517,5 +518,363 @@ describe("useCourseSearch", () => {
       null,
       null
     ])
+  })
+})
+
+describe("useSearchInputs", () => {
+  it.each([
+    {
+      descrip:  "initial: empty",
+      initial:  null,
+      expected: {
+        text:         "",
+        activeFacets: INITIAL_FACET_STATE,
+        sort:         null,
+        ui:           null
+      }
+    },
+    {
+      descrip: "initial: text, facets, ui",
+      initial: {
+        text:         "cat",
+        activeFacets: { topics: ["math", "bio"] },
+        ui:           "list"
+      },
+      expected: {
+        text:         "cat",
+        activeFacets: { ...INITIAL_FACET_STATE, topics: ["math", "bio"] },
+        ui:           "list",
+        sort:         null
+      }
+    },
+    {
+      descrip:  "initial: sort",
+      initial:  { sort: { field: "coursenum", option: "asc" } },
+      expected: {
+        text:         "",
+        activeFacets: INITIAL_FACET_STATE,
+        sort:         { field: "coursenum", option: "asc" },
+        ui:           null
+      }
+    }
+  ])(
+    "Reads initial searchParams and text from history ($desc)",
+    ({ initial, expected }) => {
+      const initialEntries = initial ?
+        [`?${serializeSearchParams(initial)}`] :
+        undefined
+      const history = createMemoryHistory({ initialEntries })
+      const { result } = renderHook(() => useSearchInputs(history))
+      expect(result.current.searchParams).toEqual(expected)
+      expect(result.current.text).toEqual(expected.text)
+
+      /**
+       * We want to ensure that the initial state is set from the URL, as
+       * opposed to the initial state being empty and updated via a useEffect
+       * hook. The latter approach could lead to extra runSearch calls in
+       * useCourseSearch, or extra history entries with useSyncUrlAndSearch
+       */
+      expect(result.all.length).toBe(1)
+    }
+  )
+
+  test("setSearchParams updates searchParams when given an object", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+    act(() => {
+      result.current.setSearchParams({
+        text:         "cat",
+        activeFacets: { topics: ["math", "bio"] },
+        ui:           null,
+        sort:         null
+      })
+    })
+    expect(result.current.searchParams).toEqual({
+      text:         "cat",
+      activeFacets: { topics: ["math", "bio"] },
+      sort:         null,
+      ui:           null
+    })
+  })
+
+  test("setSearchParams updates searchParams when given an callback", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+    act(() => {
+      result.current.setSearchParams(current => ({ ...current, text: "cat" }))
+    })
+    expect(result.current.searchParams).toEqual({
+      text:         "cat",
+      activeFacets: INITIAL_FACET_STATE,
+      sort:         null,
+      ui:           null
+    })
+  })
+
+  test("setText updates text but NOT searchParams", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+    expect(result.current.text).toEqual("")
+    const initialSearchParams = result.current.searchParams
+    act(() => {
+      result.current.setText("cat")
+    })
+    expect(result.current.searchParams).toEqual(initialSearchParams)
+    expect(result.current.text).toEqual("cat")
+  })
+
+  test("clearAllFilters clears text and searchParams", () => {
+    const initialEntries = [
+      `?${serializeSearchParams({
+        text:         "cat",
+        activeFacets: { topics: ["math", "bio"] },
+        ui:           "list",
+        sort:         { field: "coursenum", option: "asc" }
+      })}`
+    ]
+    const history = createMemoryHistory({ initialEntries })
+    const { result } = renderHook(() => useSearchInputs(history))
+    const initialSearchParams = result.current.searchParams
+    const initialText = result.current.text
+
+    act(() => result.current.clearAllFilters())
+    // data changed
+    expect(result.current.searchParams).not.toEqual(initialSearchParams)
+    expect(result.current.text).not.toEqual(initialText)
+
+    // reset as expected
+    expect(result.current.searchParams).toEqual({
+      text:         "",
+      activeFacets: INITIAL_FACET_STATE,
+      sort:         null,
+      ui:           null
+    })
+    expect(result.current.text).toEqual("")
+  })
+
+  test("toggleFacet adds/removes a facet", () => {
+    const initialEntries = [
+      `?${serializeSearchParams({
+        text:         "cat",
+        activeFacets: { topics: ["math", "bio"] }
+      })}`
+    ]
+    const history = createMemoryHistory({ initialEntries })
+    const { result } = renderHook(() => useSearchInputs(history))
+    act(() => {
+      result.current.toggleFacet("topics", "math", false)
+    })
+    expect(result.current.searchParams.activeFacets.topics).toEqual(["bio"])
+    act(() => {
+      result.current.toggleFacet("topics", "math", true)
+    })
+    expect(result.current.searchParams.activeFacets.topics).toEqual([
+      "bio",
+      "math"
+    ])
+  })
+
+  test("toggleFacets adds/removes multiple facets", () => {
+    const initialEntries = [
+      `?${serializeSearchParams({
+        text:         "cat",
+        activeFacets: {
+          topics:          ["math", "bio"],
+          level:           ["beginner"],
+          department_name: ["physics", "biology"]
+        }
+      })}`
+    ]
+    const history = createMemoryHistory({ initialEntries })
+    const { result } = renderHook(() => useSearchInputs(history))
+    act(() => {
+      result.current.toggleFacets([
+        ["topics", "chem", true],
+        ["level", "beginner", false],
+        ["department_name", "chemistry", true]
+      ])
+    })
+    expect(result.current.searchParams.activeFacets.topics).toEqual([
+      "math",
+      "bio",
+      "chem"
+    ])
+    expect(result.current.searchParams.activeFacets.level).toEqual([])
+    expect(result.current.searchParams.activeFacets.department_name).toEqual([
+      "physics",
+      "biology",
+      "chemistry"
+    ])
+  })
+
+  test("onUpdateFacet adds/removes a facet", () => {
+    const initialEntries = [
+      `?${serializeSearchParams({
+        text:         "cat",
+        activeFacets: { topics: ["math", "bio"] }
+      })}`
+    ]
+    const history = createMemoryHistory({ initialEntries })
+    const { result } = renderHook(() => useSearchInputs(history))
+    act(() => {
+      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: false }})
+    })
+    expect(result.current.searchParams.activeFacets.topics).toEqual(["bio"])
+    act(() => {
+      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: true }})
+    })
+    expect(result.current.searchParams.activeFacets.topics).toEqual([
+      "bio",
+      "math"
+    ])
+  })
+
+  test("toggleFacet sets texts -> searchParams.text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+
+    expect(result.current.searchParams.text).toEqual("")
+    act(() => {
+      result.current.toggleFacet("topics", "math", true)
+    })
+    expect(result.current.searchParams.text).toEqual("algebra")
+  })
+
+  test("toggleFacets sets texts -> searchParams.text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+
+    expect(result.current.searchParams.text).toEqual("")
+    act(() => {
+      result.current.toggleFacets([["topics", "math", true]])
+    })
+    expect(result.current.searchParams.text).toEqual("algebra")
+  })
+
+  test("onUpdateFacet sets texts -> searchParams.text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+
+    expect(result.current.searchParams.text).toEqual("")
+    act(() => {
+      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: true }})
+    })
+    expect(result.current.searchParams.text).toEqual("algebra")
+  })
+
+  test("onUpdateText updates texts but not searchParams.text; submitText finalizes text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+    expect(result.current.text).toBe("algebra")
+    expect(result.current.searchParams.text).toBe("")
+
+    act(() => result.current.submitText())
+    expect(result.current.searchParams.text).toBe("algebra")
+  })
+
+  test("clearText clears text and searchParams.text", () => {
+    const history = createMemoryHistory({
+      initialEntries: [`?${serializeSearchParams({ text: "algebra" })}`]
+    })
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    expect(result.current.text).toBe("algebra")
+    expect(result.current.searchParams.text).toBe("algebra")
+
+    act(() => result.current.clearText())
+    expect(result.current.text).toBe("")
+    expect(result.current.searchParams.text).toBe("")
+  })
+
+  test("updateSort updates sort and sets text -> searchParams.text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+
+    expect(result.current.searchParams.sort).toBe(null)
+    expect(result.current.searchParams.text).toBe("")
+
+    act(() => {
+      result.current.updateSort({ target: { value: "-title" } })
+    })
+    expect(result.current.searchParams.sort).toEqual({ field: "title", option: "desc" })
+    expect(result.current.searchParams.text).toBe("algebra")
+  })
+
+  test("updateUI updates ui and sets text -> searchParams.text", () => {
+    const history = createMemoryHistory()
+    const { result } = renderHook(() => useSearchInputs(history))
+
+    act(() => result.current.setText("algebra"))
+
+    expect(result.current.searchParams.sort).toBe(null)
+    expect(result.current.searchParams.text).toBe("")
+
+    act(() => {
+      result.current.updateUI("list")
+    })
+    expect(result.current.searchParams.ui).toBe("list")
+    expect(result.current.searchParams.text).toBe("algebra")
+  })
+})
+
+describe("useSyncUrlAndSearch", () => {
+  const setupHook = (initialEntries?: InitialEntry[]) => {
+    const history = createMemoryHistory({ initialEntries })
+    const all = renderHook(() => {
+      const search = useSearchInputs(history)
+      useSyncUrlAndSearch(history, search)
+      return search
+    })
+    return [all, history] as const
+  }
+
+  it("syncs searchParams to url", async () => {
+    const [{ result }, history] = setupHook()
+
+    expect(history.index).toBe(0)
+    act(() => {
+      result.current.setText("algebra")
+      result.current.toggleFacet("topics", "math", true) // syncs text
+    })
+
+    act(() => {
+      result.current.setText("linear algebra")
+    })
+
+    expect(result.current.searchParams.text).toBe("algebra")
+    expect(result.current.text).toBe("linear algebra") // not submitted yet
+
+
+    expect(history.location.search).toBe("?q=algebra&t=math")
+    expect(history.index).toBe(1)
+  })
+
+  it("syncs url to searchParams", async () => {
+    const [{ result }, history] = setupHook([
+      `?${serializeSearchParams({ text: "algebra", activeFacets: { topics: ["math"] } })}`
+    ])
+
+    act(() => {
+      result.current.clearAllFilters()
+    })
+
+    expect(result.current.searchParams.text).toBe("")
+    expect(history.location.search).toBe("")
+
+    act(() => history.go(-1))
+
+    expect(history.location.search).toBe("?q=algebra&t=math")
+    expect(result.current.searchParams.text).toBe("algebra")
+    expect(result.current.searchParams.activeFacets.topics).toEqual(["math"])
   })
 })
