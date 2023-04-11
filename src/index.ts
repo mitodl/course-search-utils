@@ -327,7 +327,9 @@ const setLocation = (history: HHistory, searchParams: SearchParams) => {
   })
   if (currentSearch !== newSearch) {
     const prefix = newSearch ? "?" : ""
-    history.push(`${prefix}${newSearch}`)
+    history.push({
+      search: `${prefix}${newSearch}`
+    })
   }
 }
 

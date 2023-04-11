@@ -856,12 +856,13 @@ describe("useSyncUrlAndSearch", () => {
   }
 
   it("syncs searchParams to url", async () => {
-    const [{ result }, history] = setupHook()
+    const [{ result }, history] = setupHook(["/search"])
 
     expect(history.index).toBe(0)
     act(() => {
       result.current.setText("algebra")
-      result.current.toggleFacet("topics", "math", true) // syncs text
+      result.current.toggleFacet("topics", "math", true)
+      result.current.submitText()
     })
 
     act(() => {
@@ -871,8 +872,26 @@ describe("useSyncUrlAndSearch", () => {
     expect(result.current.searchParams.text).toBe("algebra")
     expect(result.current.text).toBe("linear algebra") // not submitted yet
 
-    expect(history.location.search).toBe("?q=algebra&t=math")
+    expect(history.location).toEqual(
+      expect.objectContaining({
+        pathname: "/search",
+        search:   "?q=algebra&t=math"
+      })
+    )
     expect(history.index).toBe(1)
+  })
+
+  it("syncs empty search parameters to URL correctly", () => {
+    const [{ result }, history] = setupHook(["/search?q=algebra"])
+    act(() => {
+      result.current.clearText()
+    })
+    expect(history.location).toEqual(
+      expect.objectContaining({
+        pathname: "/search",
+        search:   ""
+      })
+    )
   })
 
   it("syncs url to searchParams", async () => {
