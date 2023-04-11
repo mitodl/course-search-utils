@@ -333,6 +333,11 @@ const setLocation = (history: HHistory, searchParams: SearchParams) => {
   }
 }
 
+/**
+ * Sync changes to URL search parameters with `searchParams`, and vice versa.
+ *
+ * Pushes a new entry to the history stack every time the URL would change.
+ */
 export const useSyncUrlAndSearch = (
   history: HHistory,
   {
