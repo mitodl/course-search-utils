@@ -2,7 +2,11 @@ import * as React from "react"
 import { mount } from "enzyme"
 import { act } from "react-dom/test-utils"
 import { renderHook } from "@testing-library/react-hooks/dom"
-import { MemoryHistoryOptions, createMemoryHistory, InitialEntry } from "history"
+import {
+  MemoryHistoryOptions,
+  createMemoryHistory,
+  InitialEntry
+} from "history"
 
 import {
   LearningResourceType,
@@ -310,7 +314,11 @@ describe("useCourseSearch", () => {
     const { wrapper, runSearch } = render()
     act(() => {
       // @ts-expect-error
-      wrapper.find(".toggleFacet").prop("onClick")("topics", "mathematics", true)
+      wrapper.find(".toggleFacet").prop("onClick")(
+        "topics",
+        "mathematics",
+        true
+      )
     })
     checkSearchCall(runSearch, [
       "",
@@ -717,11 +725,15 @@ describe("useSearchInputs", () => {
     const history = createMemoryHistory({ initialEntries })
     const { result } = renderHook(() => useSearchInputs(history))
     act(() => {
-      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: false }})
+      result.current.onUpdateFacet({
+        target: { name: "topics", value: "math", checked: false }
+      })
     })
     expect(result.current.searchParams.activeFacets.topics).toEqual(["bio"])
     act(() => {
-      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: true }})
+      result.current.onUpdateFacet({
+        target: { name: "topics", value: "math", checked: true }
+      })
     })
     expect(result.current.searchParams.activeFacets.topics).toEqual([
       "bio",
@@ -763,7 +775,9 @@ describe("useSearchInputs", () => {
 
     expect(result.current.searchParams.text).toEqual("")
     act(() => {
-      result.current.onUpdateFacet({ target: { name: "topics", value: "math", checked: true }})
+      result.current.onUpdateFacet({
+        target: { name: "topics", value: "math", checked: true }
+      })
     })
     expect(result.current.searchParams.text).toEqual("algebra")
   })
@@ -806,7 +820,10 @@ describe("useSearchInputs", () => {
     act(() => {
       result.current.updateSort({ target: { value: "-title" } })
     })
-    expect(result.current.searchParams.sort).toEqual({ field: "title", option: "desc" })
+    expect(result.current.searchParams.sort).toEqual({
+      field:  "title",
+      option: "desc"
+    })
     expect(result.current.searchParams.text).toBe("algebra")
   })
 
@@ -854,14 +871,16 @@ describe("useSyncUrlAndSearch", () => {
     expect(result.current.searchParams.text).toBe("algebra")
     expect(result.current.text).toBe("linear algebra") // not submitted yet
 
-
     expect(history.location.search).toBe("?q=algebra&t=math")
     expect(history.index).toBe(1)
   })
 
   it("syncs url to searchParams", async () => {
     const [{ result }, history] = setupHook([
-      `?${serializeSearchParams({ text: "algebra", activeFacets: { topics: ["math"] } })}`
+      `?${serializeSearchParams({
+        text:         "algebra",
+        activeFacets: { topics: ["math"] }
+      })}`
     ])
 
     act(() => {
