@@ -186,6 +186,11 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
     // serialization is the same.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serializeSearchParams(searchParamsInternal)])
+
+  /**
+   * Store text in state + ref. State for re-renders, and ref for render-stable
+   * callbacks.
+   */
   const textRef = useRef(searchParamsInternal.text)
   const [text, setTextState] = useState(searchParamsInternal.text)
   const setText = useCallback((val: string) => {
