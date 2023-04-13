@@ -3,7 +3,8 @@ import React, {
   useCallback,
   useEffect,
   MouseEvent,
-  ChangeEvent
+  useMemo,
+  useRef
 } from "react"
 import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
@@ -20,9 +21,10 @@ import {
   deserializeSearchParams,
   deserializeSort,
   serializeSearchParams,
-  SortParam
+  SortParam,
+  SearchParams
 } from "./url_utils"
-import { useDidMountEffect } from "./hooks"
+import { useEffectAfterMount } from "./hooks"
 
 export * from "./constants"
 
@@ -70,19 +72,313 @@ const history4or5Listen = (
   })
 }
 
+export const useFacetOptions = (
+  aggregations: Aggregations,
+  activeFacets: Facets
+): ((group: string) => Aggregation | null) => {
+  return useCallback(
+    (group: string) => {
+      const emptyFacet = { buckets: [] }
+      const emptyActiveFacets = {
+        buckets: (activeFacets[group] || []).map((facet: string) => ({
+          key:       facet,
+          doc_count: 0
+        }))
+      }
+
+      if (!aggregations) {
+        return null
+      }
+
+      return mergeFacetResults(
+        aggregations.get(group) || emptyFacet,
+        emptyActiveFacets
+      )
+    },
+    [aggregations, activeFacets]
+  )
+}
+
+type UseSearchInputsResult = {
+  /**
+   * Parameters to be used for a search query.
+   *
+   * Typically, these are the parameters of the previous search query. Thus,
+   * `searchParams.text` may be different from `text` if the has typed new text
+   * without submitting the search.
+   */
+  searchParams: SearchParams
+  setSearchParams: React.Dispatch<React.SetStateAction<SearchParams>>
+  /**
+   * `text` displayed in the UI.
+   *
+   * May be different from `searchParams.text` if user has typed new text
+   * without submitting the search.
+   */
+  text: string
+  setText: (text: string) => void
+  /**
+   * Reset `searchParams` and `text`.
+   */
+  clearAllFilters: () => void
+  /**
+   * Toggle a single facet; also sets text -> searchParams.text.
+   */
+  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
+  /**
+   * Toggle multiple facets; also sets text -> searchParams.text.
+   */
+  toggleFacets: (facets: [string, string, boolean][]) => void
+  /**
+   * Event handler for toggling a single facet; also sets text -> searchParams.text.
+   */
+  onUpdateFacet: ({
+    target
+  }: {
+    target: Pick<HTMLInputElement, "value" | "checked" | "name">
+  }) => void
+  /**
+   * Input handler for updating `text` (des NOT update `searchParams.text`).
+   */
+  updateText: (event: { target: { value: string } }) => void
+  /**
+   * Event handler for clearing `text`; also clears searchParams.text.
+   */
+  clearText: () => void
+  /**
+   * Event handler for updating `searchParams.sort`; also sets text -> searchParams.text.
+   */
+  updateSort: (event: { target: { value: string } }) => void
+  /**
+   * Updates `searchParams.sort`; also sets text -> searchParams.text.
+   */
+  updateUI: (newUI: string | null) => void
+  /**
+   * Set `searchParams.text` to the current value of `text`.
+   */
+  submitText: () => void
+}
+
+/**
+ * Provides state and event handlers for learning resources search UI; state
+ * includes data for facets, query text, sort order, ui variant (e.g.,
+ * 'compact').
+ *
+ * Note that there are two different state values for search text, `text` and
+ * `searchParams.text`. In the typical setup:
+ *  - `text` represents the text currently displayed in the UI and updates
+ *    frequently (e.g., on every keypress).
+ *  - `searchParams.text` represents the text used for the currently displayed
+ *     search results and updates less often (e.g., when a user presses "submit"
+ *     or on debounced keypresses).
+ *
+ * The provided event handlers for updating other search parameters (sort, ui,
+ * facets) sync `text` -> `searchParams.text`.
+ */
+export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
+  const [searchParamsInternal, setSearchParams] = useState<SearchParams>(() =>
+    deserializeSearchParams(history.location)
+  )
+
+  const searchParams = useMemo(() => {
+    return searchParamsInternal
+    // This is intentional: let's maintain referential equality when
+    // serialization is the same.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serializeSearchParams(searchParamsInternal)])
+
+  /**
+   * Store text in state + ref. State for re-renders, and ref for render-stable
+   * callbacks.
+   */
+  const textRef = useRef(searchParamsInternal.text)
+  const [text, setTextState] = useState(searchParamsInternal.text)
+  const setText = useCallback((val: string) => {
+    setTextState(val)
+    textRef.current = val
+  }, [])
+
+  const clearAllFilters = useCallback(() => {
+    setSearchParams({
+      text:         "",
+      sort:         null,
+      ui:           null,
+      activeFacets: INITIAL_FACET_STATE
+    })
+    setText("")
+  }, [setText])
+
+  const toggleFacet: UseSearchInputsResult["toggleFacet"] = useCallback(
+    (name, value, isEnabled) => {
+      setSearchParams(current => {
+        const { activeFacets, sort, ui } = current
+        const newFacets = clone(activeFacets)
+
+        if (isEnabled) {
+          newFacets[name] = _.union(newFacets[name] || [], [value])
+        } else {
+          newFacets[name] = _.without(newFacets[name] || [], value)
+        }
+        return {
+          ...current,
+          activeFacets: newFacets,
+          sort,
+          ui,
+          text:         textRef.current
+        }
+      })
+    },
+    []
+  )
+
+  const toggleFacets: UseSearchInputsResult["toggleFacets"] = useCallback(
+    facets => {
+      setSearchParams(current => {
+        const { activeFacets, sort, ui } = current
+        const newFacets = clone(activeFacets)
+
+        facets.forEach(([name, value, isEnabled]) => {
+          if (isEnabled) {
+            newFacets[name] = _.union(newFacets[name] || [], [value])
+          } else {
+            newFacets[name] = _.without(newFacets[name] || [], value)
+          }
+        })
+        return {
+          ...current,
+          activeFacets: newFacets,
+          sort,
+          ui,
+          text:         textRef.current
+        }
+      })
+    },
+    []
+  )
+
+  const onUpdateFacet: UseSearchInputsResult["onUpdateFacet"] = useCallback(
+    e => toggleFacet(e.target.name, e.target.value, e.target.checked),
+    [toggleFacet]
+  )
+
+  const updateText: UseSearchInputsResult["updateText"] = useCallback(
+    event => {
+      const text = event ? event.target.value : ""
+      setText(text)
+    },
+    [setText]
+  )
+
+  const updateSort: UseSearchInputsResult["updateSort"] = useCallback(
+    (event): void => {
+      const param = event ? (event.target as HTMLSelectElement).value : ""
+      const newSort = deserializeSort(param)
+      setSearchParams(current => ({
+        ...current,
+        sort: newSort,
+        text: textRef.current
+      }))
+    },
+    []
+  )
+
+  const updateUI = useCallback((newUI: string | null): void => {
+    setSearchParams(current => ({
+      ...current,
+      ui:   newUI,
+      text: textRef.current
+    }))
+  }, [])
+
+  const clearText = useCallback(() => {
+    setText("")
+    setSearchParams(current => ({ ...current, text: "" }))
+  }, [setText, setSearchParams])
+
+  const submitText = useCallback(() => {
+    setSearchParams(current => ({
+      ...current,
+      text: textRef.current
+    }))
+  }, [])
+
+  return {
+    searchParams,
+    setSearchParams,
+    text,
+    setText,
+    clearAllFilters,
+    toggleFacet,
+    toggleFacets,
+    onUpdateFacet,
+    updateText,
+    updateSort,
+    clearText,
+    updateUI,
+    submitText
+  }
+}
+
+const setLocation = (history: HHistory, searchParams: SearchParams) => {
+  const currentSearch = serializeSearchParams(
+    deserializeSearchParams(history.location)
+  )
+  const { activeFacets, sort, ui, text } = searchParams
+  const newSearch = serializeSearchParams({
+    text,
+    activeFacets,
+    sort,
+    ui
+  })
+  if (currentSearch !== newSearch) {
+    const prefix = newSearch ? "?" : ""
+    history.push({
+      search: `${prefix}${newSearch}`
+    })
+  }
+}
+
+/**
+ * Sync changes to URL search parameters with `searchParams`, and vice versa.
+ *
+ * Pushes a new entry to the history stack every time the URL would change.
+ */
+export const useSyncUrlAndSearch = (
+  history: HHistory,
+  {
+    searchParams,
+    setSearchParams,
+    setText
+  }: Pick<UseSearchInputsResult, "searchParams" | "setSearchParams" | "setText">
+) => {
+  // sync URL to search
+  useEffect(() => {
+    const unlisten = history4or5Listen(history, location => {
+      const { activeFacets, sort, ui, text } = deserializeSearchParams(location)
+      setSearchParams({ activeFacets, sort, ui, text })
+      setText(text)
+    })
+    return unlisten
+  }, [history, setSearchParams, setText])
+
+  useEffect(() => {
+    setLocation(history, searchParams)
+  }, [history, searchParams])
+}
+
 interface PreventableEvent {
   preventDefault?: () => void
   type?: string
 }
 interface CourseSearchResult {
   facetOptions: (group: string) => Aggregation | null
-  clearAllFilters: () => void
-  toggleFacet: (name: string, value: string, isEnbaled: boolean) => void
-  toggleFacets: (facets: [string, string, boolean][]) => void
-  onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
-  updateText: React.ChangeEventHandler<HTMLInputElement>
+  clearAllFilters: UseSearchInputsResult["clearAllFilters"]
+  toggleFacet: UseSearchInputsResult["toggleFacet"]
+  toggleFacets: UseSearchInputsResult["toggleFacets"]
+  onUpdateFacets: UseSearchInputsResult["onUpdateFacet"]
+  updateText: UseSearchInputsResult["updateText"]
   clearText: React.MouseEventHandler
-  updateSort: React.ChangeEventHandler
+  updateSort: UseSearchInputsResult["updateSort"]
   acceptSuggestion: (suggestion: string) => void
   loadMore: () => void
   incremental: boolean
@@ -119,113 +415,28 @@ export const useCourseSearch = (
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
-  const [text, setText] = useState<string>(() => {
-    const { text } = deserializeSearchParams(history.location)
-    return text
-  })
-  const [activeFacetsAndSort, setActiveFacetsAndSort] = useState<FacetsAndSort>(
-    () => {
-      const { activeFacets, sort, ui } = deserializeSearchParams(
-        history.location
-      )
-      return { activeFacets, sort, ui }
-    }
-  )
 
-  const facetOptions = useCallback(
-    (group: string): Aggregation | null => {
-      const emptyFacet = { buckets: [] }
-      const { activeFacets } = activeFacetsAndSort
-      const emptyActiveFacets = {
-        buckets: (activeFacets[group] || []).map((facet: string) => ({
-          key:       facet,
-          doc_count: 0
-        }))
-      }
-
-      if (!aggregations) {
-        return null
-      }
-
-      return mergeFacetResults(
-        aggregations.get(group) || emptyFacet,
-        emptyActiveFacets
-      )
-    },
-    [aggregations, activeFacetsAndSort]
-  )
-
-  const clearAllFilters = useCallback(() => {
-    setText("")
-    setActiveFacetsAndSort({
-      activeFacets: INITIAL_FACET_STATE,
-      sort:         null,
-      ui:           null
-    })
-  }, [setText, setActiveFacetsAndSort])
-
-  const toggleFacet: CourseSearchResult["toggleFacet"] = useCallback(
-    (name, value, isEnabled) => {
-      const { activeFacets, sort, ui } = activeFacetsAndSort
-      const newFacets = clone(activeFacets)
-
-      if (isEnabled) {
-        newFacets[name] = _.union(newFacets[name] || [], [value])
-      } else {
-        newFacets[name] = _.without(newFacets[name] || [], value)
-      }
-      setActiveFacetsAndSort({ activeFacets: newFacets, sort, ui })
-    },
-    [activeFacetsAndSort, setActiveFacetsAndSort]
-  )
-
-  const toggleFacets: CourseSearchResult["toggleFacets"] = useCallback(
-    facets => {
-      const { activeFacets, sort, ui } = activeFacetsAndSort
-      const newFacets = clone(activeFacets)
-
-      facets.forEach(([name, value, isEnabled]) => {
-        if (isEnabled) {
-          newFacets[name] = _.union(newFacets[name] || [], [value])
-        } else {
-          newFacets[name] = _.without(newFacets[name] || [], value)
-        }
-      })
-      setActiveFacetsAndSort({ activeFacets: newFacets, sort, ui })
-    },
-    [activeFacetsAndSort, setActiveFacetsAndSort]
-  )
-
-  const onUpdateFacets: CourseSearchResult["onUpdateFacets"] = useCallback(
-    e => toggleFacet(e.target.name, e.target.value, e.target.checked),
-    [toggleFacet]
-  )
-
-  const updateText: CourseSearchResult["updateText"] = useCallback(
-    event => {
-      const text = event ? event.target.value : ""
-      setText(text)
-    },
-    [setText]
-  )
-
-  const updateSort = useCallback(
-    (event: ChangeEvent): void => {
-      const param = event ? (event.target as HTMLSelectElement).value : ""
-      const newSort = deserializeSort(param)
-      const { activeFacets, ui } = activeFacetsAndSort
-      setActiveFacetsAndSort({ activeFacets, sort: newSort, ui: ui }) // this will cause a search via useDidMountEffect
-    },
-    [setActiveFacetsAndSort, activeFacetsAndSort]
-  )
-
-  const updateUI = useCallback(
-    (newUI: string | null): void => {
-      const { activeFacets, sort } = activeFacetsAndSort
-      setActiveFacetsAndSort({ activeFacets, sort, ui: newUI }) // this will cause a search via useDidMountEffect
-    },
-    [setActiveFacetsAndSort, activeFacetsAndSort]
-  )
+  const seachUI = useSearchInputs(history)
+  const {
+    searchParams,
+    setSearchParams,
+    text,
+    setText,
+    clearAllFilters,
+    toggleFacet,
+    toggleFacets,
+    onUpdateFacet: onUpdateFacets,
+    updateText,
+    updateSort,
+    updateUI
+  } = seachUI
+  const { activeFacets, sort, ui } = searchParams
+  const activeFacetsAndSort = useMemo(() => ({ activeFacets, sort, ui }), [
+    activeFacets,
+    sort,
+    ui
+  ])
+  const facetOptions = useFacetOptions(aggregations, activeFacets)
 
   const internalRunSearch = useCallback(
     async (
@@ -263,19 +474,7 @@ export const useCourseSearch = (
 
       await runSearch(text, searchFacets, nextFrom, sort, ui)
 
-      // search is updated, now echo params to URL bar
-      const currentSearch = serializeSearchParams(
-        deserializeSearchParams(history.location)
-      )
-      const newSearch = serializeSearchParams({
-        text,
-        activeFacets,
-        sort,
-        ui
-      })
-      if (currentSearch !== newSearch) {
-        history.push(`?${newSearch}`)
-      }
+      setLocation(history, { text, activeFacets, sort, ui })
     },
     [
       from,
@@ -293,9 +492,9 @@ export const useCourseSearch = (
       const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
       clearSearch()
       setText(text)
-      setActiveFacetsAndSort({ activeFacets, sort, ui })
+      setSearchParams(current => ({ ...current, activeFacets, sort, ui }))
     },
-    [clearSearch, setText, setActiveFacetsAndSort]
+    [clearSearch, setText, setSearchParams]
   )
 
   const clearText = useCallback(
@@ -357,7 +556,7 @@ export const useCourseSearch = (
   // facet-related callbacks (toggleFacet, etc) be dependent on then value of
   // the runSearch function, which leads to too much needless churn in the
   // facet callbacks and then causes excessive re-rendering of the facet UI
-  useDidMountEffect(() => {
+  useEffectAfterMount(() => {
     internalRunSearch(text, activeFacetsAndSort)
   }, [activeFacetsAndSort])
 
@@ -372,7 +571,6 @@ export const useCourseSearch = (
     [internalRunSearch, text, activeFacetsAndSort]
   )
 
-  const { sort, activeFacets, ui } = activeFacetsAndSort
   return {
     facetOptions,
     clearAllFilters,
