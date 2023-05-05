@@ -125,23 +125,96 @@ describe("search library", () => {
   })
 
   it("filters on object type", () => {
-    expect(buildSearchQuery({ activeFacets: { type: ["xyz"] } })).toStrictEqual(
-      {
-        query: {
-          bool: {
-            should: ["xyz"].map(objectType => ({
-              bool: {
-                filter: {
-                  bool: {
-                    must: [{ term: { object_type: objectType } }]
-                  }
-                }
-              }
-            }))
+    expect(
+      buildSearchQuery({ activeFacets: { type: ["course"] } })
+    ).toStrictEqual({
+      aggs: {
+        type: {
+          terms: {
+            field: "object_type.keyword",
+            size:  10000
           }
         }
+      },
+      post_filter: {
+        bool: {
+          must: [
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      "object_type.keyword": "course"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      query: {
+        bool: {
+          should: ["course"].map(objectType => ({
+            bool: {
+              filter: {
+                bool: {
+                  must: [{ term: { object_type: objectType } }]
+                }
+              }
+            }
+          }))
+        }
       }
-    )
+    })
+  })
+
+  it("filters on object type but does not exclude other types from aggregations when resourceTypes is set", () => {
+    expect(
+      buildSearchQuery({
+        activeFacets:  { type: ["course"] },
+        resourceTypes: ["course", "program"]
+      })
+    ).toStrictEqual({
+      aggs: {
+        type: {
+          terms: {
+            field: "object_type.keyword",
+            size:  10000
+          }
+        }
+      },
+      post_filter: {
+        bool: {
+          must: [
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      "object_type.keyword": "course"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      query: {
+        bool: {
+          should: ["course", "program"].map(objectType => ({
+            bool: {
+              filter: {
+                bool: {
+                  must: [{ term: { object_type: objectType } }]
+                }
+              }
+            }
+          }))
+        }
+      }
+    })
   })
 
   it(`filters by platform and topics`, () => {
