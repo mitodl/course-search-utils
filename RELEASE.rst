@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 2.2.0
+-------------
+
+- fix types bug (#52)
+
 Version 2.0.4 (Released November 03, 2022)
 -------------
 
