@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 2.2.0
+Version 2.2.0 (Released May 11, 2023)
 -------------
 
 - fix types bug (#52)
