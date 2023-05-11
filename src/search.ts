@@ -159,6 +159,7 @@ export interface SearchQueryParams {
   sort?: SortParam
   activeFacets?: Facets
   channelName?: string
+  resourceTypes?: string[]
 }
 
 const getTypes = (activeFacets: Facets | undefined) => {
@@ -178,7 +179,8 @@ export const buildSearchQuery = ({
   size,
   sort,
   activeFacets,
-  channelName
+  channelName,
+  resourceTypes
 }: SearchQueryParams): Record<string, any> => {
   let builder = bodybuilder()
 
@@ -225,7 +227,7 @@ export const buildSearchQuery = ({
     builder.sort(field, sortQuery)
   }
 
-  const types = getTypes(activeFacets)
+  const types = resourceTypes ?? getTypes(activeFacets)
   const searchText = normalizeDoubleQuotes(text)
   return emptyOrNil(
     intersection([...LR_TYPE_ALL, LearningResourceType.ResourceFile], types)
