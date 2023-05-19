@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 2.3.0
+Version 2.3.0 (Released May 19, 2023)
 -------------
 
 - add aggregations param (#55)
