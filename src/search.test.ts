@@ -124,9 +124,150 @@ describe("search library", () => {
     })
   })
 
+  it(`only performs aggregations for the facets selected in the aggregations array`, () => {
+    const text = ""
+    const facets = {
+      offered_by: ["MITx"],
+      topics:     ["Engineering", "Science"],
+      type:       [LearningResourceType.Course]
+    }
+
+    expect(
+      buildSearchQuery({
+        text:         text,
+        activeFacets: facets,
+        aggregations: ["offered_by"]
+      })
+    ).toStrictEqual({
+      aggs: {
+        agg_filter_offered_by: {
+          aggs: {
+            offered_by: {
+              terms: {
+                field: "offered_by",
+                size:  10000
+              }
+            }
+          },
+          filter: {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: {
+                      bool: {
+                        must: [
+                          {
+                            bool: {
+                              should: [
+                                {
+                                  term: {
+                                    topics: "Engineering"
+                                  }
+                                },
+                                {
+                                  term: {
+                                    topics: "Science"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            bool: {
+                              should: [
+                                {
+                                  term: {
+                                    "object_type.keyword": "course"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      post_filter: {
+        bool: {
+          must: [
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      offered_by: "MITx"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      topics: "Engineering"
+                    }
+                  },
+                  {
+                    term: {
+                      topics: "Science"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      "object_type.keyword": "course"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      query: {
+        bool: {
+          should: [
+            {
+              bool: {
+                filter: {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          object_type: "course"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    })
+  })
+
   it("filters on object type", () => {
     expect(
-      buildSearchQuery({ activeFacets: { type: ["course"] } })
+      buildSearchQuery({
+        activeFacets: { type: ["course"] },
+        aggregations: ["type"]
+      })
     ).toStrictEqual({
       aggs: {
         type: {
@@ -173,7 +314,8 @@ describe("search library", () => {
     expect(
       buildSearchQuery({
         activeFacets:  { type: ["course"] },
-        resourceTypes: ["course", "program"]
+        resourceTypes: ["course", "program"],
+        aggregations:  ["type"]
       })
     ).toStrictEqual({
       aggs: {
@@ -227,7 +369,11 @@ describe("search library", () => {
 
     expect(
       // @ts-ignore
-      buildSearchQuery({ text: text, activeFacets: facets })
+      buildSearchQuery({
+        text:         text,
+        activeFacets: facets,
+        aggregations: ["topics", "offered_by"]
+      })
     ).toStrictEqual({
       aggs: {
         agg_filter_offered_by: {
@@ -330,59 +476,6 @@ describe("search library", () => {
               ]
             }
           }
-        },
-        agg_filter_type: {
-          aggs: {
-            type: {
-              terms: {
-                field: "object_type.keyword",
-                size:  10000
-              }
-            }
-          },
-          filter: {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    filter: {
-                      bool: {
-                        must: [
-                          {
-                            bool: {
-                              should: [
-                                {
-                                  term: {
-                                    offered_by: "MITx"
-                                  }
-                                }
-                              ]
-                            }
-                          },
-                          {
-                            bool: {
-                              should: [
-                                {
-                                  term: {
-                                    topics: "Engineering"
-                                  }
-                                },
-                                {
-                                  term: {
-                                    topics: "Science"
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
         }
       },
       post_filter: {
@@ -457,8 +550,9 @@ describe("search library", () => {
     activeFacets["level"] = ["Undergraduate"]
     //eslint-disable-next-line camelcase
     const { query, post_filter, aggs } = buildSearchQuery({
-      text: "",
-      activeFacets
+      text:         "",
+      activeFacets,
+      aggregations: ["level"]
     })
     expect(query).toStrictEqual({
       bool: {
@@ -548,7 +642,8 @@ describe("search library", () => {
         resource_type: ["Exams"],
         type:          [LearningResourceType.ResourceFile],
         offered_by:    ["OCW"]
-      }
+      },
+      aggregations: ["resource_type", "type", "offered_by"]
     })
 
     expect(query).toStrictEqual({

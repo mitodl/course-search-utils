@@ -160,6 +160,7 @@ export interface SearchQueryParams {
   activeFacets?: Facets
   channelName?: string
   resourceTypes?: string[]
+  aggregations?: string[]
 }
 
 const getTypes = (activeFacets: Facets | undefined) => {
@@ -180,7 +181,8 @@ export const buildSearchQuery = ({
   sort,
   activeFacets,
   channelName,
-  resourceTypes
+  resourceTypes,
+  aggregations
 }: SearchQueryParams): Record<string, any> => {
   let builder = bodybuilder()
 
@@ -233,7 +235,7 @@ export const buildSearchQuery = ({
     intersection([...LR_TYPE_ALL, LearningResourceType.ResourceFile], types)
   ) ?
     buildChannelQuery(builder, searchText, types, channelName) :
-    buildLearnQuery(builder, searchText, types, activeFacets)
+    buildLearnQuery(builder, searchText, types, activeFacets, aggregations)
 }
 
 export const buildChannelQuery = (
@@ -285,7 +287,8 @@ export const buildLearnQuery = (
   builder: Bodybuilder,
   text: string | null,
   types: Array<string>,
-  facets?: Facets
+  facets?: Facets,
+  aggregations?: Array<string>
 ): Record<string, any> => {
   for (const type of types) {
     const queryType = isDoubleQuoted(text) ? "query_string" : "multi_match"
@@ -344,7 +347,7 @@ export const buildLearnQuery = (
       }
 
     // Add filters for facets if necessary
-    const facetClauses = buildFacetSubQuery(facets, builder, type)
+    const facetClauses = buildFacetSubQuery(facets, builder, type, aggregations)
     builder = buildOrQuery(builder, type, textQuery, [])
     builder = builder.rawOption("post_filter", {
       bool: {
@@ -404,7 +407,8 @@ const buildLevelQuery = (
 export const buildFacetSubQuery = (
   facets: Facets | undefined,
   builder: Bodybuilder,
-  objectType?: string
+  objectType?: string,
+  aggregations?: string[]
 ): any[] => {
   const facetClauses: any[] = []
   if (facets) {
@@ -419,79 +423,82 @@ export const buildFacetSubQuery = (
         }
       }
 
-      // $FlowFixMe: we check for null facets earlier
-      Object.entries(facets).forEach(([otherKey, otherValues]) => {
-        if (otherKey !== key && otherValues && otherValues.length > 0) {
-          if (otherKey === "level") {
-            buildLevelQuery(builder, otherValues, facetClausesForFacet)
-          } else {
-            addFacetClauseToArray(
-              facetClausesForFacet,
-              otherKey,
-              otherValues,
-              objectType
-            )
-          }
-        }
-      })
-
-      if (facetClausesForFacet.length > 0) {
-        const filter = {
-          filter: {
-            bool: {
-              must: [...facetClausesForFacet]
+      if (aggregations && aggregations.includes(key)) {
+        // $FlowFixMe: we check for null facets earlier
+        Object.entries(facets).forEach(([otherKey, otherValues]) => {
+          if (otherKey !== key && otherValues && otherValues.length > 0) {
+            if (otherKey === "level") {
+              buildLevelQuery(builder, otherValues, facetClausesForFacet)
+            } else {
+              addFacetClauseToArray(
+                facetClausesForFacet,
+                otherKey,
+                otherValues,
+                objectType
+              )
             }
           }
-        }
+        })
 
-        if (key === "level") {
-          // this is done seperately b/c it's a nested field
-          builder.agg("filter", key, aggr =>
-            aggr
-              .orFilter("bool", filter)
-              .agg("nested", { path: "runs" }, "level", aggr =>
-                aggr.agg(
-                  "terms",
-                  "runs.level",
-                  { size: 10000 },
-                  "level",
-                  aggr => aggr.agg("reverse_nested", null as any, {}, "courses")
+        if (facetClausesForFacet.length > 0) {
+          const filter = {
+            filter: {
+              bool: {
+                must: [...facetClausesForFacet]
+              }
+            }
+          }
+
+          if (key === "level") {
+            // this is done seperately b/c it's a nested field
+            builder.agg("filter", key, aggr =>
+              aggr
+                .orFilter("bool", filter)
+                .agg("nested", { path: "runs" }, "level", aggr =>
+                  aggr.agg(
+                    "terms",
+                    "runs.level",
+                    { size: 10000 },
+                    "level",
+                    aggr =>
+                      aggr.agg("reverse_nested", null as any, {}, "courses")
+                  )
                 )
-              )
-          )
-        } else {
-          builder.agg("filter", key, aggregation =>
-            aggregation
-              .orFilter("bool", filter)
-              .agg(
-                "terms",
-                key === OBJECT_TYPE ? "object_type.keyword" : key,
-                { size: 10000 },
-                key
-              )
-          )
-        }
-      } else {
-        if (key === "level") {
-          // this is done seperately b/c it's a nested field
-          builder.agg("nested", { path: "runs" }, "level", aggr =>
-            aggr.agg(
-              "terms",
-              "runs.level",
-              {
-                size: 10000
-              },
-              "level",
-              aggr => aggr.agg("reverse_nested", null as any, {}, "courses")
             )
-          )
+          } else {
+            builder.agg("filter", key, aggregation =>
+              aggregation
+                .orFilter("bool", filter)
+                .agg(
+                  "terms",
+                  key === OBJECT_TYPE ? "object_type.keyword" : key,
+                  { size: 10000 },
+                  key
+                )
+            )
+          }
         } else {
-          builder.agg(
-            "terms",
-            key === OBJECT_TYPE ? "object_type.keyword" : key,
-            { size: 10000 },
-            key
-          )
+          if (key === "level") {
+            // this is done seperately b/c it's a nested field
+            builder.agg("nested", { path: "runs" }, "level", aggr =>
+              aggr.agg(
+                "terms",
+                "runs.level",
+                {
+                  size: 10000
+                },
+                "level",
+                aggr => aggr.agg("reverse_nested", null as any, {}, "courses")
+              )
+            )
+          } else {
+            builder.agg(
+              "terms",
+              key === OBJECT_TYPE ? "object_type.keyword" : key,
+              { size: 10000 },
+              key
+            )
+          }
         }
       }
     })
