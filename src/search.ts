@@ -148,13 +148,13 @@ export const normalizeDoubleQuotes = (
 export const emptyOrNil = either(isEmpty, isNil)
 
 /**
-  Interface for parameters for generating a search query. Supported fields are text, from, size, sort, channelName
+  Interface for parameters for generating a search query. Supported fields are text, searchAfter, size, sort, channelName
   and activeFacets. activeFacets supports audience, certification, type, offered_by, topics, department_name, level,
   course_feature_tags and resource_type as nested params
 */
 export interface SearchQueryParams {
   text?: string
-  from?: number
+  searchAfter?: number[]
   size?: number
   sort?: SortParam
   activeFacets?: Facets
@@ -176,7 +176,7 @@ const getTypes = (activeFacets: Facets | undefined) => {
 */
 export const buildSearchQuery = ({
   text,
-  from,
+  searchAfter,
   size,
   sort,
   activeFacets,
@@ -186,9 +186,10 @@ export const buildSearchQuery = ({
 }: SearchQueryParams): Record<string, any> => {
   let builder = bodybuilder()
 
-  if (!isNil(from)) {
-    builder = builder.from(from)
+  if (!isNil(searchAfter)) {
+    builder = builder.rawOption("search_after", searchAfter)
   }
+
   if (!isNil(size)) {
     builder = builder.size(size)
   }
@@ -512,26 +513,55 @@ export const buildOrQuery = (
   textQuery: Record<string, any> | undefined,
   extraClauses: any[]
 ): Bodybuilder => {
-  const textFilter = emptyOrNil(textQuery) ? [] : [{ bool: textQuery }]
+  if (emptyOrNil(textQuery)) {
+    builder = builder.orQuery("bool", {
+      filter: {
+        bool: {
+          must: [
+            {
+              term: {
+                object_type: searchType
+              }
+            },
+            ...extraClauses
+          ]
+        }
+      }
+    })
+  } else {
+    const textFilter = emptyOrNil(textQuery) ? [] : [{ bool: textQuery }]
 
-  builder = builder.orQuery("bool", {
-    filter: {
-      bool: {
-        must: [
-          {
-            term: {
-              object_type: searchType
+    builder = builder.query(
+      "function_score",
+      {
+        boost_mode:   "replace",
+        script_score: {
+          script: {
+            source: "Math.round(_score*2)"
+          }
+        }
+      },
+      (nested : Bodybuilder)  =>
+        nested.orQuery("bool", {
+          filter: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    object_type: searchType
+                  }
+                },
+                ...extraClauses,
+                // Add multimatch text query here to filter out non-matching results
+                ...textFilter
+              ]
             }
           },
-          ...extraClauses,
-          // Add multimatch text query here to filter out non-matching results
-          ...textFilter
-        ]
-      }
-    },
-    // Add multimatch text query here again to score results based on match
-    ...textQuery
-  })
+          // Add multimatch text query here again to score results based on match
+          ...textQuery
+        })
+    )
+  }
   return builder
 }
 
