@@ -394,7 +394,8 @@ interface CourseSearchResult {
    * default form action will be prevented.
    */
   onSubmit: (e: PreventableEvent) => void
-  from: number
+  from: number 
+  searchAfter: Array<number> | null
   updateUI: (newUI: string | null) => void
   ui: string | null
 }
@@ -405,7 +406,8 @@ export const useCourseSearch = (
     searchFacets: Facets,
     nextFrom: number,
     sort?: SortParam | null,
-    ui?: string | null
+    ui?: string | null,
+    searchAfter?: Array<number> | null
   ) => Promise<void>,
   clearSearch: () => void,
   aggregations: Aggregations,
@@ -415,6 +417,7 @@ export const useCourseSearch = (
 ): CourseSearchResult => {
   const [incremental, setIncremental] = useState(false)
   const [from, setFrom] = useState(0)
+  const [searchAfter, setSearchAfter] = useState(null)
 
   const seachUI = useSearchInputs(history)
   const {
@@ -454,7 +457,8 @@ export const useCourseSearch = (
       if (!incremental) {
         clearSearch()
         nextFrom = 0
-      }
+      } 
+
       setFrom(nextFrom)
       setIncremental(incremental)
 
@@ -472,13 +476,15 @@ export const useCourseSearch = (
         searchFacets.type = LR_TYPE_ALL
       }
 
-      await runSearch(text, searchFacets, nextFrom, sort, ui)
+      await runSearch(text, searchFacets, nextFrom, sort, ui, searchAfter)
 
       setLocation(history, { text, activeFacets, sort, ui })
     },
     [
       from,
       setFrom,
+      searchAfter,
+      setSearchAfter,
       setIncremental,
       clearSearch,
       runSearch,
@@ -589,6 +595,7 @@ export const useCourseSearch = (
     onSubmit,
     from,
     updateUI,
-    ui
+    ui,
+    searchAfter
   }
 }
