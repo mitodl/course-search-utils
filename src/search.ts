@@ -355,7 +355,6 @@ export const buildLearnQuery = (
 
     // Add filters for facets if necessary
     const facetClauses = buildFacetSubQuery(facets, builder, type, aggregations)
-    builder = buildOrQuery(builder, type, textQuery, [])
 
     if (!emptyOrNil(text)) {
       orSubqueriesBuilder = buildOrQuery(
