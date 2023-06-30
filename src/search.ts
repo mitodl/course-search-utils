@@ -389,14 +389,16 @@ export const buildLearnQuery = (
       buildSuggestQuery(text, LEARN_SUGGEST_FIELDS)
     )
 
-    builder = builder.query("function_score", {
-      boost_mode:   "replace",
-      script_score: {
-        script: {
-          source: "Math.round(_score*2)"
-        }
-      },
-      ...orSubqueriesBuilder.build()
+    builder = builder.rawOption("query", {
+      function_score: {
+        boost_mode:   "replace",
+        script_score: {
+          script: {
+            source: "Math.round(_score*2)"
+          }
+        },
+        query: orSubqueriesBuilder.build()
+      }
     })
 
     builder = builder.rawOption("sort", [
