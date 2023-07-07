@@ -431,11 +431,10 @@ export const useCourseSearch = (
     updateUI
   } = seachUI
   const { activeFacets, sort, ui } = searchParams
-  const activeFacetsAndSort = useMemo(() => ({ activeFacets, sort, ui }), [
-    activeFacets,
-    sort,
-    ui
-  ])
+  const activeFacetsAndSort = useMemo(
+    () => ({ activeFacets, sort, ui }),
+    [activeFacets, sort, ui]
+  )
   const facetOptions = useFacetOptions(aggregations, activeFacets)
 
   const internalRunSearch = useCallback(
