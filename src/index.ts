@@ -8,7 +8,7 @@ import React, {
 } from "react"
 import { unionWith, eqBy, prop, clone } from "ramda"
 import _ from "lodash"
-import { History as HHistory } from "history"
+import type { History as HHistory } from "history"
 
 import {
   LearningResourceType,

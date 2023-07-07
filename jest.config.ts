@@ -20,7 +20,7 @@ const config: Config.InitialOptions = {
     {
       displayName:      "history-v5",
       moduleNameMapper: {
-        history$: "history-v5"
+        history$: "history"
       },
       ...common
     }
