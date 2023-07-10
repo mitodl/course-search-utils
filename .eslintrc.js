@@ -1,10 +1,5 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint"],
-  extends: [
-    "eslint-config-mitodl",
-    'plugin:@typescript-eslint/recommended',
-  ],
+  extends:  ["eslint-config-mitodl"],
   settings: {
     react: {
       version: "16.4.0"
@@ -12,11 +7,11 @@ module.exports = {
   },
   env: {
     browser: true,
-    jquery: true,
-    jest: true
+    jquery:  true,
+    jest:    true
   },
   rules: {
-    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-ts-comment":  "off",
     "@typescript-eslint/no-explicit-any": "off"
   }
 }
