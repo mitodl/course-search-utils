@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 2.3.1
+-------------
+
+- Change history dependency to optional peer dependency
+
 Version 2.3.0 (Released May 19, 2023)
 -------------
 
