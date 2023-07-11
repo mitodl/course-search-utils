@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 2.3.2
+Version 2.3.2 (Released July 11, 2023)
 -------------
 
 - update linting (#61)
