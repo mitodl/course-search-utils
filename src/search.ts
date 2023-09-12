@@ -148,12 +148,13 @@ export const normalizeDoubleQuotes = (
 export const emptyOrNil = either(isEmpty, isNil)
 
 /**
-  Interface for parameters for generating a search query. Supported fields are text, from, size, sort, channelName
+  Interface for parameters for generating a search query. Supported fields are text, searchAfter, size, sort, channelName
   and activeFacets. activeFacets supports audience, certification, type, offered_by, topics, department_name, level,
   course_feature_tags and resource_type as nested params
 */
 export interface SearchQueryParams {
   text?: string
+  searchAfter?: number[]
   from?: number
   size?: number
   sort?: SortParam
@@ -176,6 +177,7 @@ const getTypes = (activeFacets: Facets | undefined) => {
 */
 export const buildSearchQuery = ({
   text,
+  searchAfter,
   from,
   size,
   sort,
@@ -186,11 +188,14 @@ export const buildSearchQuery = ({
 }: SearchQueryParams): Record<string, any> => {
   let builder = bodybuilder()
 
-  if (!isNil(from)) {
-    builder = builder.from(from)
+  if (!isNil(searchAfter)) {
+    builder = builder.rawOption("search_after", searchAfter)
   }
   if (!isNil(size)) {
     builder = builder.size(size)
+  }
+  if (isNil(searchAfter) && !isNil(from)) {
+    builder = builder.from(from)
   }
   if (
     sort &&
@@ -290,6 +295,8 @@ export const buildLearnQuery = (
   facets?: Facets,
   aggregations?: Array<string>
 ): Record<string, any> => {
+  let orSubqueriesBuilder = bodybuilder()
+
   for (const type of types) {
     const queryType = isDoubleQuoted(text) ? "query_string" : "multi_match"
     const textQuery = emptyOrNil(text) ?
@@ -348,24 +355,60 @@ export const buildLearnQuery = (
 
     // Add filters for facets if necessary
     const facetClauses = buildFacetSubQuery(facets, builder, type, aggregations)
-    builder = buildOrQuery(builder, type, textQuery, [])
+
+    if (!emptyOrNil(text)) {
+      orSubqueriesBuilder = buildOrQuery(
+        orSubqueriesBuilder,
+        type,
+        textQuery,
+        []
+      )
+    } else {
+      builder = buildOrQuery(builder, type, textQuery, [])
+    }
+
     builder = builder.rawOption("post_filter", {
       bool: {
         must: [...facetClauses]
       }
     })
 
-    // Include suggest if search test is not null/empty
-    if (!emptyOrNil(text)) {
-      builder = builder.rawOption(
-        "suggest",
-        // @ts-expect-error
-        buildSuggestQuery(text, LEARN_SUGGEST_FIELDS)
-      )
-    } else if (facetClauses.length === 0 && equals(types, LR_TYPE_ALL)) {
+    if (
+      emptyOrNil(text) &&
+      facetClauses.length === 0 &&
+      equals(types, LR_TYPE_ALL)
+    ) {
       builder = builder.rawOption("sort", buildDefaultSort())
     }
   }
+
+  if (!emptyOrNil(text)) {
+    builder = builder.rawOption(
+      "suggest",
+      // @ts-expect-error
+      buildSuggestQuery(text, LEARN_SUGGEST_FIELDS)
+    )
+
+    builder = builder.query("function_score", {
+      boost_mode:   "replace",
+      script_score: {
+        script: {
+          source: "Math.round(_score*2)"
+        }
+      },
+      ...orSubqueriesBuilder.build()
+    })
+
+    builder = builder.rawOption("sort", [
+      {
+        _score: "desc"
+      },
+      {
+        created: "desc"
+      }
+    ])
+  }
+
   return builder.build()
 }
 
