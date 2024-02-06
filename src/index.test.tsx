@@ -8,15 +8,11 @@ import {
   InitialEntry
 } from "history"
 
-import {
-  LearningResourceType,
-  INITIAL_FACET_STATE,
-  LR_TYPE_ALL
-} from "./constants"
+import { LearningResourceType, INITIAL_FACET_STATE } from "./constants"
 
 import { useCourseSearch, useSearchInputs, useSyncUrlAndSearch } from "./index"
 import { facetMap, wait } from "./test_util"
-import { serializeSort, serializeSearchParams } from "./url_utils"
+import { serializeSearchParams } from "./url_utils"
 
 function FacetTestComponent(props: any) {
   const {
@@ -57,7 +53,8 @@ function TestComponent(props: any) {
     onSubmit,
     sort,
     updateSort,
-    updateUI
+    updateUI,
+    updateEndpoint
   } = useCourseSearch(
     runSearch,
     clearSearch,
@@ -76,15 +73,15 @@ function TestComponent(props: any) {
         onClick={(text: any) => acceptSuggestion(text)}
       />
       <input onChange={updateText} value={text || ""} />
-      <select
-        className="sort"
-        onChange={updateSort}
-        value={serializeSort(sort)}
-      >
+      <select className="sort" onChange={updateSort} value={sort || ""}>
         <option value="coursenum">Course number</option>
         <option value="">Relevance</option>
       </select>
       <button onClick={() => updateUI("list")} className="ui"></button>
+      <button
+        onClick={() => updateEndpoint("content_file")}
+        className="endpoint"
+      ></button>
       <div className="submit" onClick={onSubmit} />
       <FacetTestComponent
         clearAllFilters={clearAllFilters}
@@ -166,11 +163,9 @@ describe("useCourseSearch", () => {
     expect(wrapper.find("input").prop("value")).toBe("")
     checkSearchCall(runSearch, [
       "", // empty search text
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       0,
+      null,
       null,
       null
     ])
@@ -183,15 +178,10 @@ describe("useCourseSearch", () => {
     expect(wrapper.find("select").prop("value")).toBe("coursenum")
     checkSearchCall(runSearch, [
       "", // empty search text
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       0,
-      {
-        field:  "coursenum",
-        option: "asc"
-      },
+      "coursenum",
+      null,
       null
     ])
   })
@@ -201,13 +191,24 @@ describe("useCourseSearch", () => {
     wrapper.find(".ui").simulate("click")
     checkSearchCall(runSearch, [
       "", // empty search text
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       0,
       null,
-      "list"
+      "list",
+      null
+    ])
+  })
+
+  it("should let you update the endpoint param", async () => {
+    const { wrapper, runSearch } = render()
+    wrapper.find(".endpoint").simulate("click")
+    checkSearchCall(runSearch, [
+      "", // empty search text
+      INITIAL_FACET_STATE,
+      0,
+      null,
+      null,
+      "content_file"
     ])
   })
 
@@ -218,11 +219,9 @@ describe("useCourseSearch", () => {
     wrapper.find(".submit").simulate("click")
     checkSearchCall(runSearch, [
       "My New Search Text", // empty search text
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       0,
+      null,
       null,
       null
     ])
@@ -239,7 +238,7 @@ describe("useCourseSearch", () => {
       wrapper.find(".onUpdateFacets").prop("onClick")?.({
         target: {
           // @ts-expect-error
-          name:    "topics",
+          name:    "topic",
           value:   "Mathematics",
           checked: true
         }
@@ -248,7 +247,7 @@ describe("useCourseSearch", () => {
     wrapper.update()
     expect(wrapper.find("FacetTestComponent").prop("activeFacets")).toEqual({
       ...INITIAL_FACET_STATE,
-      topics: ["Mathematics"]
+      topic: ["Mathematics"]
     })
     await wait(1)
 
@@ -257,7 +256,7 @@ describe("useCourseSearch", () => {
         text:         "",
         activeFacets: {
           ...INITIAL_FACET_STATE,
-          topics: ["Mathematics"]
+          topic: ["Mathematics"]
         }
       })}`
     )
@@ -266,24 +265,15 @@ describe("useCourseSearch", () => {
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:   LR_TYPE_ALL,
-        topics: ["Mathematics"]
+        topic: ["Mathematics"]
       },
       0,
+      null,
       null,
       null
     ])
     wrapper.find(".clearAllFilters").simulate("click")
-    checkSearchCall(runSearch, [
-      "",
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
-      0,
-      null,
-      null
-    ])
+    checkSearchCall(runSearch, ["", INITIAL_FACET_STATE, 0, null, null, null])
   })
 
   it("should let you accept a suggestion", async () => {
@@ -294,11 +284,9 @@ describe("useCourseSearch", () => {
     })
     checkSearchCall(runSearch, [
       "my suggestion",
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       0,
+      null,
       null,
       null
     ])
@@ -308,20 +296,16 @@ describe("useCourseSearch", () => {
     const { wrapper, runSearch } = render()
     act(() => {
       // @ts-expect-error
-      wrapper.find(".toggleFacet").prop("onClick")(
-        "topics",
-        "mathematics",
-        true
-      )
+      wrapper.find(".toggleFacet").prop("onClick")("topic", "mathematics", true)
     })
     checkSearchCall(runSearch, [
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:   LR_TYPE_ALL,
-        topics: ["mathematics"]
+        topic: ["mathematics"]
       },
       0,
+      null,
       null,
       null
     ])
@@ -332,19 +316,20 @@ describe("useCourseSearch", () => {
     act(() => {
       // @ts-expect-error
       wrapper.find(".toggleFacets").prop("onClick")([
-        ["topics", "mathematics", true],
-        ["type", LearningResourceType.Course, false],
-        ["type", LearningResourceType.ResourceFile, true]
+        ["topic", "mathematics", true],
+        ["resource_type", LearningResourceType.Course, false],
+        ["resource_type", LearningResourceType.Program, true]
       ])
     })
     checkSearchCall(runSearch, [
       "",
       {
         ...INITIAL_FACET_STATE,
-        type:   [LearningResourceType.ResourceFile],
-        topics: ["mathematics"]
+        resource_type: [LearningResourceType.Program],
+        topic:         ["mathematics"]
       },
       0,
+      null,
       null,
       null
     ])
@@ -357,11 +342,9 @@ describe("useCourseSearch", () => {
     })
     checkSearchCall(runSearch, [
       "",
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
+      INITIAL_FACET_STATE,
       10, // from value has been incremented
+      null,
       null,
       null
     ])
@@ -371,41 +354,13 @@ describe("useCourseSearch", () => {
     const { wrapper } = render()
     const facetOptions = wrapper.find(".facet-options").prop("onClick")
     // @ts-expect-error
-    expect(facetOptions("type")).toEqual({
-      buckets: [
-        { key: LearningResourceType.Video, doc_count: 8156 },
-        { key: LearningResourceType.Course, doc_count: 2508 },
-        { key: LearningResourceType.Podcast, doc_count: 1180 }
-      ]
-    })
+    expect(facetOptions("resource_type")).toEqual([
+      { key: LearningResourceType.Video, doc_count: 8156 },
+      { key: LearningResourceType.Course, doc_count: 2508 },
+      { key: LearningResourceType.Podcast, doc_count: 1180 }
+    ])
     // @ts-expect-error
-    expect(facetOptions("topics").buckets.length).toEqual(137)
-  })
-
-  it("should merge an empty active facet into the ones from the search backend", async () => {
-    const { wrapper } = render()
-    act(() => {
-      // @ts-expect-error
-      wrapper.find(".onUpdateFacets").prop("onClick")({
-        target: {
-          // @ts-expect-error
-          name:    "type",
-          value:   "Obstacle Course",
-          checked: true
-        }
-      })
-    })
-    wrapper.update()
-    const facetOptions = wrapper.find(".facet-options").prop("onClick")
-    // @ts-expect-error
-    expect(facetOptions("type")).toEqual({
-      buckets: [
-        { key: LearningResourceType.Video, doc_count: 8156 },
-        { key: LearningResourceType.Course, doc_count: 2508 },
-        { key: LearningResourceType.Podcast, doc_count: 1180 },
-        { key: "Obstacle Course", doc_count: 0 }
-      ]
-    })
+    expect(facetOptions("topic").length).toEqual(137)
   })
 
   it("should update the state when the back button is pressed", async () => {
@@ -439,15 +394,14 @@ describe("useCourseSearch", () => {
 
     const facets = wrapper.find(FacetTestComponent).prop("activeFacets")
     expect(facets).toStrictEqual({
-      audience:            [],
-      certification:       [],
-      type:                [],
-      offered_by:          [],
-      topics:              ["Science"],
-      department_name:     [],
-      level:               [],
-      course_feature_tags: [],
-      resource_type:       []
+      platform:             [],
+      offered_by:           [],
+      topic:                ["Science"],
+      department:           [],
+      level:                [],
+      course_feature:       [],
+      resource_type:        [],
+      content_feature_type: []
     })
     const text = wrapper.find("input").prop("value")
     expect(text).toBe("sometext")
@@ -486,16 +440,7 @@ describe("useCourseSearch", () => {
     act(() => {
       wrapper.find(".load-more").simulate("click")
     })
-    checkSearchCall(runSearch, [
-      "",
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
-      50,
-      null,
-      null
-    ])
+    checkSearchCall(runSearch, ["", INITIAL_FACET_STATE, 50, null, null, null])
   })
 
   it("should set the correct from value when searchPageSize is a function", async () => {
@@ -510,16 +455,7 @@ describe("useCourseSearch", () => {
     act(() => {
       wrapper.find(".load-more").simulate("click")
     })
-    checkSearchCall(runSearch, [
-      "",
-      {
-        ...INITIAL_FACET_STATE,
-        type: LR_TYPE_ALL
-      },
-      50,
-      null,
-      null
-    ])
+    checkSearchCall(runSearch, ["", INITIAL_FACET_STATE, 50, null, null, null])
   })
 })
 
@@ -532,31 +468,35 @@ describe("useSearchInputs", () => {
         text:         "",
         activeFacets: INITIAL_FACET_STATE,
         sort:         null,
-        ui:           null
+        ui:           null,
+        endpoint:     null
       }
     },
     {
       descrip: "initial: text, facets, ui",
       initial: {
         text:         "cat",
-        activeFacets: { topics: ["math", "bio"] },
-        ui:           "list"
+        activeFacets: { topic: ["math", "bio"] },
+        ui:           "list",
+        endpoint:     null
       },
       expected: {
         text:         "cat",
-        activeFacets: { ...INITIAL_FACET_STATE, topics: ["math", "bio"] },
+        activeFacets: { ...INITIAL_FACET_STATE, topic: ["math", "bio"] },
         ui:           "list",
-        sort:         null
+        sort:         null,
+        endpoint:     null
       }
     },
     {
       descrip:  "initial: sort",
-      initial:  { sort: { field: "coursenum", option: "asc" } },
+      initial:  { sort: "coursenum" },
       expected: {
         text:         "",
         activeFacets: INITIAL_FACET_STATE,
-        sort:         { field: "coursenum", option: "asc" },
-        ui:           null
+        sort:         "coursenum",
+        ui:           null,
+        endpoint:     null
       }
     }
   ])(
@@ -586,14 +526,14 @@ describe("useSearchInputs", () => {
     act(() => {
       result.current.setSearchParams({
         text:         "cat",
-        activeFacets: { topics: ["math", "bio"] },
+        activeFacets: { topic: ["math", "bio"] },
         ui:           null,
         sort:         null
       })
     })
     expect(result.current.searchParams).toEqual({
       text:         "cat",
-      activeFacets: { topics: ["math", "bio"] },
+      activeFacets: { topic: ["math", "bio"] },
       sort:         null,
       ui:           null
     })
@@ -609,7 +549,8 @@ describe("useSearchInputs", () => {
       text:         "cat",
       activeFacets: INITIAL_FACET_STATE,
       sort:         null,
-      ui:           null
+      ui:           null,
+      endpoint:     null
     })
   })
 
@@ -625,13 +566,14 @@ describe("useSearchInputs", () => {
     expect(result.current.text).toEqual("cat")
   })
 
-  test("clearAllFilters clears text and searchParams", () => {
+  test("clearAllFilters clears text and searchParams but not ui or endpoint", () => {
     const initialEntries = [
       `?${serializeSearchParams({
         text:         "cat",
-        activeFacets: { topics: ["math", "bio"] },
+        activeFacets: { topic: ["math", "bio"] },
         ui:           "list",
-        sort:         { field: "coursenum", option: "asc" }
+        sort:         "coursenum",
+        endpoint:     "endpoint"
       })}`
     ]
     const history = createMemoryHistory({ initialEntries })
@@ -649,7 +591,8 @@ describe("useSearchInputs", () => {
       text:         "",
       activeFacets: INITIAL_FACET_STATE,
       sort:         null,
-      ui:           null
+      ui:           "list",
+      endpoint:     "endpoint"
     })
     expect(result.current.text).toEqual("")
   })
@@ -658,19 +601,19 @@ describe("useSearchInputs", () => {
     const initialEntries = [
       `?${serializeSearchParams({
         text:         "cat",
-        activeFacets: { topics: ["math", "bio"] }
+        activeFacets: { topic: ["math", "bio"] }
       })}`
     ]
     const history = createMemoryHistory({ initialEntries })
     const { result } = renderHook(() => useSearchInputs(history))
     act(() => {
-      result.current.toggleFacet("topics", "math", false)
+      result.current.toggleFacet("topic", "math", false)
     })
-    expect(result.current.searchParams.activeFacets.topics).toEqual(["bio"])
+    expect(result.current.searchParams.activeFacets.topic).toEqual(["bio"])
     act(() => {
-      result.current.toggleFacet("topics", "math", true)
+      result.current.toggleFacet("topic", "math", true)
     })
-    expect(result.current.searchParams.activeFacets.topics).toEqual([
+    expect(result.current.searchParams.activeFacets.topic).toEqual([
       "bio",
       "math"
     ])
@@ -681,9 +624,9 @@ describe("useSearchInputs", () => {
       `?${serializeSearchParams({
         text:         "cat",
         activeFacets: {
-          topics:          ["math", "bio"],
-          level:           ["beginner"],
-          department_name: ["physics", "biology"]
+          topic:      ["math", "bio"],
+          level:      ["beginner"],
+          department: ["7", "8"]
         }
       })}`
     ]
@@ -691,21 +634,21 @@ describe("useSearchInputs", () => {
     const { result } = renderHook(() => useSearchInputs(history))
     act(() => {
       result.current.toggleFacets([
-        ["topics", "chem", true],
+        ["topic", "chem", true],
         ["level", "beginner", false],
-        ["department_name", "chemistry", true]
+        ["department", "5", true]
       ])
     })
-    expect(result.current.searchParams.activeFacets.topics).toEqual([
+    expect(result.current.searchParams.activeFacets.topic).toEqual([
       "math",
       "bio",
       "chem"
     ])
     expect(result.current.searchParams.activeFacets.level).toEqual([])
-    expect(result.current.searchParams.activeFacets.department_name).toEqual([
-      "physics",
-      "biology",
-      "chemistry"
+    expect(result.current.searchParams.activeFacets.department).toEqual([
+      "7",
+      "8",
+      "5"
     ])
   })
 
@@ -713,23 +656,23 @@ describe("useSearchInputs", () => {
     const initialEntries = [
       `?${serializeSearchParams({
         text:         "cat",
-        activeFacets: { topics: ["math", "bio"] }
+        activeFacets: { topic: ["math", "bio"] }
       })}`
     ]
     const history = createMemoryHistory({ initialEntries })
     const { result } = renderHook(() => useSearchInputs(history))
     act(() => {
       result.current.onUpdateFacet({
-        target: { name: "topics", value: "math", checked: false }
+        target: { name: "topic", value: "math", checked: false }
       })
     })
-    expect(result.current.searchParams.activeFacets.topics).toEqual(["bio"])
+    expect(result.current.searchParams.activeFacets.topic).toEqual(["bio"])
     act(() => {
       result.current.onUpdateFacet({
-        target: { name: "topics", value: "math", checked: true }
+        target: { name: "topic", value: "math", checked: true }
       })
     })
-    expect(result.current.searchParams.activeFacets.topics).toEqual([
+    expect(result.current.searchParams.activeFacets.topic).toEqual([
       "bio",
       "math"
     ])
@@ -743,7 +686,7 @@ describe("useSearchInputs", () => {
 
     expect(result.current.searchParams.text).toEqual("")
     act(() => {
-      result.current.toggleFacet("topics", "math", true)
+      result.current.toggleFacet("topic", "math", true)
     })
     expect(result.current.searchParams.text).toEqual("algebra")
   })
@@ -756,7 +699,7 @@ describe("useSearchInputs", () => {
 
     expect(result.current.searchParams.text).toEqual("")
     act(() => {
-      result.current.toggleFacets([["topics", "math", true]])
+      result.current.toggleFacets([["topic", "math", true]])
     })
     expect(result.current.searchParams.text).toEqual("algebra")
   })
@@ -770,7 +713,7 @@ describe("useSearchInputs", () => {
     expect(result.current.searchParams.text).toEqual("")
     act(() => {
       result.current.onUpdateFacet({
-        target: { name: "topics", value: "math", checked: true }
+        target: { name: "topic", value: "math", checked: true }
       })
     })
     expect(result.current.searchParams.text).toEqual("algebra")
@@ -814,10 +757,7 @@ describe("useSearchInputs", () => {
     act(() => {
       result.current.updateSort({ target: { value: "-title" } })
     })
-    expect(result.current.searchParams.sort).toEqual({
-      field:  "title",
-      option: "desc"
-    })
+    expect(result.current.searchParams.sort).toEqual("-title")
     expect(result.current.searchParams.text).toBe("algebra")
   })
 
@@ -855,7 +795,7 @@ describe("useSyncUrlAndSearch", () => {
     expect(history.index).toBe(0)
     act(() => {
       result.current.setText("algebra")
-      result.current.toggleFacet("topics", "math", true)
+      result.current.toggleFacet("topic", "math", true)
       result.current.submitText()
     })
 
@@ -892,7 +832,7 @@ describe("useSyncUrlAndSearch", () => {
     const [{ result }, history] = setupHook([
       `?${serializeSearchParams({
         text:         "algebra",
-        activeFacets: { topics: ["math"] }
+        activeFacets: { topic: ["math"] }
       })}`
     ])
 
@@ -907,6 +847,6 @@ describe("useSyncUrlAndSearch", () => {
 
     expect(history.location.search).toBe("?q=algebra&t=math")
     expect(result.current.searchParams.text).toBe("algebra")
-    expect(result.current.searchParams.activeFacets.topics).toEqual(["math"])
+    expect(result.current.searchParams.activeFacets.topic).toEqual(["math"])
   })
 })

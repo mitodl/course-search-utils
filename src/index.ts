@@ -6,22 +6,16 @@ import React, {
   useMemo,
   useRef
 } from "react"
-import { unionWith, eqBy, prop, clone } from "ramda"
+import { clone } from "ramda"
 import _ from "lodash"
 import type { History as HHistory } from "history"
 
-import {
-  LearningResourceType,
-  INITIAL_FACET_STATE,
-  LR_TYPE_ALL
-} from "./constants"
+import { INITIAL_FACET_STATE } from "./constants"
 import {
   FacetsAndSort,
   Facets,
   deserializeSearchParams,
-  deserializeSort,
   serializeSearchParams,
-  SortParam,
   SearchParams
 } from "./url_utils"
 import { useEffectAfterMount } from "./hooks"
@@ -29,30 +23,20 @@ import { useEffectAfterMount } from "./hooks"
 export * from "./constants"
 
 export * from "./url_utils"
+export * from "./open_api_generated/api"
 
-export { buildSearchQuery, SearchQueryParams } from "./search"
+export { buildSearchUrl, SearchQueryParams } from "./search"
 
 export interface Bucket {
   key: string
   doc_count: number // eslint-disable-line camelcase
 }
 
-export type Aggregation = {
-  doc_count_error_upper_bound?: number // eslint-disable-line camelcase
-  sum_other_doc_count?: number // eslint-disable-line camelcase
-  buckets: Bucket[]
-}
+export type Aggregation = Bucket[]
 
-export type Aggregations = Map<string, Aggregation>
+export type Aggregations = Map<string, Bucket[]>
 
 export type GetSearchPageSize = (ui: string | null) => number
-
-export const mergeFacetResults = (...args: Aggregation[]): Aggregation => ({
-  buckets: args
-    .map(prop("buckets"))
-    // @ts-ignore
-    .reduce((buckets, acc) => unionWith(eqBy(prop("key")), buckets, acc))
-})
 
 /**
  * Accounts for a difference in the listener API for v4 and v5.
@@ -78,22 +62,18 @@ export const useFacetOptions = (
 ): ((group: string) => Aggregation | null) => {
   return useCallback(
     (group: string) => {
-      const emptyFacet = { buckets: [] }
-      const emptyActiveFacets = {
-        buckets: (activeFacets[group] || []).map((facet: string) => ({
+      const emptyActiveFacets = (activeFacets[group] || []).map(
+        (facet: string) => ({
           key:       facet,
           doc_count: 0
-        }))
-      }
+        })
+      )
 
       if (!aggregations) {
         return null
       }
 
-      return mergeFacetResults(
-        aggregations.get(group) || emptyFacet,
-        emptyActiveFacets
-      )
+      return aggregations.get(group) || emptyActiveFacets
     },
     [aggregations, activeFacets]
   )
@@ -148,7 +128,7 @@ type UseSearchInputsResult = {
   /**
    * Event handler for updating `searchParams.sort`; also sets text -> searchParams.text.
    */
-  updateSort: (event: { target: { value: string } }) => void
+  updateSort: (event: { target: { value: string } } | null) => void
   /**
    * Updates `searchParams.sort`; also sets text -> searchParams.text.
    */
@@ -157,6 +137,7 @@ type UseSearchInputsResult = {
    * Set `searchParams.text` to the current value of `text`.
    */
   submitText: () => void
+  updateEndpoint: (newEndpoint: string | null) => void
 }
 
 /**
@@ -199,11 +180,14 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
   }, [])
 
   const clearAllFilters = useCallback(() => {
-    setSearchParams({
-      text:         "",
-      sort:         null,
-      ui:           null,
-      activeFacets: INITIAL_FACET_STATE
+    setSearchParams(current => {
+      return {
+        text:         "",
+        sort:         null,
+        ui:           current.ui,
+        activeFacets: INITIAL_FACET_STATE,
+        endpoint:     current.endpoint
+      }
     })
     setText("")
   }, [setText])
@@ -271,8 +255,7 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
 
   const updateSort: UseSearchInputsResult["updateSort"] = useCallback(
     (event): void => {
-      const param = event ? (event.target as HTMLSelectElement).value : ""
-      const newSort = deserializeSort(param)
+      const newSort = event ? (event.target as HTMLSelectElement).value : ""
       setSearchParams(current => ({
         ...current,
         sort: newSort,
@@ -287,6 +270,14 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
       ...current,
       ui:   newUI,
       text: textRef.current
+    }))
+  }, [])
+
+  const updateEndpoint = useCallback((newEndpoint: string | null): void => {
+    setSearchParams(current => ({
+      ...current,
+      endpoint: newEndpoint,
+      text:     textRef.current
     }))
   }, [])
 
@@ -315,6 +306,7 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
     updateSort,
     clearText,
     updateUI,
+    updateEndpoint,
     submitText
   }
 }
@@ -323,12 +315,13 @@ const setLocation = (history: HHistory, searchParams: SearchParams) => {
   const currentSearch = serializeSearchParams(
     deserializeSearchParams(history.location)
   )
-  const { activeFacets, sort, ui, text } = searchParams
+  const { activeFacets, sort, ui, text, endpoint } = searchParams
   const newSearch = serializeSearchParams({
     text,
     activeFacets,
     sort,
-    ui
+    ui,
+    endpoint
   })
   if (currentSearch !== newSearch) {
     const prefix = newSearch ? "?" : ""
@@ -354,8 +347,9 @@ export const useSyncUrlAndSearch = (
   // sync URL to search
   useEffect(() => {
     const unlisten = history4or5Listen(history, location => {
-      const { activeFacets, sort, ui, text } = deserializeSearchParams(location)
-      setSearchParams({ activeFacets, sort, ui, text })
+      const { activeFacets, sort, ui, text, endpoint } =
+        deserializeSearchParams(location)
+      setSearchParams({ activeFacets, sort, ui, text, endpoint })
       setText(text)
     })
     return unlisten
@@ -383,7 +377,7 @@ interface CourseSearchResult {
   loadMore: () => void
   incremental: boolean
   text: string
-  sort: SortParam | null
+  sort: string | null
   activeFacets: Facets
   /**
    * Callback that handles search submission. Pass this to your search input
@@ -397,6 +391,8 @@ interface CourseSearchResult {
   from: number
   updateUI: (newUI: string | null) => void
   ui: string | null
+  updateEndpoint: (newEndpoint: string | null) => void
+  endpoint: string | null
 }
 
 export const useCourseSearch = (
@@ -404,8 +400,9 @@ export const useCourseSearch = (
     text: string,
     searchFacets: Facets,
     nextFrom: number,
-    sort?: SortParam | null,
-    ui?: string | null
+    sort?: string | null,
+    ui?: string | null,
+    endpoint?: string | null
   ) => Promise<void>,
   clearSearch: () => void,
   aggregations: Aggregations,
@@ -428,12 +425,13 @@ export const useCourseSearch = (
     onUpdateFacet: onUpdateFacets,
     updateText,
     updateSort,
-    updateUI
+    updateUI,
+    updateEndpoint
   } = seachUI
-  const { activeFacets, sort, ui } = searchParams
+  const { activeFacets, sort, ui, endpoint } = searchParams
   const activeFacetsAndSort = useMemo(
-    () => ({ activeFacets, sort, ui }),
-    [activeFacets, sort, ui]
+    () => ({ activeFacets, sort, ui, endpoint }),
+    [activeFacets, sort, ui, endpoint]
   )
   const facetOptions = useFacetOptions(aggregations, activeFacets)
 
@@ -443,7 +441,7 @@ export const useCourseSearch = (
       activeFacetsAndSort: FacetsAndSort,
       incremental = false
     ) => {
-      const { activeFacets, sort, ui } = activeFacetsAndSort
+      const { activeFacets, sort, ui, endpoint } = activeFacetsAndSort
 
       const currentPageSize =
         typeof searchPageSize === "number" ? searchPageSize : searchPageSize(ui)
@@ -459,21 +457,9 @@ export const useCourseSearch = (
 
       const searchFacets = clone(activeFacets)
 
-      if (searchFacets.type !== undefined && searchFacets.type.length > 0) {
-        if (searchFacets.type.includes(LearningResourceType.Podcast)) {
-          searchFacets.type.push(LearningResourceType.PodcastEpisode)
-        }
+      await runSearch(text, searchFacets, nextFrom, sort, ui, endpoint)
 
-        if (searchFacets.type.includes(LearningResourceType.Userlist)) {
-          searchFacets.type.push(LearningResourceType.LearningPath)
-        }
-      } else {
-        searchFacets.type = LR_TYPE_ALL
-      }
-
-      await runSearch(text, searchFacets, nextFrom, sort, ui)
-
-      setLocation(history, { text, activeFacets, sort, ui })
+      setLocation(history, { text, activeFacets, sort, ui, endpoint })
     },
     [
       from,
@@ -488,10 +474,17 @@ export const useCourseSearch = (
 
   const initSearch = useCallback(
     (location: { search: string }) => {
-      const { text, activeFacets, sort, ui } = deserializeSearchParams(location)
+      const { text, activeFacets, sort, ui, endpoint } =
+        deserializeSearchParams(location)
       clearSearch()
       setText(text)
-      setSearchParams(current => ({ ...current, activeFacets, sort, ui }))
+      setSearchParams(current => ({
+        ...current,
+        activeFacets,
+        sort,
+        ui,
+        endpoint
+      }))
     },
     [clearSearch, setText, setSearchParams]
   )
@@ -588,6 +581,8 @@ export const useCourseSearch = (
     onSubmit,
     from,
     updateUI,
-    ui
+    ui,
+    endpoint,
+    updateEndpoint
   }
 }
