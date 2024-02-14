@@ -11,57 +11,57 @@ describe("course search library", () => {
     it("should deserialize text from the URL", () => {
       expect(deserializeSearchParams({ search: "q=The Best Course" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "The Best Course",
-        sort: null,
-        ui:   null
+        text:     "The Best Course",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
     it("should deserialize offered by", () => {
-      expect(deserializeSearchParams({ search: "o=MITx" })).toEqual({
+      expect(deserializeSearchParams({ search: "o=mitx" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          ["MITx"],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           ["mitx"],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
-    it("should deserialize department_name", () => {
-      expect(deserializeSearchParams({ search: "d=Philosophy" })).toEqual({
+    it("should deserialize departmen", () => {
+      expect(deserializeSearchParams({ search: "d=2" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     ["Philosophy"],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           ["2"],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
@@ -73,235 +73,190 @@ describe("course search library", () => {
         })
       ).toEqual({
         activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        [
+          platform:   [],
+          offered_by: [],
+          topic:      [
             "Science",
             "Physics",
             "Chemistry",
             "Computer Science",
             "Electronics"
           ],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
     it("should deserialize type from the URL", () => {
-      expect(deserializeSearchParams({ search: "type=course" })).toEqual({
+      expect(deserializeSearchParams({ search: "r=course" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                ["course"],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        ["course"],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
-      })
-    })
-
-    it("should deserialize audience from the URL", () => {
-      expect(deserializeSearchParams({ search: "a=Open%20Content" })).toEqual({
-        activeFacets: {
-          audience:            ["Open Content"],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
-        },
-        text: "",
-        sort: null,
-        ui:   null
-      })
-    })
-
-    it("should deserialize certification from the URL", () => {
-      expect(deserializeSearchParams({ search: "c=Certification" })).toEqual({
-        activeFacets: {
-          audience:            [],
-          certification:       ["Certification"],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
-        },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
     it("should deserialize level from the URL", () => {
-      expect(deserializeSearchParams({ search: "l=Graduate" })).toEqual({
+      expect(deserializeSearchParams({ search: "l=graduate" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               ["Graduate"],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                ["graduate"],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
-    it("should deserialize course feature tags from the URL", () => {
+    it("should deserialize content featrue tags from the URL", () => {
       expect(
         deserializeSearchParams({
           search:
-            "f=Exams%20with%20Solutions&f=Exams&f=Media%20Assignments&f=Media%20Assignments%20with%20Examples"
+            "cf=Exams%20with%20Solutions&cf=Exams&cf=Media%20Assignments%20with%20Examples"
         })
       ).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          resource_type:       [],
-          course_feature_tags: [
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: [
             "Exams with Solutions",
             "Exams",
-            "Media Assignments",
             "Media Assignments with Examples"
           ]
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
-    it("should deserialize resource type from the URL", () => {
+    it("should deserialize course_feature from the URL", () => {
       expect(
         deserializeSearchParams({
-          search: "r=Assignments&r=Exams&r=Lecture%20Notes"
+          search: "f=Assignments&f=Exams&f=Lecture%20Notes"
         })
       ).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       ["Assignments", "Exams", "Lecture Notes"]
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       ["Assignments", "Exams", "Lecture Notes"],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
-    it("should deserialize an ascending sort param", () => {
-      expect(deserializeSearchParams({ search: "s=coursenum" })).toEqual({
-        activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
-        },
-        text: "",
-        sort: {
-          field:  "coursenum",
-          option: "asc"
-        },
-        ui: null
-      })
-    })
-
-    it("should deserialize a descending sort param", () => {
+    it("should deserialize a sort param", () => {
       expect(deserializeSearchParams({ search: "s=-coursenum" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: {
-          field:  "coursenum",
-          option: "desc"
-        },
-        ui: null
+        text:     "",
+        sort:     "-coursenum",
+        ui:       null,
+        endpoint: null
       })
     })
 
     it("should deserialize the ui param", () => {
       expect(deserializeSearchParams({ search: "u=list" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   "list"
+        text:     "",
+        sort:     null,
+        ui:       "list",
+        endpoint: null
+      })
+    })
+
+    it("should deserialize the endpoint param", () => {
+      expect(deserializeSearchParams({ search: "e=endpoint" })).toEqual({
+        activeFacets: {
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
+        },
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: "endpoint"
       })
     })
 
     it("should ignore unknown params", () => {
       expect(deserializeSearchParams({ search: "eeee=beeeeeep" })).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: null,
-        ui:   null
+        text:     "",
+        sort:     null,
+        ui:       null,
+        endpoint: null
       })
     })
 
@@ -312,22 +267,19 @@ describe("course search library", () => {
         })
       ).toEqual({
         activeFacets: {
-          audience:            [],
-          certification:       [],
-          offered_by:          [],
-          topics:              [],
-          type:                [],
-          department_name:     [],
-          level:               [],
-          course_feature_tags: [],
-          resource_type:       []
+          platform:             [],
+          offered_by:           [],
+          topic:                [],
+          department:           [],
+          level:                [],
+          course_feature:       [],
+          resource_type:        [],
+          content_feature_type: []
         },
-        text: "",
-        sort: {
-          field:  "coursenum",
-          option: "desc"
-        },
-        ui: null
+        text:     "",
+        sort:     "-coursenum",
+        ui:       null,
+        endpoint: null
       })
     })
   })
@@ -359,7 +311,7 @@ describe("course search library", () => {
       expect(
         serializeSearchParams({
           activeFacets: {
-            topics: [
+            topic: [
               "Science",
               "Physics",
               "Chemistry",
@@ -377,10 +329,10 @@ describe("course search library", () => {
       expect(
         serializeSearchParams({
           activeFacets: {
-            level: ["Graduate"]
+            level: ["graduate"]
           }
         })
-      ).toEqual("l=Graduate")
+      ).toEqual("l=graduate")
     })
 
     it("should serialize offered by", () => {
@@ -393,41 +345,21 @@ describe("course search library", () => {
       ).toEqual("o=MITx")
     })
 
-    it("should serialize type to the URL", () => {
+    it("should serialize resource_type to the URL", () => {
       expect(
         serializeSearchParams({
           activeFacets: {
-            type: ["course"]
+            resource_type: ["course"]
           }
         })
-      ).toEqual("type=course")
+      ).toEqual("r=course")
     })
 
-    it("should serialize audience", () => {
+    it("should serialize course_feature", () => {
       expect(
         serializeSearchParams({
           activeFacets: {
-            audience: ["Open Content"]
-          }
-        })
-      ).toEqual("a=Open%20Content")
-    })
-
-    it("should serialize certification", () => {
-      expect(
-        serializeSearchParams({
-          activeFacets: {
-            certification: ["Certificate"]
-          }
-        })
-      ).toEqual("c=Certificate")
-    })
-
-    it("should serialize course_feature_tags", () => {
-      expect(
-        serializeSearchParams({
-          activeFacets: {
-            course_feature_tags: [
+            course_feature: [
               "Exams with Solutions",
               "Exams",
               "Media Assignments",
@@ -437,6 +369,23 @@ describe("course search library", () => {
         })
       ).toEqual(
         "f=Exams%20with%20Solutions&f=Exams&f=Media%20Assignments&f=Media%20Assignments%20with%20Examples"
+      )
+    })
+
+    it("should serialize content_feature_type", () => {
+      expect(
+        serializeSearchParams({
+          activeFacets: {
+            content_feature_type: [
+              "Exams with Solutions",
+              "Exams",
+              "Media Assignments",
+              "Media Assignments with Examples"
+            ]
+          }
+        })
+      ).toEqual(
+        "cf=Exams%20with%20Solutions&cf=Exams&cf=Media%20Assignments&cf=Media%20Assignments%20with%20Examples"
       )
     })
 
@@ -450,34 +399,20 @@ describe("course search library", () => {
       ).toEqual("r=Assignments&r=Exams&r=Lecture%20Notes")
     })
 
-    it("should serialize sort for ascending params", () => {
+    it("should serialize sort", () => {
       expect(
         serializeSearchParams({
-          sort: {
-            field:  "coursenum",
-            option: "asc"
-          }
+          sort: "sort"
         })
-      ).toEqual("s=coursenum")
+      ).toEqual("s=sort")
     })
 
-    it("should serialize sort for descending params", () => {
+    it("should serialize endpoint", () => {
       expect(
         serializeSearchParams({
-          sort: {
-            field:  "coursenum",
-            option: "desc"
-          }
+          endpoint: "endpoint"
         })
-      ).toEqual("s=-coursenum")
-    })
-
-    it("should the serialize ui param", () => {
-      expect(
-        serializeSearchParams({
-          ui: "list"
-        })
-      ).toEqual("u=list")
+      ).toEqual("e=endpoint")
     })
   })
 

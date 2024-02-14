@@ -12,33 +12,29 @@ const urlParamToArray = (param: ParsedParam): string[] =>
   _.union(toArray(param) || [])
 
 export interface Facets {
-  audience?: string[]
-  certification?: string[]
-  type?: string[]
+  platform?: string[]
   offered_by?: string[]
-  topics?: string[]
-  department_name?: string[]
+  topic?: string[]
+  department?: string[]
   level?: string[]
-  course_feature_tags?: string[]
+  course_feature?: string[]
   resource_type?: string[]
-}
-
-export interface SortParam {
-  field: string
-  option: string
+  content_feature_type?: string[]
 }
 
 export interface FacetsAndSort {
   activeFacets: Facets
-  sort: SortParam | null
+  sort: string | null
   ui: string | null
+  endpoint: string | null
 }
 
 export type SearchParams = {
   text: string
   activeFacets: Facets
-  sort: SortParam | null
+  sort: string | null
   ui: string | null
+  endpoint: string | null
 }
 
 const handleText = (q: ParsedParam): string => {
@@ -52,30 +48,12 @@ const handleText = (q: ParsedParam): string => {
   return q
 }
 
-export const deserializeSort = (sortParam: string): SortParam | null => {
-  if (!sortParam) {
+export const deserializeTextParam = (param: string): string | null => {
+  if (!param) {
     return null
   }
 
-  if (sortParam.startsWith("-")) {
-    return {
-      field:  sortParam.slice(1),
-      option: "desc"
-    }
-  } else {
-    return {
-      field:  sortParam,
-      option: "asc"
-    }
-  }
-}
-
-export const deserializeUI = (uiParam: string): string | null => {
-  if (!uiParam) {
-    return null
-  }
-
-  return uiParam
+  return param
 }
 
 export const deserializeSearchParams = ({
@@ -85,64 +63,53 @@ export const deserializeSearchParams = ({
 }): SearchParams => {
   const searchUrlParams = search.replace(/^\?/, "").split("?", 1)[0]
 
-  const { type, o, t, q, a, c, d, l, f, r, s, u } = qs.parse(searchUrlParams)
+  const { p, o, t, q, d, l, f, cf, r, s, u, e } = qs.parse(searchUrlParams)
 
   return {
     text:         handleText(q),
     activeFacets: {
-      audience:            urlParamToArray(a),
-      certification:       urlParamToArray(c),
-      type:                urlParamToArray(type),
-      offered_by:          urlParamToArray(o),
-      topics:              urlParamToArray(t),
-      department_name:     urlParamToArray(d),
-      level:               urlParamToArray(l),
-      course_feature_tags: urlParamToArray(f),
-      resource_type:       urlParamToArray(r)
+      platform:             urlParamToArray(p),
+      offered_by:           urlParamToArray(o),
+      topic:                urlParamToArray(t),
+      department:           urlParamToArray(d),
+      level:                urlParamToArray(l),
+      course_feature:       urlParamToArray(f),
+      resource_type:        urlParamToArray(r),
+      content_feature_type: urlParamToArray(cf)
     },
-    sort: deserializeSort(handleText(s)),
-    ui:   deserializeUI(handleText(u))
+    sort:     deserializeTextParam(handleText(s)),
+    ui:       deserializeTextParam(handleText(u)),
+    endpoint: deserializeTextParam(handleText(e))
   }
 }
 
-export const serializeSort = (sort: SortParam | null): string | undefined => {
-  if (sort === null) {
+export const serializeTextParam = (
+  param: string | null
+): string | undefined => {
+  if (param === null) {
     // leave it off the params if set to default
     return undefined
   }
 
-  if (sort.option === "desc") {
-    return `-${sort.field}`
-  } else {
-    return sort.field
-  }
-}
-
-export const serializeUI = (ui: string | null): string | undefined => {
-  if (ui === null) {
-    // leave it off the params if set to default
-    return undefined
-  }
-
-  return ui
+  return param
 }
 
 export const serializeSearchParams = ({
   text,
   activeFacets,
   sort,
-  ui
+  ui,
+  endpoint
 }: Partial<SearchParams>): string => {
   const {
-    type,
+    platform,
     offered_by,
-    topics,
-    audience,
-    certification,
-    department_name,
+    topic,
+    department,
     level,
-    course_feature_tags,
+    course_feature,
     resource_type,
+    content_feature_type,
     ...others
   } = activeFacets ?? {}
   if (Object.keys(others).length > 0) {
@@ -150,17 +117,16 @@ export const serializeSearchParams = ({
   }
 
   return qs.stringify({
-    q: text || undefined,
-    type,
-    a: audience,
-    c: certification,
-    o: offered_by,
-    t: topics,
-    d: department_name,
-    l: level,
-    f: course_feature_tags,
-    r: resource_type,
-    s: serializeSort(sort || null),
-    u: serializeUI(ui || null)
+    q:  text || undefined,
+    o:  offered_by,
+    t:  topic,
+    d:  department,
+    l:  level,
+    f:  course_feature,
+    r:  resource_type,
+    cf: content_feature_type,
+    s:  serializeTextParam(sort || null),
+    u:  serializeTextParam(ui || null),
+    e:  serializeTextParam(endpoint || null)
   })
 }

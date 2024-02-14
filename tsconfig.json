@@ -36,6 +36,7 @@
     "src/*.test.ts",
     "src/*.test.tsx",
     "src/test_setup.ts",
-    "src/test_util.ts"
+    "src/test_util.ts",
+    "src/open_api_generated/api.ts"
   ]
 }
