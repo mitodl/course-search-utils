@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.0.0
+-------------
+
+- use new api changes (#64)
+
 Version 2.3.2 (Released July 11, 2023)
 -------------
 
