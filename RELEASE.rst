@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.0
+Version 3.0.0 (Released February 14, 2024)
 -------------
 
 - use new api changes (#64)
