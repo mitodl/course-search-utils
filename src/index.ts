@@ -62,7 +62,7 @@ export const useFacetOptions = (
 ): ((group: string) => Aggregation | null) => {
   return useCallback(
     (group: string) => {
-      const emptyActiveFacets = (activeFacets[group] || []).map(
+      const emptyActiveFacets = (activeFacets[group as keyof Facets] || []).map(
         (facet: string) => ({
           key:       facet,
           doc_count: 0
@@ -197,11 +197,12 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
       setSearchParams(current => {
         const { activeFacets, sort, ui } = current
         const newFacets = clone(activeFacets)
+        const facetName = name as keyof Facets
 
         if (isEnabled) {
-          newFacets[name] = _.union(newFacets[name] || [], [value])
+          newFacets[facetName] = _.union(newFacets[facetName] || [], [value])
         } else {
-          newFacets[name] = _.without(newFacets[name] || [], value)
+          newFacets[facetName] = _.without(newFacets[facetName] || [], value)
         }
         return {
           ...current,
@@ -222,10 +223,11 @@ export const useSearchInputs = (history: HHistory): UseSearchInputsResult => {
         const newFacets = clone(activeFacets)
 
         facets.forEach(([name, value, isEnabled]) => {
+          const facetName = name as keyof Facets
           if (isEnabled) {
-            newFacets[name] = _.union(newFacets[name] || [], [value])
+            newFacets[facetName] = _.union(newFacets[facetName] || [], [value])
           } else {
-            newFacets[name] = _.without(newFacets[name] || [], value)
+            newFacets[facetName] = _.without(newFacets[facetName] || [], value)
           }
         })
         return {
