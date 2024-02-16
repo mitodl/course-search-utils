@@ -53,7 +53,7 @@
     "babel-eslint": "10.x",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.4",
-    "eslint": "^7.32.0",
+    "eslint": "^8.56.0",
     "eslint-config-google": "0.x",
     "eslint-config-mitodl": "^1.0.0",
     "eslint-plugin-babel": "5.x",
