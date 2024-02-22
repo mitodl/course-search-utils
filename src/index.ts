@@ -13,30 +13,32 @@ import type { History as HHistory } from "history"
 import { INITIAL_FACET_STATE } from "./constants"
 import {
   FacetsAndSort,
-  Facets,
   deserializeSearchParams,
   serializeSearchParams,
   SearchParams
 } from "./url_utils"
+import {
+  Facets,
+  Aggregation,
+  Aggregations,
+  GetSearchPageSize
+} from "./facet_display/types"
 import { useEffectAfterMount } from "./hooks"
 
 export * from "./constants"
 
 export * from "./url_utils"
 export * from "./open_api_generated/api"
+export * from "./facet_display/types"
+export {
+  default as FacetDisplay,
+  getDepartmentName,
+  getLevelName
+} from "./facet_display/FacetDisplay"
+export { default as FilterableFacet } from "./facet_display/FilterableFacet"
+export { sanitizeFacets } from "./facet_display/SanitizeFacets"
 
 export { buildSearchUrl, SearchQueryParams } from "./search"
-
-export interface Bucket {
-  key: string
-  doc_count: number // eslint-disable-line camelcase
-}
-
-export type Aggregation = Bucket[]
-
-export type Aggregations = Map<string, Bucket[]>
-
-export type GetSearchPageSize = (ui: string | null) => number
 
 /**
  * Accounts for a difference in the listener API for v4 and v5.
