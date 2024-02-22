@@ -4,3 +4,4 @@ dist/*
 
 # typescript writes this file for incremental compilation
 .tsbuildinfo
+.DS_Store
