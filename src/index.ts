@@ -25,6 +25,17 @@ export * from "./constants"
 export * from "./url_utils"
 export * from "./open_api_generated/api"
 
+export type {
+  UseInfiniteSearchProps,
+  UseInfiniteSearchResult
+} from "./hooks/useInfiniteSearch"
+export type {
+  UseSearchQueryParamsProps,
+  UseSearchQueryParamsResult
+} from "./hooks/useSearchQueryParams"
+export { default as useInfiniteSearch } from "./hooks/useInfiniteSearch"
+export { default as useSearchQueryParams } from "./hooks/useSearchQueryParams"
+
 export { buildSearchUrl, SearchQueryParams } from "./search"
 
 export interface Bucket {
