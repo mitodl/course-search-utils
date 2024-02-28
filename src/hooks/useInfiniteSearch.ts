@@ -143,7 +143,6 @@ const useInfiniteSearch = ({
       setIsFetchingNextPage(false)
       setStatus("pending")
     }
-    urlRef.current = null
   }, [firstPageUrl, keepPreviousData])
 
   useEffect(() => {
