@@ -333,14 +333,13 @@ test.each([
     initial:  "?d=6&r=program",
     expected: new URLSearchParams("?d=6")
   }
-])("Turning a facet off with setFacetActive", () => {
-  const { result, searchParams } = setup({
-    initial: "?r=course&r=program&d=6"
-  })
+])("Turning a facet off with setFacetActive", ({ initial, expected }) => {
+  const { result, searchParams } = setup({ initial })
   act(() => {
     result.current.setFacetActive("resource_type", "program", false)
   })
-  expect(searchParams.current).toEqual(new URLSearchParams("?d=6"))
+  console.log(searchParams.current.toString())
+  expect(searchParams.current).toEqual(expected)
 })
 
 test.each([

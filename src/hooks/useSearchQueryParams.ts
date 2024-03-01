@@ -38,6 +38,7 @@ interface UseSearchQueryParamsResult {
      */
     checked: boolean
   ) => void
+  setFacet: (name: string, value: string[] | boolean | null) => void
   /**
    * Modifies the current UrlSearchParams to clear all facets according to the
    * current endpoint.
@@ -200,17 +201,58 @@ const useSearchQueryParams = ({
           next.sort()
           return next
         }
-        if (!isValid(value)) return next
+        if (!isValid(value)) return prev
         const exists = facetValues.includes(value)
-        if ((exists && checked) || (!exists && !checked)) return next
+        if ((exists && checked) || (!exists && !checked)) return prev
         if (checked) {
           next.append(alias, value)
         } else {
-          next.delete(alias, value)
+          next.delete(alias)
+          facetValues.forEach(v => {
+            if (v !== value) {
+              next.append(alias, v)
+            }
+          })
         }
         next.sort()
         return next
       })
+    },
+    [endpoint, setSearchParams]
+  )
+
+  const setFacet: UseSearchQueryParamsResult["setFacet"] = useCallback(
+    (name, value) => {
+      const config = searchParamConfig[endpoint]["facets"][name as FacetName]
+      if (!config) return
+      const { isValid, alias } = config
+      if (value === null) {
+        setSearchParams(prev => {
+          const next = new URLSearchParams(prev)
+          next.delete(alias)
+          next.sort()
+          return next
+        })
+      } else if (typeof value === "boolean") {
+        if (!config.isBoolean) return
+        setSearchParams(prev => {
+          const next = new URLSearchParams(prev)
+          next.set(alias, value ? "true" : "false")
+          next.sort()
+          return next
+        })
+      } else {
+        if (!value.every(v => isValid(v))) return
+        setSearchParams(prev => {
+          const next = new URLSearchParams(prev)
+          next.delete(alias)
+          value.forEach(v => {
+            next.append(alias, v)
+          })
+          next.sort()
+          return next
+        })
+      }
     },
     [endpoint, setSearchParams]
   )
@@ -247,6 +289,7 @@ const useSearchQueryParams = ({
     params,
     currentText,
     setFacetActive,
+    setFacet,
     setCurrentText,
     setCurrentTextAndQuery,
     setSort,
