@@ -1,4 +1,4 @@
-import type { Facets } from "./url_utils"
+import type { Facets } from "./facet_display/types"
 
 export interface SearchQueryParams {
   text?: string
