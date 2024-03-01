@@ -1,30 +1,31 @@
-import { Config } from '@jest/types'
+import { Config } from "@jest/types";
 
 const common = {
-  testEnvironment:  "jsdom",
-  transform:          {
+  testEnvironment: "jsdom",
+  transform: {
     "^.+\\.(t)sx?$": "@swc/jest",
   },
-  setupFilesAfterEnv: ["<rootDir>src/test_setup.ts"]
-}
+  setupFilesAfterEnv: ["<rootDir>src/test_setup.ts"],
+  testMatch: ["<rootDir>/src/**/*.(spec|test).ts?(x)"],
+};
 
 const config: Config.InitialOptions = {
-  projects:           [
+  projects: [
     {
-      displayName:      "history-v4",
+      displayName: "history-v4",
       moduleNameMapper: {
-        history$: "history-v4"
+        history$: "history-v4",
       },
-      ...common
+      ...common,
     },
     {
-      displayName:      "history-v5",
+      displayName: "history-v5",
       moduleNameMapper: {
-        history$: "history"
+        history$: "history",
       },
-      ...common
-    }
-  ]
-}
+      ...common,
+    },
+  ],
+};
 
-export default config
+export default config;
