@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.1
+Version 3.0.1 (Released March 06, 2024)
 -------------
 
 - move filters to course search utils (#69)
