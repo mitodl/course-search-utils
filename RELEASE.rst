@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 3.0.1
+-------------
+
+- move filters to course search utils (#69)
+- add useSearchQueryParams and useInfiniteSearch (#70)
+- update ts; remove suppressImplicitAnyIndexErrors (#68)
+
 Version 3.0.0 (Released February 14, 2024)
 -------------
 
