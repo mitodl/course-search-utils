@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import * as _ from "lodash"
 import * as qs from "query-string"
+import type { Facets } from "./facet_display/types"
 
 // type for the values in the object returned by qs.parse
 type ParsedParam = string[] | string | undefined | null
@@ -10,17 +11,6 @@ export const toArray = (obj: ParsedParam): string[] | undefined =>
 
 const urlParamToArray = (param: ParsedParam): string[] =>
   _.union(toArray(param) || [])
-
-export interface Facets {
-  platform?: string[]
-  offered_by?: string[]
-  topic?: string[]
-  department?: string[]
-  level?: string[]
-  course_feature?: string[]
-  resource_type?: string[]
-  content_feature_type?: string[]
-}
 
 export interface FacetsAndSort {
   activeFacets: Facets
