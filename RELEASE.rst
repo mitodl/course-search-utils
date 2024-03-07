@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.0.2
+-------------
+
+- update eslint-config-mitodl
+
 Version 3.0.1 (Released March 06, 2024)
 -------------
 
