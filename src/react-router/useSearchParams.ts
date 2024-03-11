@@ -5,7 +5,7 @@ type SearchParamsSetterValue =
   | URLSearchParams
   | ((prevSearchParams: URLSearchParams) => URLSearchParams)
 
-type SetSearchParmas = (newSearchParams: SearchParamsSetterValue) => void
+type SetSearchParams = (newSearchParams: SearchParamsSetterValue) => void
 
 /**
  * A hook for getting and setting URL Search Parameters with React Router.
@@ -30,7 +30,7 @@ type SetSearchParmas = (newSearchParams: SearchParamsSetterValue) => void
  * the ability independently update multiple search params in a single render
  * cycle.
  */
-const useSearchParams = (): [URLSearchParams, SetSearchParmas] => {
+const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
   const navigate = useNavigate()
   const { search } = useLocation()
 
@@ -56,7 +56,7 @@ const useSearchParams = (): [URLSearchParams, SetSearchParmas] => {
     searchParamsRef.current = searchParams
   })
 
-  const setSearchParams: SetSearchParmas = useCallback(
+  const setSearchParams: SetSearchParams = useCallback(
     nextValue => {
       const newParams =
         typeof nextValue === "function" ?
