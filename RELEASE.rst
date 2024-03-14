@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.0.3
+-------------
+
+- Add clearFacet, useSearchParam (#71)
+
 Version 3.0.2 (Released March 07, 2024)
 -------------
 
