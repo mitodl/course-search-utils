@@ -44,6 +44,10 @@ interface UseSearchQueryParamsResult {
    */
   clearFacets: () => void
   /**
+   * Modifies the current UrlSearchParams to clear the specified facet.
+   */
+  clearFacet: (name: string) => void
+  /**
    * Sets the current text to display in the search input. Does NOT affect the
    * params object.
    */
@@ -200,14 +204,33 @@ const useSearchQueryParams = ({
           next.sort()
           return next
         }
-        if (!isValid(value)) return next
+        if (!isValid(value)) return prev
         const exists = facetValues.includes(value)
-        if ((exists && checked) || (!exists && !checked)) return next
+        if ((exists && checked) || (!exists && !checked)) return prev
         if (checked) {
           next.append(alias, value)
         } else {
-          next.delete(alias, value)
+          next.delete(alias)
+          facetValues.forEach(v => {
+            if (v !== value) {
+              next.append(alias, v)
+            }
+          })
         }
+        next.sort()
+        return next
+      })
+    },
+    [endpoint, setSearchParams]
+  )
+
+  const clearFacet: UseSearchQueryParamsResult["clearFacet"] = useCallback(
+    name => {
+      const config = searchParamConfig[endpoint]["facets"][name as FacetName]
+      if (!config) return
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev)
+        next.delete(config.alias)
         next.sort()
         return next
       })
@@ -246,12 +269,13 @@ const useSearchQueryParams = ({
   const result: UseSearchQueryParamsResult = {
     params,
     currentText,
-    setFacetActive,
     setCurrentText,
+    setFacetActive,
     setCurrentTextAndQuery,
     setSort,
     setEndpoint,
-    clearFacets
+    clearFacets,
+    clearFacet
   }
   return result
 }

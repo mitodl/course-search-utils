@@ -333,14 +333,12 @@ test.each([
     initial:  "?d=6&r=program",
     expected: new URLSearchParams("?d=6")
   }
-])("Turning a facet off with setFacetActive", () => {
-  const { result, searchParams } = setup({
-    initial: "?r=course&r=program&d=6"
-  })
+])("Turning a facet off with setFacetActive", ({ initial, expected }) => {
+  const { result, searchParams } = setup({ initial })
   act(() => {
     result.current.setFacetActive("resource_type", "program", false)
   })
-  expect(searchParams.current).toEqual(new URLSearchParams("?d=6"))
+  expect(searchParams.current).toEqual(expected)
 })
 
 test.each([
@@ -434,5 +432,17 @@ test("clearFacets clears all facets", () => {
   })
   expect(searchParams.current).toEqual(
     new URLSearchParams("?q=python&x=irrelevant")
+  )
+})
+
+test("clearFacet clears specified facet", () => {
+  const { result, searchParams } = setup({
+    initial: "?r=course&d=6&q=python&x=irrelevant"
+  })
+  act(() => {
+    result.current.clearFacet("resource_type")
+  })
+  expect(searchParams.current).toEqual(
+    new URLSearchParams("?d=6&q=python&x=irrelevant")
   )
 })
