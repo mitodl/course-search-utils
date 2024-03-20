@@ -33,7 +33,10 @@ export * from "./facet_display/types"
 export {
   default as FacetDisplay,
   getDepartmentName,
-  getLevelName
+  getLevelName,
+  ActiveFacets,
+  AvailableFacets,
+  FacetContext
 } from "./facet_display/FacetDisplay"
 export { default as FilterableFacet } from "./facet_display/FilterableFacet"
 export { sanitizeFacets } from "./facet_display/SanitizeFacets"
