@@ -38,16 +38,7 @@ export {
 export { default as FilterableFacet } from "./facet_display/FilterableFacet"
 export { sanitizeFacets } from "./facet_display/SanitizeFacets"
 
-export type {
-  UseInfiniteSearchProps,
-  UseInfiniteSearchResult
-} from "./hooks/useInfiniteSearch"
-export type {
-  UseSearchQueryParamsProps,
-  UseSearchQueryParamsResult
-} from "./hooks/useSearchQueryParams"
-export { default as useInfiniteSearch } from "./hooks/useInfiniteSearch"
-export { default as useSearchQueryParams } from "./hooks/useSearchQueryParams"
+export * from "./hooks"
 
 export { buildSearchUrl, SearchQueryParams } from "./search"
 
