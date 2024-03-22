@@ -7,7 +7,7 @@ import { LEVELS, DEPARTMENTS } from "../constants"
 
 export type BucketWithLabel = Bucket & { label: string }
 
-interface Props {
+interface FacetDisplayProps {
   facetMap: FacetManifest
   facetOptions: (group: string) => Aggregation | null
   activeFacets: Facets
@@ -47,8 +47,53 @@ const resultsWithLabels = (
   return newResults
 }
 
+const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
+  facetMap,
+  facetOptions,
+  activeFacets,
+  onFacetChange
+}) => {
+  return (
+    <>
+      {facetMap.map((facetSetting, key) =>
+        facetSetting.useFilterableFacet ? (
+          <FilterableFacet
+            key={key}
+            results={resultsWithLabels(
+              facetOptions(facetSetting.name) || [],
+              facetSetting.labelFunction
+            )}
+            name={facetSetting.name}
+            title={facetSetting.title}
+            selected={activeFacets[facetSetting.name] || []}
+            onUpdate={e =>
+              onFacetChange(e.target.name, e.target.value, e.target.checked)
+            }
+            expandedOnLoad={facetSetting.expandedOnLoad}
+          />
+        ) : (
+          <Facet
+            key={key}
+            title={facetSetting.title}
+            name={facetSetting.name}
+            results={resultsWithLabels(
+              facetOptions(facetSetting.name) || [],
+              facetSetting.labelFunction
+            )}
+            onUpdate={e =>
+              onFacetChange(e.target.name, e.target.value, e.target.checked)
+            }
+            selected={activeFacets[facetSetting.name] || []}
+            expandedOnLoad={facetSetting.expandedOnLoad}
+          />
+        )
+      )}
+    </>
+  )
+}
+
 const FacetDisplay = React.memo(
-  function FacetDisplay(props: Props) {
+  function FacetDisplay(props: FacetDisplayProps) {
     const {
       facetMap,
       facetOptions,
@@ -83,39 +128,12 @@ const FacetDisplay = React.memo(
             ))
           )}
         </div>
-        {facetMap.map((facetSetting, key) =>
-          facetSetting.useFilterableFacet ? (
-            <FilterableFacet
-              key={key}
-              results={resultsWithLabels(
-                facetOptions(facetSetting.name) || [],
-                facetSetting.labelFunction
-              )}
-              name={facetSetting.name}
-              title={facetSetting.title}
-              selected={activeFacets[facetSetting.name] || []}
-              onUpdate={e =>
-                onFacetChange(e.target.name, e.target.value, e.target.checked)
-              }
-              expandedOnLoad={facetSetting.expandedOnLoad}
-            />
-          ) : (
-            <Facet
-              key={key}
-              title={facetSetting.title}
-              name={facetSetting.name}
-              results={resultsWithLabels(
-                facetOptions(facetSetting.name) || [],
-                facetSetting.labelFunction
-              )}
-              onUpdate={e =>
-                onFacetChange(e.target.name, e.target.value, e.target.checked)
-              }
-              selected={activeFacets[facetSetting.name] || []}
-              expandedOnLoad={facetSetting.expandedOnLoad}
-            />
-          )
-        )}
+        <AvailableFacets
+          facetMap={facetMap}
+          facetOptions={facetOptions}
+          activeFacets={activeFacets}
+          onFacetChange={onFacetChange}
+        />
       </>
     )
   },
@@ -130,3 +148,4 @@ const FacetDisplay = React.memo(
 )
 
 export default FacetDisplay
+export { AvailableFacets }

@@ -32,6 +32,7 @@ export * from "./open_api_generated/api"
 export * from "./facet_display/types"
 export {
   default as FacetDisplay,
+  AvailableFacets,
   getDepartmentName,
   getLevelName
 } from "./facet_display/FacetDisplay"
