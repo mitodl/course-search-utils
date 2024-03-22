@@ -1,7 +1,8 @@
-import type {
-  LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest as ResourceSearchRequest,
-  ContentFileSearchApiContentFileSearchRetrieveRequest as ContentFileSearchRequest
-} from "../open_api_generated"
+import type { v1 } from "@mitodl/open-api-axios"
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
 
 type Endpoint = "resources" | "content_files"
 

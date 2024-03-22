@@ -23,12 +23,11 @@ import {
   Aggregations,
   GetSearchPageSize
 } from "./facet_display/types"
-import { useEffectAfterMount } from "./hooks"
+import { useEffectAfterMount } from "./useEffectAfterMount"
 
 export * from "./constants"
 
 export * from "./url_utils"
-export * from "./open_api_generated/api"
 export * from "./facet_display/types"
 export {
   default as FacetDisplay,

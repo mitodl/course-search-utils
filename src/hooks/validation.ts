@@ -1,19 +1,21 @@
-import {
+import { v1 } from "@mitodl/open-api-axios"
+
+const {
   ResourceTypeEnum,
-  LearningResourcesSearchRetrieveDepartmentEnum as DepartmentEnum,
-  LearningResourcesSearchRetrieveLevelEnum as LevelEnum,
-  LearningResourcesSearchRetrievePlatformEnum as PlatformEnum,
-  LearningResourcesSearchRetrieveOfferedByEnum as OfferedByEnum,
-  LearningResourcesSearchRetrieveSortbyEnum as SortByEnum,
-  LearningResourcesSearchRetrieveAggregationsEnum as AggregationsEnum,
-  // ContentFiles
+  LearningResourcesSearchRetrieveDepartmentEnum: DepartmentEnum,
+  LearningResourcesSearchRetrieveLevelEnum: LevelEnum,
+  LearningResourcesSearchRetrievePlatformEnum: PlatformEnum,
+  LearningResourcesSearchRetrieveOfferedByEnum: OfferedByEnum,
+  LearningResourcesSearchRetrieveSortbyEnum: SortByEnum,
+  LearningResourcesSearchRetrieveAggregationsEnum: AggregationsEnum,
   ContentFileSearchRetrieveSortbyEnum,
   ContentFileSearchRetrieveAggregationsEnum
-} from "../open_api_generated"
-import type {
-  LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest as ResourceSearchRequest,
-  ContentFileSearchApiContentFileSearchRetrieveRequest as ContentFileSearchRequest
-} from "../open_api_generated"
+} = v1
+
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
 
 const withinEnum =
   <T>(allowed: T[]) =>

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getSearchUrl } from "./util"
 import type { Endpoint } from "./util"
-import type {
-  LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest as ResourceSearchRequest,
-  ContentFileSearchApiContentFileSearchRetrieveRequest as ContentFileSearchRequest,
-  SearchResponse
-} from "../open_api_generated"
+import type { v1 } from "@mitodl/open-api-axios"
+
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
+type SearchResponse = v1.LearningResourceSearchResponse
 
 type Status = "pending" | "error" | "success"
 

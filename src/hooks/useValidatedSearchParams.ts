@@ -1,10 +1,12 @@
 import { contentSearchValidators, resourceSearchValidators } from "./validation"
 import type { QueryParamValidators } from "./validation"
-import type {
-  LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest as ResourceSearchRequest,
-  ContentFileSearchApiContentFileSearchRetrieveRequest as ContentFileSearchRequest
-} from "../open_api_generated"
+import type { v1 } from "@mitodl/open-api-axios"
 import { useCallback, useMemo, useState } from "react"
+
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
 
 interface UseValidatedSearchParamsProps<ReqParams> {
   /**
