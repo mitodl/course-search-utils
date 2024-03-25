@@ -88,9 +88,9 @@ function FilterableFacet(props: Props) {
             )}
           </div>
           <div className="facet-list">
-            {facets.map((facet, i) => (
+            {facets.map(facet => (
               <SearchFacetItem
-                key={i}
+                key={`${name}-${facet.key}`}
                 facet={facet}
                 isChecked={contains(facet.key, selected || [])}
                 onUpdate={onUpdate}

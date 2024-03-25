@@ -55,10 +55,10 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
 }) => {
   return (
     <>
-      {facetMap.map((facetSetting, key) =>
+      {facetMap.map(facetSetting =>
         facetSetting.useFilterableFacet ? (
           <FilterableFacet
-            key={key}
+            key={facetSetting.name}
             results={resultsWithLabels(
               facetOptions(facetSetting.name) || [],
               facetSetting.labelFunction
@@ -73,7 +73,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
           />
         ) : (
           <Facet
-            key={key}
+            key={facetSetting.name}
             title={facetSetting.title}
             name={facetSetting.name}
             results={resultsWithLabels(
