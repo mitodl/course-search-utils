@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.4
+Version 3.0.4 (Released March 27, 2024)
 -------------
 
 - Include zero count active facets in facet options (#79)
