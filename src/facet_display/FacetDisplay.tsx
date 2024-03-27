@@ -149,3 +149,4 @@ const FacetDisplay = React.memo(
 
 export default FacetDisplay
 export { AvailableFacets }
+export type { FacetDisplayProps }
