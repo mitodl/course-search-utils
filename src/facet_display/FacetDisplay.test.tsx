@@ -61,7 +61,20 @@ describe("FacetDisplay component", () => {
       onFacetChange,
       clearAllFilters
     }
-    return { view, spies }
+    const rerender = (newProps: Partial<FacetDisplayProps>) => {
+      view.rerender(
+        <FacetDisplay
+          facetMap={defaultFacetMap}
+          facetOptions={facetOptions}
+          activeFacets={activeFacets}
+          clearAllFilters={clearAllFilters}
+          onFacetChange={onFacetChange}
+          {...props}
+          {...newProps}
+        />
+      )
+    }
+    return { view, spies, rerender }
   }
 
   test("Renders facets with expected titles", async () => {
@@ -155,5 +168,34 @@ describe("FacetDisplay component", () => {
     screen.getByRole("checkbox", {
       name: "Mechanical Engineering"
     })
+  })
+
+  test("Automically includes a zero-count option for active facets with no matches", () => {
+    const activeFacets: Facets = {
+      topic: ["Cats"]
+    }
+    const { rerender } = setup({
+      props: {
+        activeFacets,
+        facetMap: [
+          {
+            ...defaultFacetMap[0],
+            expandedOnLoad: true
+          }
+        ]
+      }
+    })
+    const checkboxCount = () => screen.getAllByRole("checkbox").length
+    expect(checkboxCount()).toBe(3)
+    screen.getByRole("checkbox", { name: "Cats" })
+    screen.getByRole("checkbox", { name: "Dogs" })
+    screen.getByRole("checkbox", { name: "Monkeys" })
+    rerender({
+      activeFacets: {
+        topic: ["Cats", "Dragons"]
+      }
+    })
+    expect(checkboxCount()).toBe(4)
+    screen.getByRole("checkbox", { name: "Dragons" })
   })
 })

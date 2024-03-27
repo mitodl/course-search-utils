@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import FilterableFacet from "./FilterableFacet"
 import Facet from "./Facet"
 import SearchFilter from "./SearchFilter"
@@ -9,6 +9,12 @@ export type BucketWithLabel = Bucket & { label: string }
 
 interface FacetDisplayProps {
   facetMap: FacetManifest
+  /**
+   * Returns the aggregation options for a given group.
+   *
+   * If `activeFacets` includes a facet with no results, that facet will
+   * automatically be included in the facet options.
+   */
   facetOptions: (group: string) => Aggregation | null
   activeFacets: Facets
   clearAllFilters: () => void
@@ -47,12 +53,42 @@ const resultsWithLabels = (
   return newResults
 }
 
+/**
+ * Augment the facet buckets for `groupKey` with active values that have no
+ * results.
+ */
+const includeActiveZerosInBuckets = (
+  groupKey: string,
+  buckets: Bucket[],
+  params: Facets
+) => {
+  const opts = [...buckets]
+  const active = params[groupKey as keyof Facets] ?? []
+  const actives = Array.isArray(active) ? active : [active]
+  actives.forEach(key => {
+    if (!opts.find(o => o.key === key)) {
+      opts.push({ key: String(key), doc_count: 0 })
+    }
+  })
+  return opts
+}
+
 const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
   facetMap,
   facetOptions,
   activeFacets,
   onFacetChange
 }) => {
+  const allFacetOptions: FacetDisplayProps["facetOptions"] = useCallback(
+    name => {
+      return includeActiveZerosInBuckets(
+        name,
+        facetOptions(name) ?? [],
+        activeFacets
+      )
+    },
+    [facetOptions, activeFacets]
+  )
   return (
     <>
       {facetMap.map(facetSetting =>
@@ -60,7 +96,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
           <FilterableFacet
             key={facetSetting.name}
             results={resultsWithLabels(
-              facetOptions(facetSetting.name) || [],
+              allFacetOptions(facetSetting.name) || [],
               facetSetting.labelFunction
             )}
             name={facetSetting.name}
@@ -77,7 +113,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
             title={facetSetting.title}
             name={facetSetting.name}
             results={resultsWithLabels(
-              facetOptions(facetSetting.name) || [],
+              allFacetOptions(facetSetting.name) || [],
               facetSetting.labelFunction
             )}
             onUpdate={e =>
