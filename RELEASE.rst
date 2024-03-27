@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 3.0.4
+-------------
+
+- Include zero count active facets in facet options (#79)
+- `useResourceSearchParams` and export AvailableFacets component (#78)
+
 Version 3.0.3 (Released March 14, 2024)
 -------------
 
