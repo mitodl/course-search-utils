@@ -45,7 +45,7 @@ function SearchFacet(props: Props) {
                 i < MAX_DISPLAY_COUNT ||
                 results.length < FACET_COLLAPSE_THRESHOLD ? (
                   <SearchFacetItem
-                    key={i}
+                    key={`${name}-${facet.key}`}
                     facet={facet}
                     isChecked={contains(facet.key, selected || [])}
                     onUpdate={onUpdate}

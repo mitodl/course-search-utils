@@ -3,6 +3,7 @@ import { shallow } from "enzyme"
 
 import {
   default as FacetDisplay,
+  AvailableFacets,
   getDepartmentName,
   getLevelName
 } from "./FacetDisplay"
@@ -61,9 +62,9 @@ describe("FacetDisplay component", () => {
   test("renders a FacetDisplay with expected FilterableFacets", async () => {
     const { render } = setup()
     const wrapper = render()
-    const facets = wrapper.children()
-    expect(facets).toHaveLength(5)
-    facets.slice(1, 5).map((facet, key) => {
+    const facets = wrapper.find(AvailableFacets).dive().children()
+    expect(facets).toHaveLength(4)
+    facets.map((facet, key) => {
       expect(facet.prop("name")).toBe(facetMap[key].name)
       expect(facet.prop("title")).toBe(facetMap[key].title)
       expect(facet.prop("expandedOnLoad")).toBe(facetMap[key].expandedOnLoad)

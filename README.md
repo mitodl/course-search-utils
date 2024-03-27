@@ -35,15 +35,15 @@ git push --tags # and it tags it too
 
 ### Hooks
 
-`@mitodl/course-search-utils` exports two hooks to assist in making search requests to MIT Open's APIs. They are:
+`@mitodl/course-search-utils` exports a few hooks to assist in making search requests to MIT Open's APIs. They are:
 
-1. `useSearchQueryParams({ searchParams, setSearchParams, ...opts? })`: Derive search API parameters (facets, search text, ...) from a `URLSearchParams` object. Often, the `URLSearchParams` object will be derived from the browser URL, though it could be state internal to react.
+1. `useResourceSearchParams({ searchParams, setSearchParams, ...opts? })` and `useContentFileSearchParams`: Derive search API parameters from a `URLSearchParams` object. Often, the `URLSearchParams` object will be derived from the browser URL, though it could be state internal to react.
 
    The hook extracts validated API parameters from the `URLSearchParams` object and returns setters that can be used to manipulate the `URLSearchParams` (e.g., toggling a search facet on or off).
 
-   The `URLSearchParams` keys are mapped to API parameters internally, e.g., `?d=physics&d=chemistry` maps to `departments: ["physics", "chemistry"]`. This mapping is not configurable.
+   The `URLSearchParams` keys are mapped directly to API parameters.
 
-2. `useInfiniteSearch({ params, baseUrl, ...opts? })`: Assists in making search API calls used in an infinite scrolling UI. The initial page is loaded by the hook, susbsequent pages via returm value `{ fetchNextPage }`. The hook's result is based on [useInfiniteQuery](https://tanstack.com/query/v4/docs/framework/react/reference/useInfiniteQuery).
+2. `useInfiniteSearch({ params, endpoint, baseUrl, ...opts? })`: Assists in making search API calls used in an infinite scrolling UI. The initial page is loaded by the hook, susbsequent pages via returm value `{ fetchNextPage }`. The hook's result is based on [useInfiniteQuery](https://tanstack.com/query/v4/docs/framework/react/reference/useInfiniteQuery).
 
 See Typescript annotations and docstrings for more information on hook props and results. Typical usage might look like:
 
@@ -51,26 +51,24 @@ See Typescript annotations and docstrings for more information on hook props and
 import { useSearchQueryParams, useInfiniteSearch, } from "@mitodl/course-search-utils"
 import type { UseInfiniteSearchProps } from "@mitodl/course-search-utils"
 
-// set aggregations to be returned for resources and content_files endpoints
-const AGGREGATIONS: UseInfiniteSearchProps["aggregations"] = {
-  resources: ["department", "level", "topic", "course_feature"],
-  content_files: ["topic", "offered_by", "content_feature_type"]
+const CONSTANT_PARAMETERS = {
+  platform: ["ocw"],
+  aggregations: ["topic", "offered_by"]
 }
-
-const CONSTANT_FACETS = { platform: ["ocw"] }
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const {
     params,
-    setFacetActive,
-    clearFacets,
+    toggleParamValue,
+    clearAllFacets,
     currentText,
     setCurrentText,
     setCurrentTextAndQuery,
   } = useSearchQueryParams({
     searchParams,
     setSearchParams,
+    facets: FACETS
   })
 
   // If necessary
@@ -79,9 +77,8 @@ const SearchPage: React.FC = () => {
   }, [params])
 
   const { pages, hasNextPage, fetchNextPage } = useInfiniteSearch({
-    params: allParams
+    params: allParams,
     baseUrl: "http://mitopen.odl.mit.edu/",
-    aggregations: AGGREGATIONS,
     keepPreviousData: true,
   })
 

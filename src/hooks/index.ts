@@ -1,13 +1,16 @@
-export { default as useSearchQueryParams } from "./useSearchQueryParams"
+export {
+  useResourceSearchParams,
+  useContentFileSearchParams
+} from "./useValidatedSearchParams"
 export type {
-  UseSearchQueryParamsProps,
-  UseSearchQueryParamsResult
-} from "./useSearchQueryParams"
-
-export type { SearchParams, Endpoint, FacetName } from "./configs"
+  UseResourceSearchParamsProps,
+  UseContentFileSearchParamsProps,
+  UseResourceSearchParamsResult,
+  UseContentFileSearchParamsResult
+} from "./useValidatedSearchParams"
 
 export { default as useInfiniteSearch } from "./useInfiniteSearch"
 export type {
-  UseInfiniteSearchProps,
-  UseInfiniteSearchResult
+  UseInfiniteSearchResult,
+  UseInfiniteSearchProps
 } from "./useInfiniteSearch"

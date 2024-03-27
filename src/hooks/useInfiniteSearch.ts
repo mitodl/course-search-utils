@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import type { SearchParams } from "./configs"
 import { getSearchUrl } from "./util"
-import type {
-  SearchResponse,
-  ContentFileSearchRetrieveAggregationsEnum as ContentFileAggregationsEnum,
-  LearningResourcesSearchRetrieveAggregationsEnum as ResourceAggregationsEnum
-} from "../open_api_generated"
+import type { Endpoint } from "./util"
+import type { v1 } from "@mitodl/open-api-axios"
+
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
+type SearchResponse = v1.LearningResourceSearchResponse
 
 type Status = "pending" | "error" | "success"
 
@@ -18,16 +20,12 @@ type UseInfiniteSearchResult = {
   fetchNextPage: () => Promise<void>
 }
 
-type AggregationsConfig = {
-  resources: ResourceAggregationsEnum[]
-  content_files: ContentFileAggregationsEnum[]
-}
-
 type UseInfiniteSearchProps = {
   /**
    * Search parameters to use for API request.
    */
-  params: SearchParams
+  params: ResourceSearchRequest | ContentFileSearchRequest
+  endpoint: Endpoint
   /**
    * The base URL for the API.
    */
@@ -36,10 +34,6 @@ type UseInfiniteSearchProps = {
    * The number of items to fetch per page.
    */
   limit?: number
-  /**
-   * Object including the aggregations to be used for each endpoint.
-   */
-  aggregations?: AggregationsConfig
   /**
    * A function which makes a request to API and returns a promise that resolves
    * to `{ data: <API RESPONSE> }`. Optional. Defaults to an implementation that
@@ -76,10 +70,10 @@ interface TracksCalled {
  */
 const useInfiniteSearch = ({
   params,
+  endpoint,
   limit = DEFAULT_LIMIT,
   makeRequest = defaultMakeRequest,
   baseUrl,
-  aggregations,
   keepPreviousData
 }: UseInfiniteSearchProps): UseInfiniteSearchResult => {
   const [nextPage, setNextPage] = useState(0)
@@ -96,14 +90,13 @@ const useInfiniteSearch = ({
   const getPageUrl = useCallback(
     (page: number) => {
       const offset = page * limit
-      return getSearchUrl(baseUrl, {
-        limit,
-        offset,
+      return getSearchUrl(baseUrl, endpoint, {
         ...params,
-        aggregations: aggregations?.[params.endpoint] ?? []
+        limit,
+        offset
       })
     },
-    [aggregations, baseUrl, limit, params]
+    [baseUrl, limit, params, endpoint]
   )
 
   const fetchNextPage: TracksCalled = useCallback(async () => {

@@ -45,10 +45,10 @@ describe("useInfiniteSearchApi", () => {
     const { result } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "test",
-          activeFacets: { department: ["6", "8"] },
-          endpoint:     "resources"
+          q:          "test",
+          department: ["6", "8"]
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -59,7 +59,7 @@ describe("useInfiniteSearchApi", () => {
      */
     expect(fetcher.fetch).toHaveBeenCalledTimes(1)
     expect(fetcher.lastUrlQueryString()).toEqual(
-      "department=6,8&limit=10&q=test"
+      "department=6&department=8&limit=10&offset=0&q=test"
     )
     expect(result.current).toEqual(
       expect.objectContaining({
@@ -88,7 +88,7 @@ describe("useInfiniteSearchApi", () => {
     })
     expect(fetcher.fetch).toHaveBeenCalledTimes(2)
     expect(fetcher.lastUrlQueryString()).toEqual(
-      "department=6,8&limit=10&offset=10&q=test"
+      "department=6&department=8&limit=10&offset=10&q=test"
     )
     await fetcher.waitForFetch()
     expect(result.current).toEqual(
@@ -109,7 +109,7 @@ describe("useInfiniteSearchApi", () => {
     })
     expect(fetcher.fetch).toHaveBeenCalledTimes(3)
     expect(fetcher.lastUrlQueryString()).toEqual(
-      "department=6,8&limit=10&offset=20&q=test"
+      "department=6&department=8&limit=10&offset=20&q=test"
     )
     await fetcher.waitForFetch()
     expect(result.current).toEqual(
@@ -133,10 +133,10 @@ describe("useInfiniteSearchApi", () => {
     const { result } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "test",
-          activeFacets: { department: ["6", "8"] },
-          endpoint:     "resources"
+          q:          "test",
+          department: ["6", "8"]
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -157,10 +157,10 @@ describe("useInfiniteSearchApi", () => {
     const { result, rerender } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "test",
-          activeFacets: { department: ["6", "8"] },
-          endpoint:     "resources"
+          q:          "test",
+          department: ["6", "8"]
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -177,10 +177,10 @@ describe("useInfiniteSearchApi", () => {
 
     rerender({
       params: {
-        queryText:    "test",
-        activeFacets: { department: ["6"] },
-        endpoint:     "resources"
+        q:          "test",
+        department: ["6"]
       },
+      endpoint:    "resources",
       baseUrl:     "https://example.com",
       makeRequest: fetcher.fetch
     })
@@ -192,7 +192,9 @@ describe("useInfiniteSearchApi", () => {
         pages:              []
       })
     )
-    expect(fetcher.lastUrlQueryString()).toEqual("department=6&limit=10&q=test")
+    expect(fetcher.lastUrlQueryString()).toEqual(
+      "department=6&limit=10&offset=0&q=test"
+    )
   })
 
   test("when parameters change and keepPreviousData=true, previous data is kept during refetch", async () => {
@@ -200,10 +202,10 @@ describe("useInfiniteSearchApi", () => {
     const { result, rerender } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "test",
-          activeFacets: { department: ["6", "8"] },
-          endpoint:     "resources"
+          q:          "test",
+          department: ["6", "8"]
         },
+        endpoint:         "resources",
         baseUrl:          "https://example.com",
         makeRequest:      fetcher.fetch,
         keepPreviousData: true
@@ -221,10 +223,10 @@ describe("useInfiniteSearchApi", () => {
 
     rerender({
       params: {
-        queryText:    "test",
-        activeFacets: { department: ["6"] },
-        endpoint:     "resources"
+        q:          "test",
+        department: ["6"]
       },
+      endpoint:         "resources",
       baseUrl:          "https://example.com",
       makeRequest:      fetcher.fetch,
       keepPreviousData: true
@@ -237,7 +239,9 @@ describe("useInfiniteSearchApi", () => {
         pages:              [{ count: 23, id: "1" }]
       })
     )
-    expect(fetcher.lastUrlQueryString()).toEqual("department=6&limit=10&q=test")
+    expect(fetcher.lastUrlQueryString()).toEqual(
+      "department=6&limit=10&offset=0&q=test"
+    )
     await fetcher.waitForFetch("2")
     expect(result.current).toEqual(
       expect.objectContaining({
@@ -254,10 +258,10 @@ describe("useInfiniteSearchApi", () => {
     const { result } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "test",
-          activeFacets: { department: ["6", "8"] },
-          endpoint:     "resources"
+          q:          "test",
+          department: ["6", "8"]
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -279,10 +283,9 @@ describe("useInfiniteSearchApi", () => {
     const { result, rerender } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "one",
-          activeFacets: {},
-          endpoint:     "resources"
+          q: "one"
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -290,10 +293,9 @@ describe("useInfiniteSearchApi", () => {
     const resolveFirst = fetcher.resolve
     rerender({
       params: {
-        queryText:    "two",
-        activeFacets: {},
-        endpoint:     "resources"
+        q: "two"
       },
+      endpoint:    "resources",
       baseUrl:     "https://example.com",
       makeRequest: fetcher.fetch
     })
@@ -335,10 +337,9 @@ describe("useInfiniteSearchApi", () => {
     const { rerender } = renderHook(useInfiniteSearch, {
       initialProps: {
         params: {
-          queryText:    "one",
-          activeFacets: {},
-          endpoint:     "resources"
+          q: "one"
         },
+        endpoint:    "resources",
         baseUrl:     "https://example.com",
         makeRequest: fetcher.fetch
       }
@@ -348,44 +349,12 @@ describe("useInfiniteSearchApi", () => {
     )
     rerender({
       params: {
-        queryText:    "one",
-        activeFacets: {},
-        endpoint:     "content_files"
+        q: "one"
       },
+      endpoint:    "content_files",
       baseUrl:     "https://example.com",
       makeRequest: fetcher.fetch
     })
     expect(fetcher.lastUrl().pathname).toBe("/api/v1/content_file_search/")
   })
-
-  test.each([
-    { endpoint: "resources", expected: ["department", "course_feature"] },
-    {
-      endpoint: "content_files",
-      expected: ["offered_by", "content_feature_type"]
-    }
-  ] as const)(
-    "Makes requests with aggregations based on endpoint",
-    async ({ expected, endpoint }) => {
-      const fetcher = getDefferedFetcher({ count: 23 })
-      renderHook(useInfiniteSearch, {
-        initialProps: {
-          params: {
-            queryText:    "one",
-            activeFacets: {},
-            endpoint
-          },
-          baseUrl:      "https://example.com",
-          makeRequest:  fetcher.fetch,
-          aggregations: {
-            resources:     ["department", "course_feature"],
-            content_files: ["offered_by", "content_feature_type"]
-          }
-        }
-      })
-      expect(fetcher.lastUrl().searchParams.get("aggregations")).toEqual(
-        expected.join(",")
-      )
-    }
-  )
 })

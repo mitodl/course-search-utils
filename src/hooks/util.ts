@@ -1,4 +1,10 @@
-import type { SearchParams, Endpoint } from "./configs"
+import type { v1 } from "@mitodl/open-api-axios"
+type ResourceSearchRequest =
+  v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
+type ContentFileSearchRequest =
+  v1.ContentFileSearchApiContentFileSearchRetrieveRequest
+
+type Endpoint = "resources" | "content_files"
 
 const endpointUrls: Record<Endpoint, string> = {
   resources:     "api/v1/learning_resources_search/",
@@ -7,50 +13,22 @@ const endpointUrls: Record<Endpoint, string> = {
 
 export const getSearchUrl = (
   baseUrl: string,
-  {
-    endpoint,
-    queryText,
-    sort,
-    activeFacets,
-    aggregations,
-    limit,
-    offset
-  }: SearchParams & {
-    aggregations: string[]
-    limit?: number
-    offset?: number
-  }
+  endpoint: Endpoint,
+  params: ResourceSearchRequest | ContentFileSearchRequest
 ): string => {
   const url = new URL(endpointUrls[endpoint], baseUrl)
 
-  if (queryText) {
-    url.searchParams.append("q", queryText)
-  }
-  if (offset) {
-    url.searchParams.append("offset", offset.toString())
-  }
-
-  if (limit) {
-    url.searchParams.append("limit", limit.toString())
-  }
-
-  if (sort) {
-    url.searchParams.append("sortby", sort)
-  }
-
-  if (aggregations && aggregations.length > 0) {
-    url.searchParams.append("aggregations", aggregations.join(","))
-  }
-
-  if (activeFacets) {
-    for (const [key, value] of Object.entries(activeFacets)) {
-      const asArray = Array.isArray(value) ? value : [value]
-      if (asArray.length > 0) {
-        url.searchParams.append(key, asArray.join(","))
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        value.forEach(v => url.searchParams.append(key, v))
+      } else {
+        url.searchParams.set(key, value)
       }
     }
-  }
-
+  })
   url.searchParams.sort()
   return url.toString()
 }
+
+export type { Endpoint }

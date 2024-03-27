@@ -23,31 +23,22 @@ import {
   Aggregations,
   GetSearchPageSize
 } from "./facet_display/types"
-import { useEffectAfterMount } from "./hooks"
+import { useEffectAfterMount } from "./useEffectAfterMount"
 
 export * from "./constants"
 
 export * from "./url_utils"
-export * from "./open_api_generated/api"
 export * from "./facet_display/types"
 export {
   default as FacetDisplay,
+  AvailableFacets,
   getDepartmentName,
   getLevelName
 } from "./facet_display/FacetDisplay"
 export { default as FilterableFacet } from "./facet_display/FilterableFacet"
 export { sanitizeFacets } from "./facet_display/SanitizeFacets"
 
-export type {
-  UseInfiniteSearchProps,
-  UseInfiniteSearchResult
-} from "./hooks/useInfiniteSearch"
-export type {
-  UseSearchQueryParamsProps,
-  UseSearchQueryParamsResult
-} from "./hooks/useSearchQueryParams"
-export { default as useInfiniteSearch } from "./hooks/useInfiniteSearch"
-export { default as useSearchQueryParams } from "./hooks/useSearchQueryParams"
+export * from "./hooks"
 
 export { buildSearchUrl, SearchQueryParams } from "./search"
 
