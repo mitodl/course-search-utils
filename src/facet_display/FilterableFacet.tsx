@@ -21,7 +21,6 @@ interface Props {
 }
 
 function FilterableFacet(props: Props) {
-  console.log("hello from filterable facet")
   const { name, title, results, selected, onUpdate, expandedOnLoad } = props
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
 
