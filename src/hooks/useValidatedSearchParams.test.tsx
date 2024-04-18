@@ -242,6 +242,69 @@ describe("useResourceSearchParams", () => {
 
   test.each([
     {
+      initial:  "?department=6&certification=false",
+      expected: new URLSearchParams("?department=6&certification=true"),
+      newValue: "true"
+    },
+    {
+      initial:  "?department=6&certification=true",
+      expected: new URLSearchParams("?department=6"),
+      newValue: ""
+    },
+    {
+      initial:  "?department=6",
+      expected: new URLSearchParams("?department=6&certification=true"),
+      newValue: "true"
+    }
+  ])(
+    "setSearchParams sets boolean params",
+    ({ initial, expected, newValue }) => {
+      const { result, searchParams } = setup({ initial })
+      act(() => {
+        result.current.setParamValue("certification", newValue)
+      })
+      expect(searchParams.current).toEqual(expected)
+    }
+  )
+
+  test.each([
+    {
+      initial:  "?resource_type=course&resource_type=program&department=6",
+      expected: new URLSearchParams("?department=6&resource_type=program"),
+      newValue: "program"
+    },
+    {
+      initial:  "?department=6",
+      expected: new URLSearchParams("?department=6&resource_type=program"),
+      newValue: "program"
+    },
+    {
+      initial:  "?resource_type=course&resource_type=program&department=6",
+      expected: new URLSearchParams(
+        "?department=6&resource_type=podcast&resource_type=program"
+      ),
+      newValue: ["podcast", "program"]
+    },
+    {
+      initial:  "?department=6",
+      expected: new URLSearchParams(
+        "?department=6&resource_type=podcast&resource_type=program"
+      ),
+      newValue: ["podcast", "program"]
+    }
+  ])(
+    "setSearchParams sets string params",
+    ({ initial, expected, newValue }) => {
+      const { result, searchParams } = setup({ initial })
+      act(() => {
+        result.current.setParamValue("resource_type", newValue)
+      })
+      expect(searchParams.current).toEqual(expected)
+    }
+  )
+
+  test.each([
+    {
       initial:  "?resource_type=course",
       value:    "true",
       expected: new URLSearchParams("?certification=true&resource_type=course")

@@ -2,7 +2,13 @@ import React, { useCallback } from "react"
 import FilterableFacet from "./FilterableFacet"
 import Facet from "./Facet"
 import SearchFilter from "./SearchFilter"
-import type { FacetManifest, Facets, Aggregation, Bucket } from "./types"
+import type {
+  FacetManifest,
+  Facets,
+  Aggregation,
+  Bucket,
+  BooleanFacets
+} from "./types"
 import { LEVELS, DEPARTMENTS } from "../constants"
 
 export type BucketWithLabel = Bucket & { label: string }
@@ -16,7 +22,7 @@ interface FacetDisplayProps {
    * automatically be included in the facet options.
    */
   facetOptions: (group: string) => Aggregation | null
-  activeFacets: Facets
+  activeFacets: Facets & BooleanFacets
   clearAllFilters: () => void
   onFacetChange: (name: string, value: string, isEnabled: boolean) => void
 }

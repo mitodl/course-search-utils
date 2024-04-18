@@ -47,3 +47,5 @@ export const LEVELS = {
   intermediate:  "Intermediate",
   introductory:  "Introductory"
 }
+
+export const BOOLEAN_FACET_NAMES = ["certification", "professional"]
