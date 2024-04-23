@@ -1,36 +1,3 @@
-import type { Facets } from "./facet_display/types"
-
-export enum LearningResourceType {
-  Course = "course",
-  Program = "program",
-  Userlist = "userlist",
-  LearningPath = "learningpath",
-  Video = "video",
-  Podcast = "podcast",
-  PodcastEpisode = "podcastepisode",
-  PseudoList = "favorites",
-  ResourceFile = "resourcefile",
-  Post = "post",
-  Comment = "comment",
-  Profile = "profile"
-}
-
-export const INITIAL_FACET_STATE: Facets = {
-  platform:             [],
-  offered_by:           [],
-  topic:                [],
-  department:           [],
-  level:                [],
-  course_feature:       [],
-  resource_type:        [],
-  content_feature_type: []
-}
-
-export const LEARNING_RESOURCE_ENDPOINT = "resource"
-export const CONTENT_FILE_ENDPOINT = "content_file"
-
-export const COURSENUM_SORT_FIELD = "department_course_numbers.sort_coursenum"
-
 export const DEPARTMENTS = {
   1:       "Civil and Environmental Engineering",
   2:       "Mechanical Engineering",
