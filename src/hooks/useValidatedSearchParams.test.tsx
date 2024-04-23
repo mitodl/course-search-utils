@@ -278,6 +278,11 @@ describe("useResourceSearchParams", () => {
       initial:  "?resource_type=course&certification=true",
       value:    "true",
       expected: new URLSearchParams("?resource_type=course")
+    },
+    {
+      initial:  "?resource_type=course&certification=false",
+      value:    "false",
+      expected: new URLSearchParams("?resource_type=course")
     }
   ])(
     "Turning a boolean param off with toggleParamValue",
@@ -331,7 +336,7 @@ describe("useResourceSearchParams", () => {
     )
   })
 
-  test("patchParams updates search params", () => {
+  test("setting search params via patchParams", () => {
     const { result, searchParams } = setup({
       initial:
         "?resource_type=course&department=6&q=python&x=irrelevant&topic=javascript"
@@ -340,16 +345,40 @@ describe("useResourceSearchParams", () => {
       result.current.patchParams({
         resource_type: ["program"],
         department:    ["8", "18"],
-        topic:         []
+        topic:         [],
+        certification: true
       })
     })
     searchParams.current.sort()
     expect(searchParams.current).toEqual(
       new URLSearchParams([
+        ["certification", "true"],
         ["department", "8"],
         ["department", "18"],
         ["q", "python"],
         ["resource_type", "program"],
+        ["x", "irrelevant"]
+      ])
+    )
+  })
+
+  test("unsetting search params via patchParams", () => {
+    const { result, searchParams } = setup({
+      initial:
+        "?resource_type=course&certification=true&department=6&q=python&x=irrelevant&topic=javascript"
+    })
+    act(() => {
+      result.current.patchParams({
+        resource_type: [],
+        certification: null
+      })
+    })
+    searchParams.current.sort()
+    expect(searchParams.current).toEqual(
+      new URLSearchParams([
+        ["department", "6"],
+        ["q", "python"],
+        ["topic", "javascript"],
         ["x", "irrelevant"]
       ])
     )
