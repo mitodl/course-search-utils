@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 3.0.5
+-------------
+
+- support boolean facets (#94)
+- delete old search functions (#95)
+- Update Yarn to v1.22.22 (#84)
+- Pin dependencies (#83)
+- Add renovate.json (#63)
+
 Version 3.0.4 (Released March 27, 2024)
 -------------
 
