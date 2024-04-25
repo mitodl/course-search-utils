@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.5
+Version 3.0.5 (Released April 25, 2024)
 -------------
 
 - support boolean facets (#94)
