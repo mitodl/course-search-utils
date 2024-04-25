@@ -58,6 +58,9 @@ interface UseValidatedSearchParamsResult<ReqParams> {
    * - if `checked=false`, value is REMOVED from parameter list.
    */
   toggleParamValue: (name: string, rawValue: string, checked: boolean) => void
+
+  setParamValue: (name: string, rawValue: string | string[]) => void
+
   /**
    * Current search text. May be different from the `q` parameter.
    */
@@ -86,7 +89,10 @@ const useValidatedSearchParams = <ReqParams>({
       const validator = validators[key as keyof ReqParams]
       const values = searchParams.getAll(key)
       const validated = validator(values)
-      if (!validated || (Array.isArray(validated) && validated.length === 0)) {
+      if (
+        validated === undefined ||
+        (Array.isArray(validated) && validated.length === 0)
+      ) {
         return acc
       }
       return { ...acc, [key]: validated }
@@ -174,6 +180,43 @@ const useValidatedSearchParams = <ReqParams>({
     [setSearchParams, facets, onFacetsChange, validators]
   )
 
+  const setParamValue = useCallback(
+    (name: string, rawValue: string | string[]) => {
+      const validator = validators[name as keyof ReqParams]
+      if (!validator) {
+        console.warn(`Unrecognized search param: ${name}`)
+      }
+
+      const validated = validator(
+        Array.isArray(rawValue) ? rawValue : [rawValue]
+      )
+      const value = validated
+      if (value === undefined || value === null) {
+        setSearchParams(current => {
+          const copy = new URLSearchParams(current)
+          copy.delete(name)
+          copy.sort()
+          return copy
+        })
+      } else {
+        setSearchParams(current => {
+          const copy = new URLSearchParams(current)
+          if (Array.isArray(value)) {
+            copy.delete(name)
+            value.forEach(v => copy.append(name, v.toString()))
+          } else {
+            copy.set(name, value.toString())
+          }
+          return copy
+        })
+      }
+      if ((facets as string[]).includes(name)) {
+        onFacetsChange?.()
+      }
+    },
+    [setSearchParams, facets, onFacetsChange, validators]
+  )
+
   const [currentText, setCurrentText] = useState(searchParams.get("q") ?? "")
   const setCurrentTextAndQuery = useCallback(
     (value: string) => {
@@ -198,6 +241,7 @@ const useValidatedSearchParams = <ReqParams>({
     clearParam,
     patchParams,
     toggleParamValue,
+    setParamValue,
     currentText,
     setCurrentText,
     setCurrentTextAndQuery
