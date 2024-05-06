@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.6
+Version 3.0.6 (Released May 06, 2024)
 -------------
 
 - update open-api-axios (#97)
