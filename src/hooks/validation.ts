@@ -8,6 +8,7 @@ const {
   LearningResourcesSearchRetrieveOfferedByEnum: OfferedByEnum,
   LearningResourcesSearchRetrieveSortbyEnum: SortByEnum,
   LearningResourcesSearchRetrieveAggregationsEnum: AggregationsEnum,
+  LearningResourcesSearchRetrieveLearningFormatEnum: LearningFormatEnum,
   ContentFileSearchRetrieveSortbyEnum,
   ContentFileSearchRetrieveAggregationsEnum
 } = v1
@@ -38,21 +39,23 @@ type QueryParamValidators<ReqParams> = {
 }
 
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
-  resource_type:  withinEnum(Object.values(ResourceTypeEnum)),
-  department:     withinEnum(Object.values(DepartmentEnum)),
-  level:          withinEnum(Object.values(LevelEnum)),
-  platform:       withinEnum(Object.values(PlatformEnum)),
-  offered_by:     withinEnum(Object.values(OfferedByEnum)),
-  sortby:         values => withinEnum(Object.values(SortByEnum))(values)[0],
-  q:              first,
-  topic:          identity,
-  certification:  firstBoolean,
-  professional:   firstBoolean,
-  aggregations:   withinEnum(Object.values(AggregationsEnum)),
-  course_feature: identity,
-  limit:          firstNumber,
-  offset:         firstNumber,
-  id:             numbers
+  resource_type:   withinEnum(Object.values(ResourceTypeEnum)),
+  department:      withinEnum(Object.values(DepartmentEnum)),
+  level:           withinEnum(Object.values(LevelEnum)),
+  platform:        withinEnum(Object.values(PlatformEnum)),
+  offered_by:      withinEnum(Object.values(OfferedByEnum)),
+  sortby:          values => withinEnum(Object.values(SortByEnum))(values)[0],
+  q:               first,
+  topic:           identity,
+  certification:   firstBoolean,
+  professional:    firstBoolean,
+  aggregations:    withinEnum(Object.values(AggregationsEnum)),
+  course_feature:  identity,
+  limit:           firstNumber,
+  offset:          firstNumber,
+  id:              numbers,
+  free:            firstBoolean,
+  learning_format: withinEnum(Object.values(LearningFormatEnum))
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
