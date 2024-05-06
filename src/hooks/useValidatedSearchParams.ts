@@ -42,6 +42,10 @@ interface UseValidatedSearchParamsResult<ReqParams> {
    */
   clearAllFacets: () => void
   /**
+   * True if there are any facets in the request.
+   */
+  hasFacets: boolean
+  /**
    * Clear a particle parameter by key.
    */
   clearParam: (key: keyof ReqParams & string) => void
@@ -238,6 +242,7 @@ const useValidatedSearchParams = <ReqParams>({
   return {
     params,
     clearAllFacets,
+    hasFacets: facets.some(f => searchParams.has(f)),
     clearParam,
     patchParams,
     toggleParamValue,
