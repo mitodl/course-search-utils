@@ -754,10 +754,10 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@^2024.3.22":
-  version "2024.3.22"
-  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.3.22.tgz#85aed96bd6c80389b1c36b514818a68178d2ee47"
-  integrity sha512-abX88MIyk697KZ4OGB5HP61CDUXCi2L0xD8xIb8G28s03OwO2KyZa5EHDmhhGq9Si5sLZzpfLSJkwd42FOJjJQ==
+"@mitodl/open-api-axios@^2024.5.6":
+  version "2024.5.6"
+  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.5.6.tgz#81a0777198da6de54cfbb0968c6fd1f620b11686"
+  integrity sha512-Z3mmohEeWHI4csKJQlqp5G5szE+6uzE16rX9bSovSfCSui8svpGNyiwlcfsZL7VHMr/6CKT7LYl9I0ydlxvgcw==
   dependencies:
     "@types/node" "^20.11.19"
     axios "^1.6.5"
@@ -1169,9 +1169,9 @@
   integrity sha512-LhF+9fbIX4iPzhsRLpK5H7iPdvW8L4IwGciXQIOEcuF62+9nw/VQVsOViAOOGxY3OlOKGLFv0sWwJXdwQeTn6A==
 
 "@types/node@^20.11.19":
-  version "20.11.30"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.30.tgz#9c33467fc23167a347e73834f788f4b9f399d66f"
-  integrity sha512-dHM6ZxwlmuZaRmUPfv1p+KrdD1Dci04FbdEm/9wEMouFqxYoFl5aMkt0VMAUtYRQDyYvD41WJLukhq/ha3YuTw==
+  version "20.12.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.12.9.tgz#d7234f2e7839b55fcab5048404aef0195684adff"
+  integrity sha512-o93r47yu04MHumPBCFg0bMPBMNgtMg3jzbhl7e68z50+BMHmRMGDJv13eBlUgOdc9i/uoJXGMGYLtJV4ReTXEg==
   dependencies:
     undici-types "~5.26.4"
 
