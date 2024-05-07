@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.0.7
+Version 3.0.7 (Released May 07, 2024)
 -------------
 
 - add hasFacets return value (#99)
