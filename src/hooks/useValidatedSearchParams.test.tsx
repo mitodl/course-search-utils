@@ -370,10 +370,7 @@ describe("useResourceSearchParams", () => {
       expected: new URLSearchParams("?q=python&x=irrelevant")
     }
   ])("clearFacets clears all facets", ({ initial, facets, expected }) => {
-    const props = { facets } as Omit<
-      UseResourceSearchParamsProps,
-      "searchParams" | "setSearchParams"
-    >
+    const props = { facets } as Pick<UseResourceSearchParamsProps, "facets">
     const { result, searchParams } = setup({ initial, props })
     act(() => {
       result.current.clearAllFacets()
@@ -381,6 +378,32 @@ describe("useResourceSearchParams", () => {
     searchParams.current.sort()
     expect(searchParams.current).toEqual(expected)
   })
+
+  test.each([
+    {
+      initial:
+        "?resource_type=course&department=6&department=8&q=python&x=irrelevant",
+      facets:   ["department"],
+      expected: true
+    },
+    {
+      initial:  "?resource_type=course",
+      facets:   ["department"],
+      expected: false
+    },
+    {
+      initial:  "?resource_type=course",
+      facets:   ["resource_type"],
+      expected: true
+    }
+  ])(
+    "hasFacets is true if and only if the searchParams include facets",
+    ({ initial, facets, expected }) => {
+      const props = { facets } as Pick<UseResourceSearchParamsProps, "facets">
+      const { result } = setup({ initial, props })
+      expect(result.current.hasFacets).toBe(expected)
+    }
+  )
 
   test("clearParam clears specified parameter", () => {
     const { result, searchParams } = setup({
