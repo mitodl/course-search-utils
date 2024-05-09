@@ -31,9 +31,11 @@ export interface Facets {
   course_feature?: string[]
   resource_type?: string[]
   content_feature_type?: string[]
+  learning_format?: string[]
 }
 
 export interface BooleanFacets {
   certification?: boolean | null
   professional?: boolean | null
+  free?: boolean | null
 }
