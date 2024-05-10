@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.0.8
+-------------
+
+- Update Facet Types (#101)
+
 Version 3.0.7 (Released May 07, 2024)
 -------------
 
