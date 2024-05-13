@@ -1,5 +1,4 @@
 import React from "react"
-import Dotdotdot from "react-dotdotdot"
 import { Bucket } from "./types"
 
 interface Props {
@@ -33,7 +32,7 @@ export function SearchFacetItem(props: Props) {
       />
       <div className="facet-label">
         <label htmlFor={facetId} className={"facet-key"}>
-          <Dotdotdot clamp={1}>{displayKey || ""}</Dotdotdot>
+          {displayKey ?? ""}
         </label>
         <div className="facet-count">{facet.doc_count}</div>
       </div>
