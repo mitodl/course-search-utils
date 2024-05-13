@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.0.9
+-------------
+
+- remove dotdotdot (#104)
+
 Version 3.0.8 (Released May 10, 2024)
 -------------
 
