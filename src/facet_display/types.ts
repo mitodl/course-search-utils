@@ -3,6 +3,8 @@ export interface Bucket {
   doc_count: number
 }
 
+export type BucketWithLabel = Bucket & { label: string }
+
 export type Aggregation = Bucket[]
 
 export type Aggregations = Map<string, Bucket[]>
@@ -13,14 +15,23 @@ export type FacetKey = keyof Facets
 export type BooleanFacetKey = keyof BooleanFacets
 
 export type SingleFacetOptions = {
+  type?: "static" | "filterable"
   name: FacetKey
   title: string
-  useFilterableFacet: boolean
   expandedOnLoad: boolean
   labelFunction?: ((value: string) => string) | null
 }
+export type BooleanFacetGroupOptions = {
+  type: "group"
+  key: "string"
+  facets: {
+    value: true | false
+    name: BooleanFacetKey
+    label: string
+  }[]
+}
 
-export type FacetManifest = SingleFacetOptions[]
+export type FacetManifest = (SingleFacetOptions | BooleanFacetGroupOptions)[]
 
 export interface Facets {
   platform?: string[]

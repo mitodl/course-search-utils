@@ -43,7 +43,7 @@ function FilterableFacet(props: Props) {
       results
   }, [filterText, results])
 
-  const facets = (filteredResults || results) ?? []
+  const buckets = (filteredResults || results) ?? []
   return results && results.length === 0 ? null : (
     <div className="facets filterable-facet">
       <button
@@ -88,14 +88,14 @@ function FilterableFacet(props: Props) {
             )}
           </div>
           <div className="facet-list">
-            {facets.map(facet => (
+            {buckets.map(bucket => (
               <SearchFacetItem
-                key={`${name}-${facet.key}`}
-                facet={facet}
-                isChecked={contains(facet.key, selected || [])}
+                key={`${name}-${bucket.key}`}
+                bucket={bucket}
+                isChecked={contains(bucket.key, selected || [])}
                 onUpdate={onUpdate}
                 name={name}
-                displayKey={facet.label}
+                displayKey={bucket.label}
               />
             ))}
           </div>
