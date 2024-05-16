@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import FilterableFacet from "./FilterableFacet";
 import Facet from "./Facet";
-import SearchFilter from "./SearchFilter";
+import FilterIndicator from "./FilterIndicator";
 import type {
   FacetManifest,
   Facets,
@@ -194,11 +194,10 @@ const FacetDisplay = React.memo(
             </button>
           </div>
           {activeFacetValues.map(({ name, value, label }) => (
-            <SearchFilter
+            <FilterIndicator
               key={`${name}-${value}`}
-              value={String(value)}
-              label={label}
-              clearFacet={() => onFacetChange(name, String(value), false)}
+              label={label || String(value)}
+              onClick={() => onFacetChange(name, String(value), false)}
             />
           ))}
         </div>
