@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { contains } from "ramda"
 
 import { SearchFacetItem } from "./SearchFacetItem"
-import { BucketWithLabel } from "./FacetDisplay"
+import { BucketWithLabel } from "./types"
 
 const MAX_DISPLAY_COUNT = 5
 const FACET_COLLAPSE_THRESHOLD = 15

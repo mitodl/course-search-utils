@@ -3,19 +3,22 @@ import React from "react"
 import { SearchFacetItem } from "./SearchFacetItem"
 import type {
   Bucket,
-  BooleanFacetGroupOptions,
+  MultiFacetGroupOptions,
   Facets,
   BooleanFacets
 } from "./types"
 
 interface Props {
   results: Record<string, Bucket[]>
-  facets: BooleanFacetGroupOptions["facets"]
+  facets: MultiFacetGroupOptions["facets"]
   onUpdate: React.ChangeEventHandler<HTMLInputElement>
   activeFacets: Facets & BooleanFacets
 }
 
-function BooleanFacetGroup(props: Props) {
+/**
+ * Used to display a specific set of facet name-value pairs.
+ */
+function MultiFacetGroup(props: Props) {
   const { results, facets, onUpdate, activeFacets } = props
 
   return (
@@ -40,4 +43,4 @@ function BooleanFacetGroup(props: Props) {
   )
 }
 
-export default BooleanFacetGroup
+export default MultiFacetGroup

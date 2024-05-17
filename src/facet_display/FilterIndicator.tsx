@@ -1,15 +1,15 @@
-import React from "react";
+import React from "react"
 
 interface FilterIndicatorProps {
-  label: string;
-  onClick: () => void;
+  label: string
+  onClick: () => void
 }
 
 /**
  * Indicates that a search filter is active.
  */
 export default function FilterIndicator(props: FilterIndicatorProps) {
-  const { onClick, label } = props;
+  const { onClick, label } = props
 
   return (
     <div className="active-search-filter">
@@ -25,6 +25,6 @@ export default function FilterIndicator(props: FilterIndicatorProps) {
         </span>
       </button>
     </div>
-  );
+  )
 }
-export type { FilterIndicatorProps };
+export type { FilterIndicatorProps }

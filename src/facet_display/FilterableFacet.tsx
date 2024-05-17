@@ -3,7 +3,7 @@ import { contains } from "ramda"
 import Fuse from "fuse.js"
 
 import { SearchFacetItem } from "./SearchFacetItem"
-import { BucketWithLabel } from "./FacetDisplay"
+import { BucketWithLabel } from "./types"
 
 // the `.search method returns records like { item, refindex }
 // where item is the facet and refIndex is it's index in the original
