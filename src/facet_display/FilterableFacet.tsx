@@ -66,6 +66,7 @@ function FilterableFacet(props: Props) {
               onChange={handleFilterInput}
               value={filterText}
               placeholder={`Search ${title || ""}`}
+              aria-label={`Search ${title || ""}`}
             />
             {filterText === "" ? (
               <i

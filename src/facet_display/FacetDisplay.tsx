@@ -76,6 +76,7 @@ const includeActiveZerosInBuckets = (
     if (active.length === 0) return
     const actives = Array.isArray(active) ? active : [active]
     const existing = new Set(copy[groupKey].map(bucket => bucket.key))
+    copy[groupKey] = [...copy[groupKey]]
     actives.forEach(key => {
       if (!existing.has(key)) {
         copy[groupKey].push({ key, doc_count: 0 })
@@ -86,6 +87,10 @@ const includeActiveZerosInBuckets = (
   return copy
 }
 
+/**
+ * Display available facets for search UI.
+ *
+ */
 const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
   facetMap,
   facetOptions,
@@ -154,7 +159,8 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
             />
           )
         }
-        throw new Error("Unexpected")
+        console.error("Unrecognized facet configuration.")
+        return null
       })}
     </>
   )
@@ -166,6 +172,10 @@ type FacetValue = {
   label?: string
 }
 
+/**
+ * Display available facets along with "clear all" button and buttons indicating
+ * currently active facets.
+ */
 const FacetDisplay = React.memo(
   function FacetDisplay(props: FacetDisplayProps) {
     const {

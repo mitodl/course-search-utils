@@ -1,6 +1,7 @@
 import React from "react"
 import { render, screen, within } from "@testing-library/react"
 import user from "@testing-library/user-event"
+import invariant from "tiny-invariant"
 
 import FacetDisplay, { getDepartmentName } from "./FacetDisplay"
 import type { FacetDisplayProps } from "./FacetDisplay"
@@ -63,7 +64,7 @@ describe.each([undefined, "static", "filterable"] as const)(
       topic: [
         { key: "Cats", doc_count: 10 },
         { key: "Dogs", doc_count: 20 },
-        { key: "Monkeys", doc_count: 30 }
+        { key: "Donkeys", doc_count: 30 }
       ],
       department: [
         { key: "1", doc_count: 100 },
@@ -181,7 +182,7 @@ describe.each([undefined, "static", "filterable"] as const)(
       expect(checkboxCount()).toBe(3)
       screen.getByRole("checkbox", { name: "Cats" })
       screen.getByRole("checkbox", { name: "Dogs" })
-      screen.getByRole("checkbox", { name: "Monkeys" })
+      screen.getByRole("checkbox", { name: "Donkeys" })
       rerender({
         activeFacets: {
           topic: ["Cats", "Dragons"]
@@ -190,10 +191,26 @@ describe.each([undefined, "static", "filterable"] as const)(
       expect(checkboxCount()).toBe(4)
       screen.getByRole("checkbox", { name: "Dragons" })
     })
+
+    test("Displays filterable facet if type='filterable'", async () => {
+      setup({ facetMap: [{ ...defaultFacetMap[0] }] })
+      const textbox = screen.queryByRole("textbox", { name: "Search Topics" })
+      expect(!!textbox).toBe(type === "filterable")
+      if (type !== "filterable") return
+      expect(screen.getAllByRole("checkbox")).toHaveLength(3)
+      invariant(textbox, "Expected textbox to exist")
+      await user.type(textbox, "D")
+      const box0 = screen.queryByRole("checkbox", { name: "Cats" })
+      const box1 = screen.queryByRole("checkbox", { name: "Dogs" })
+      const box2 = screen.queryByRole("checkbox", { name: "Donkeys" })
+      expect(!!box0).toBe(false)
+      expect(!!box1).toBe(true)
+      expect(!!box2).toBe(true)
+    })
   }
 )
 
-describe("FacetDisplay with type='boolean' facet", () => {
+describe("FacetDisplay with type='group' facet", () => {
   const multiFacetGroup: MultiFacetGroupOptions = {
     type:   "group",
     facets: [
