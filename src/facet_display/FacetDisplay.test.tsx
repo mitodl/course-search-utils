@@ -20,7 +20,7 @@ const departmentFacet: SingleFacetOptions = {
 
 const setupFacetDisplay = (
   props: Partial<FacetDisplayProps> &
-    Pick<FacetDisplayProps, "facetMap" | "facetOptions">
+    Pick<FacetDisplayProps, "facetManifest" | "facetOptions">
 ) => {
   const activeFacets = {}
   const clearAllFilters = jest.fn()
@@ -55,7 +55,7 @@ const setupFacetDisplay = (
 describe.each([undefined, "static", "filterable"] as const)(
   "FacetDisplay component (type=%s)",
   type => {
-    const defaultFacetMap = [
+    const defaultFacetManifest = [
       { ...topicFacet, type },
       { ...departmentFacet, type }
     ]
@@ -73,24 +73,24 @@ describe.each([undefined, "static", "filterable"] as const)(
     }
     const setup = (props?: Partial<FacetDisplayProps>) =>
       setupFacetDisplay({
-        facetMap:     defaultFacetMap,
-        facetOptions: defaultAggregations,
+        facetManifest: defaultFacetManifest,
+        facetOptions:  defaultAggregations,
         ...props
       })
 
     test("Renders facets with expected titles", async () => {
       setup()
-      screen.getByRole("button", { name: defaultFacetMap[0].title })
-      screen.getByRole("button", { name: defaultFacetMap[1].title })
+      screen.getByRole("button", { name: defaultFacetManifest[0].title })
+      screen.getByRole("button", { name: defaultFacetManifest[1].title })
     })
 
     test.each([{ expandedOnLoad: false }, { expandedOnLoad: true }])(
       "Initially expanded based on expandedOnLoad ($expandedOnLoad)",
       ({ expandedOnLoad }) => {
-        const facetMap = [{ ...defaultFacetMap[0], expandedOnLoad }]
-        setup({ facetMap })
+        const facetManifest = [{ ...defaultFacetManifest[0], expandedOnLoad }]
+        setup({ facetManifest })
         screen.getByRole("button", {
-          name:     facetMap[0].title,
+          name:     facetManifest[0].title,
           expanded: expandedOnLoad
         })
         const checkboxes = screen.queryAllByRole("checkbox")
@@ -99,9 +99,9 @@ describe.each([undefined, "static", "filterable"] as const)(
     )
 
     test("Clicking facet title toggles expanded state", async () => {
-      setup({ facetMap: [defaultFacetMap[0]] })
+      setup({ facetManifest: [defaultFacetManifest[0]] })
       const button = screen.getByRole("button", {
-        name: defaultFacetMap[0].title
+        name: defaultFacetManifest[0].title
       })
       const checkboxCount = () => screen.queryAllByRole("checkbox").length
       await user.click(button)
@@ -136,9 +136,9 @@ describe.each([undefined, "static", "filterable"] as const)(
 
     test("Clicking a facet checkbox calls onFacetChange", async () => {
       const { spies } = setup({
-        facetMap: [
+        facetManifest: [
           {
-            ...defaultFacetMap[0],
+            ...defaultFacetManifest[0],
             expandedOnLoad: true
           }
         ]
@@ -149,9 +149,9 @@ describe.each([undefined, "static", "filterable"] as const)(
 
     test("it accepts a label function to convert codes to names", () => {
       setup({
-        facetMap: [
+        facetManifest: [
           {
-            ...defaultFacetMap[1],
+            ...defaultFacetManifest[1],
             labelFunction:  getDepartmentName,
             expandedOnLoad: true
           }
@@ -171,9 +171,9 @@ describe.each([undefined, "static", "filterable"] as const)(
       }
       const { rerender } = setup({
         activeFacets,
-        facetMap: [
+        facetManifest: [
           {
-            ...defaultFacetMap[0],
+            ...defaultFacetManifest[0],
             expandedOnLoad: true
           }
         ]
@@ -193,7 +193,7 @@ describe.each([undefined, "static", "filterable"] as const)(
     })
 
     test("Displays filterable facet if type='filterable'", async () => {
-      setup({ facetMap: [{ ...defaultFacetMap[0] }] })
+      setup({ facetManifest: [{ ...defaultFacetManifest[0] }] })
       const textbox = screen.queryByRole("textbox", { name: "Search Topics" })
       expect(!!textbox).toBe(type === "filterable")
       if (type !== "filterable") return
@@ -218,7 +218,7 @@ describe("FacetDisplay with type='group' facet", () => {
       { value: false, name: "free", label: "Free Stuff" } as const
     ]
   }
-  const defaultFacetMap = [multiFacetGroup]
+  const defaultFacetManifest = [multiFacetGroup]
 
   const defaultAggregations = {
     certification: [
@@ -233,8 +233,8 @@ describe("FacetDisplay with type='group' facet", () => {
 
   const setup = (props?: Partial<FacetDisplayProps>) =>
     setupFacetDisplay({
-      facetMap:     defaultFacetMap,
-      facetOptions: defaultAggregations,
+      facetManifest: defaultFacetManifest,
+      facetOptions:  defaultAggregations,
       ...props
     })
 

@@ -14,7 +14,7 @@ import { LEVELS, DEPARTMENTS } from "../constants"
 import MultiFacetGroup from "./MultiFacetGroup"
 
 interface FacetDisplayProps {
-  facetMap: FacetManifest
+  facetManifest: FacetManifest
   /**
    * Returns the aggregation options for a given group.
    *
@@ -92,7 +92,7 @@ const includeActiveZerosInBuckets = (
  *
  */
 const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
-  facetMap,
+  facetManifest,
   facetOptions,
   activeFacets,
   onFacetChange
@@ -103,7 +103,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
   )
   return (
     <>
-      {facetMap.map(facetSettings => {
+      {facetManifest.map(facetSettings => {
         if (!facetSettings.type || facetSettings.type === "static") {
           return (
             <Facet
@@ -142,7 +142,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
           if (facetSettings.facets.length === 0) return null
           const { name, value } = facetSettings.facets[0]
           /**
-           * Assumption: no two facetManifest entry will have the same name and
+           * Assumption: no two FacetManifest entry will have the same name and
            * value for first facet in a group.
            * (It would be silly to include the same name-value pair twice).
            */
@@ -179,26 +179,28 @@ type FacetValue = {
 const FacetDisplay = React.memo(
   function FacetDisplay(props: FacetDisplayProps) {
     const {
-      facetMap,
+      facetManifest,
       facetOptions,
       activeFacets,
       clearAllFilters,
       onFacetChange
     } = props
 
-    const activeFacetValues = facetMap.flatMap((facetSetting): FacetValue[] => {
-      if (facetSetting.type === "group") {
-        return facetSetting.facets.filter(
-          ({ name, value }) => activeFacets[name] === value
-        )
-      } else {
-        return (activeFacets[facetSetting.name] ?? []).map(value => ({
-          value,
-          name:  facetSetting.name,
-          label: facetSetting.labelFunction?.(value)
-        }))
+    const activeFacetValues = facetManifest.flatMap(
+      (facetSetting): FacetValue[] => {
+        if (facetSetting.type === "group") {
+          return facetSetting.facets.filter(
+            ({ name, value }) => activeFacets[name] === value
+          )
+        } else {
+          return (activeFacets[facetSetting.name] ?? []).map(value => ({
+            value,
+            name:  facetSetting.name,
+            label: facetSetting.labelFunction?.(value)
+          }))
+        }
       }
-    })
+    )
 
     return (
       <>
@@ -222,7 +224,7 @@ const FacetDisplay = React.memo(
           ))}
         </div>
         <AvailableFacets
-          facetMap={facetMap}
+          facetManifest={facetManifest}
           facetOptions={facetOptions}
           activeFacets={activeFacets}
           onFacetChange={onFacetChange}
