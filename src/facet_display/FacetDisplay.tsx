@@ -76,10 +76,10 @@ const includeActiveZerosInBuckets = (
     if (active.length === 0) return
     const actives = Array.isArray(active) ? active : [active]
     const existing = new Set(copy[groupKey].map(bucket => bucket.key))
-    copy[groupKey] = [...copy[groupKey]]
+    copy[groupKey] = [...copy[groupKey]] ?? []
     actives.forEach(key => {
       if (!existing.has(key)) {
-        copy[groupKey].push({ key, doc_count: 0 })
+        copy[groupKey].push({ key: String(key), doc_count: 0 })
       }
     })
   })

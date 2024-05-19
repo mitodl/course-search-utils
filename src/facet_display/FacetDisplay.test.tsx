@@ -264,4 +264,33 @@ describe("FacetDisplay with type='group' facet", () => {
     await user.click(screen.getByRole("checkbox", { name: "Free Stuff" }))
     expect(spies.onFacetChange).toHaveBeenCalledWith("free", "false", true)
   })
+
+  test.each([
+    { facetOptions: { free: [] }, rendered: false },
+    {
+      facetOptions: { free: [{ key: "false", doc_count: 10 }] },
+      rendered:     true
+    }
+  ])(
+    "Does not display the group if no facets available",
+    ({ facetOptions, rendered }) => {
+      setup({
+        facetOptions
+      })
+      expect(!!document.querySelector(".facets")).toBe(rendered)
+    }
+  )
+
+  test("Displays group entries that are active even if empty", () => {
+    setup({
+      facetOptions: {
+        certification: []
+      },
+      activeFacets: {
+        certification: true
+      }
+    })
+    const checkbox = screen.getByRole("checkbox", { name: "With Certificate" })
+    expect(checkbox).toBeTruthy()
+  })
 })
