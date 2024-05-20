@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.1.0
+Version 3.1.0 (Released May 20, 2024)
 -------------
 
 - Boolean Facets (#106)
