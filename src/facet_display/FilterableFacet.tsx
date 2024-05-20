@@ -3,7 +3,7 @@ import { contains } from "ramda"
 import Fuse from "fuse.js"
 
 import { SearchFacetItem } from "./SearchFacetItem"
-import { BucketWithLabel } from "./FacetDisplay"
+import { BucketWithLabel } from "./types"
 
 // the `.search method returns records like { item, refindex }
 // where item is the facet and refIndex is it's index in the original
@@ -43,7 +43,7 @@ function FilterableFacet(props: Props) {
       results
   }, [filterText, results])
 
-  const facets = (filteredResults || results) ?? []
+  const buckets = (filteredResults || results) ?? []
   return results && results.length === 0 ? null : (
     <div className="facets filterable-facet">
       <button
@@ -66,6 +66,7 @@ function FilterableFacet(props: Props) {
               onChange={handleFilterInput}
               value={filterText}
               placeholder={`Search ${title || ""}`}
+              aria-label={`Search ${title || ""}`}
             />
             {filterText === "" ? (
               <i
@@ -88,14 +89,14 @@ function FilterableFacet(props: Props) {
             )}
           </div>
           <div className="facet-list">
-            {facets.map(facet => (
+            {buckets.map(bucket => (
               <SearchFacetItem
-                key={`${name}-${facet.key}`}
-                facet={facet}
-                isChecked={contains(facet.key, selected || [])}
+                key={`${name}-${bucket.key}`}
+                bucket={bucket}
+                isChecked={contains(bucket.key, selected || [])}
                 onUpdate={onUpdate}
                 name={name}
-                displayKey={facet.label}
+                displayKey={bucket.label}
               />
             ))}
           </div>

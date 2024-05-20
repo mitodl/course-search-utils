@@ -2,7 +2,7 @@ import React from "react"
 import { Bucket } from "./types"
 
 interface Props {
-  facet: Bucket
+  bucket: Bucket
   isChecked: boolean
   onUpdate: React.ChangeEventHandler<HTMLInputElement>
   name: string
@@ -17,16 +17,16 @@ export const slugify = (text: string) =>
     .replace(/[\W_]/g, "-")
 
 export function SearchFacetItem(props: Props) {
-  const { facet, isChecked, onUpdate, name, displayKey } = props
+  const { bucket, isChecked, onUpdate, name, displayKey } = props
 
-  const facetId = slugify(`${name}-${facet.key}`)
+  const facetId = slugify(`${name}-${bucket.key}`)
   return (
     <div className={isChecked ? "facet-visible checked" : "facet-visible"}>
       <input
         type="checkbox"
         id={facetId}
         name={name}
-        value={facet.key}
+        value={bucket.key}
         checked={isChecked}
         onChange={onUpdate}
       />
@@ -34,7 +34,7 @@ export function SearchFacetItem(props: Props) {
         <label htmlFor={facetId} className={"facet-key"}>
           {displayKey ?? ""}
         </label>
-        <div className="facet-count">{facet.doc_count}</div>
+        <div className="facet-count">{bucket.doc_count}</div>
       </div>
     </div>
   )

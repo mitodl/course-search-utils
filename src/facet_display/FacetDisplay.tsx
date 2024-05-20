@@ -1,27 +1,27 @@
-import React, { useCallback } from "react"
+import React, { useMemo } from "react"
 import FilterableFacet from "./FilterableFacet"
 import Facet from "./Facet"
-import SearchFilter from "./SearchFilter"
+import FilterIndicator from "./FilterIndicator"
 import type {
   FacetManifest,
   Facets,
   Aggregation,
   Bucket,
-  BooleanFacets
+  BooleanFacets,
+  BucketWithLabel
 } from "./types"
 import { LEVELS, DEPARTMENTS } from "../constants"
-
-export type BucketWithLabel = Bucket & { label: string }
+import MultiFacetGroup from "./MultiFacetGroup"
 
 interface FacetDisplayProps {
-  facetMap: FacetManifest
+  facetManifest: FacetManifest
   /**
    * Returns the aggregation options for a given group.
    *
    * If `activeFacets` includes a facet with no results, that facet will
    * automatically be included in the facet options.
    */
-  facetOptions: (group: string) => Aggregation | null
+  facetOptions: Record<string, Bucket[]>
   activeFacets: Facets & BooleanFacets
   clearAllFilters: () => void
   onFacetChange: (name: string, value: string, isEnabled: boolean) => void
@@ -64,85 +64,143 @@ const resultsWithLabels = (
  * results.
  */
 const includeActiveZerosInBuckets = (
-  groupKey: string,
-  buckets: Bucket[],
-  params: Facets
+  bucketGroups: Record<string, Bucket[]>,
+  params: Facets | BooleanFacets
 ) => {
-  const opts = [...buckets]
-  const active = params[groupKey as keyof Facets] ?? []
-  const actives = Array.isArray(active) ? active : [active]
-  actives.forEach(key => {
-    if (!opts.find(o => o.key === key)) {
-      opts.push({ key: String(key), doc_count: 0 })
+  const copy = { ...bucketGroups }
+  Object.entries(params).forEach(([groupKey, active]) => {
+    if (!copy[groupKey]) {
+      // params might include non-facets.
+      return
     }
+    if (active.length === 0) return
+    const actives = Array.isArray(active) ? active : [active]
+    const existing = new Set(copy[groupKey].map(bucket => bucket.key))
+    copy[groupKey] = [...copy[groupKey]] ?? []
+    actives.forEach(key => {
+      if (!existing.has(key)) {
+        copy[groupKey].push({ key: String(key), doc_count: 0 })
+      }
+    })
   })
-  return opts
+
+  return copy
 }
 
+/**
+ * Display available facets for search UI.
+ *
+ */
 const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
-  facetMap,
+  facetManifest,
   facetOptions,
   activeFacets,
   onFacetChange
 }) => {
-  const allFacetOptions: FacetDisplayProps["facetOptions"] = useCallback(
-    name => {
-      return includeActiveZerosInBuckets(
-        name,
-        facetOptions(name) ?? [],
-        activeFacets
-      )
-    },
+  const allOpts = useMemo(
+    () => includeActiveZerosInBuckets(facetOptions, activeFacets),
     [facetOptions, activeFacets]
   )
   return (
     <>
-      {facetMap.map(facetSetting =>
-        facetSetting.useFilterableFacet ? (
-          <FilterableFacet
-            key={facetSetting.name}
-            results={resultsWithLabels(
-              allFacetOptions(facetSetting.name) || [],
-              facetSetting.labelFunction
-            )}
-            name={facetSetting.name}
-            title={facetSetting.title}
-            selected={activeFacets[facetSetting.name] || []}
-            onUpdate={e =>
-              onFacetChange(e.target.name, e.target.value, e.target.checked)
-            }
-            expandedOnLoad={facetSetting.expandedOnLoad}
-          />
-        ) : (
-          <Facet
-            key={facetSetting.name}
-            title={facetSetting.title}
-            name={facetSetting.name}
-            results={resultsWithLabels(
-              allFacetOptions(facetSetting.name) || [],
-              facetSetting.labelFunction
-            )}
-            onUpdate={e =>
-              onFacetChange(e.target.name, e.target.value, e.target.checked)
-            }
-            selected={activeFacets[facetSetting.name] || []}
-            expandedOnLoad={facetSetting.expandedOnLoad}
-          />
-        )
-      )}
+      {facetManifest.map(facetSettings => {
+        if (!facetSettings.type || facetSettings.type === "static") {
+          return (
+            <Facet
+              key={facetSettings.name}
+              title={facetSettings.title}
+              name={facetSettings.name}
+              results={resultsWithLabels(
+                allOpts[facetSettings.name] ?? [],
+                facetSettings.labelFunction
+              )}
+              onUpdate={e =>
+                onFacetChange(e.target.name, e.target.value, e.target.checked)
+              }
+              selected={activeFacets[facetSettings.name] || []}
+              expandedOnLoad={facetSettings.expandedOnLoad}
+            />
+          )
+        } else if (facetSettings.type === "filterable") {
+          return (
+            <FilterableFacet
+              key={facetSettings.name}
+              title={facetSettings.title}
+              name={facetSettings.name}
+              results={resultsWithLabels(
+                allOpts[facetSettings.name] ?? [],
+                facetSettings.labelFunction
+              )}
+              onUpdate={e =>
+                onFacetChange(e.target.name, e.target.value, e.target.checked)
+              }
+              selected={activeFacets[facetSettings.name] || []}
+              expandedOnLoad={facetSettings.expandedOnLoad}
+            />
+          )
+        } else if (facetSettings.type === "group") {
+          if (facetSettings.facets.length === 0) return null
+          const { name, value } = facetSettings.facets[0]
+          /**
+           * Assumption: no two FacetManifest entry will have the same name and
+           * value for first facet in a group.
+           * (It would be silly to include the same name-value pair twice).
+           */
+          const key = `${name}-${value}`
+          return (
+            <MultiFacetGroup
+              key={key}
+              facets={facetSettings.facets}
+              results={allOpts}
+              onUpdate={e =>
+                onFacetChange(e.target.name, e.target.value, e.target.checked)
+              }
+              activeFacets={activeFacets}
+            />
+          )
+        }
+        console.error("Unrecognized facet configuration.")
+        return null
+      })}
     </>
   )
 }
 
+type FacetValue = {
+  name: string
+  value: string | boolean
+  label?: string
+}
+
+/**
+ * Display available facets along with "clear all" button and buttons indicating
+ * currently active facets.
+ */
 const FacetDisplay = React.memo(
   function FacetDisplay(props: FacetDisplayProps) {
     const {
-      facetMap,
+      facetManifest,
       facetOptions,
       activeFacets,
       clearAllFilters,
       onFacetChange
     } = props
+
+    const activeFacetValues = facetManifest.flatMap(
+      (facetSetting): FacetValue[] => {
+        if (facetSetting.type === "group") {
+          return facetSetting.facets.filter(
+            ({ name, value }) => activeFacets[name] === value
+          )
+        } else {
+          return (activeFacets[facetSetting.name] ?? []).map(value => ({
+            value,
+            name:  facetSetting.name,
+            label: facetSetting.labelFunction?.(value)
+          }))
+        }
+      }
+    )
 
     return (
       <>
@@ -157,21 +215,16 @@ const FacetDisplay = React.memo(
               Clear All
             </button>
           </div>
-          {facetMap.map(facetSetting =>
-            (activeFacets[facetSetting.name] || []).map((facet, i) => (
-              <SearchFilter
-                key={i}
-                value={facet}
-                clearFacet={() =>
-                  onFacetChange(facetSetting.name, facet, false)
-                }
-                labelFunction={facetSetting.labelFunction || null}
-              />
-            ))
-          )}
+          {activeFacetValues.map(({ name, value, label }) => (
+            <FilterIndicator
+              key={`${name}-${value}`}
+              label={label || String(value)}
+              onClick={() => onFacetChange(name, String(value), false)}
+            />
+          ))}
         </div>
         <AvailableFacets
-          facetMap={facetMap}
+          facetManifest={facetManifest}
           facetOptions={facetOptions}
           activeFacets={activeFacets}
           onFacetChange={onFacetChange}

@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { contains } from "ramda"
 
 import { SearchFacetItem } from "./SearchFacetItem"
-import { BucketWithLabel } from "./FacetDisplay"
+import { BucketWithLabel } from "./types"
 
 const MAX_DISPLAY_COUNT = 5
 const FACET_COLLAPSE_THRESHOLD = 15
@@ -40,17 +40,17 @@ function SearchFacet(props: Props) {
       {showFacetList ? (
         <>
           {results ?
-            results.map((facet, i) =>
+            results.map((bucket, i) =>
               showAllFacets ||
                 i < MAX_DISPLAY_COUNT ||
                 results.length < FACET_COLLAPSE_THRESHOLD ? (
                   <SearchFacetItem
-                    key={`${name}-${facet.key}`}
-                    facet={facet}
-                    isChecked={contains(facet.key, selected || [])}
+                    key={`${name}-${bucket.key}`}
+                    bucket={bucket}
+                    isChecked={contains(bucket.key, selected || [])}
                     onUpdate={onUpdate}
                     name={name}
-                    displayKey={facet.label}
+                    displayKey={bucket.label}
                   />
                 ) : null
             ) :
