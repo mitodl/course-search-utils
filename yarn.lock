@@ -762,10 +762,10 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@^2024.5.6":
-  version "2024.5.6"
-  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.5.6.tgz#81a0777198da6de54cfbb0968c6fd1f620b11686"
-  integrity sha512-Z3mmohEeWHI4csKJQlqp5G5szE+6uzE16rX9bSovSfCSui8svpGNyiwlcfsZL7VHMr/6CKT7LYl9I0ydlxvgcw==
+"@mitodl/open-api-axios@^2024.6.4":
+  version "2024.6.4"
+  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.6.4.tgz#e906b764b115665858570f4bbf04bc065a2eeb4f"
+  integrity sha512-oJ3AwyDTrHOQXairhtqHyBHb9CzIf7En2gV7y6BANDKXhYGXKOVvxqWtvV+1jsCzgGWT6A2nBXYsKuVIGoAP6w==
   dependencies:
     "@types/node" "^20.11.19"
     axios "^1.6.5"

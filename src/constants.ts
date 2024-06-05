@@ -48,4 +48,11 @@ export const LEVELS = {
   introductory:  "Introductory"
 }
 
+export const CERTIFICATION_TYPES = {
+  none:         "No Certificate",
+  completion:   "Certificate of Completion",
+  micromasters: "MicroMasters Credential",
+  professional: "Professional Certificate"
+}
+
 export const BOOLEAN_FACET_NAMES = ["certification", "professional"]

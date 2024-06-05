@@ -53,6 +53,7 @@ export interface Facets {
   resource_type?: string[]
   content_feature_type?: string[]
   learning_format?: string[]
+  certification_type?: string[]
 }
 
 export interface BooleanFacets {
