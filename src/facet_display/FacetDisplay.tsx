@@ -10,7 +10,7 @@ import type {
   BooleanFacets,
   BucketWithLabel
 } from "./types"
-import { LEVELS, DEPARTMENTS } from "../constants"
+import { LEVELS, DEPARTMENTS, CERTIFICATION_TYPES } from "../constants"
 import MultiFacetGroup from "./MultiFacetGroup"
 
 interface FacetDisplayProps {
@@ -25,6 +25,16 @@ interface FacetDisplayProps {
   activeFacets: Facets & BooleanFacets
   clearAllFilters: () => void
   onFacetChange: (name: string, value: string, isEnabled: boolean) => void
+}
+
+export const getCertificationTypeName = (certificationType: string): string => {
+  if (certificationType in CERTIFICATION_TYPES) {
+    return CERTIFICATION_TYPES[
+      certificationType as keyof typeof CERTIFICATION_TYPES
+    ]
+  } else {
+    return certificationType
+  }
 }
 
 export const getDepartmentName = (departmentId: string): string => {
