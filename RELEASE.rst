@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.1.1
+-------------
+
+- certification type (#108)
+
 Version 3.1.0 (Released May 20, 2024)
 -------------
 
