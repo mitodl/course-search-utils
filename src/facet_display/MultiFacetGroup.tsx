@@ -39,7 +39,7 @@ function MultiFacetGroup(props: Props) {
     .filter(hasBucket)
   if (!available.length) return null
   return (
-    <div className="facets">
+    <div className="facets multi-facet-group">
       {available.map(({ facet, bucket }) => {
         if (!bucket) return
         const isChecked = activeFacets[facet.name] === facet.value

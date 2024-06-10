@@ -32,7 +32,7 @@ function FilterableFacet(props: Props) {
     setFilterText(filterText)
   }, [])
 
-  const titleLineIcon = showFacetList ? "arrow_drop_down" : "arrow_right"
+  const titleLineIcon = showFacetList ? "expand_less" : "expand_more"
 
   const filteredResults = useMemo(() => {
     return filterText ?

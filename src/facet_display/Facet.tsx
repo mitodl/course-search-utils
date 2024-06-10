@@ -22,10 +22,10 @@ function SearchFacet(props: Props) {
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
   const [showAllFacets, setShowAllFacets] = useState(false)
 
-  const titleLineIcon = showFacetList ? "arrow_drop_down" : "arrow_right"
+  const titleLineIcon = showFacetList ? "expand_less" : "expand_more"
 
   return results && results.length === 0 ? null : (
-    <div className="facets">
+    <div className="facets base-facet">
       <button
         className="filter-section-button"
         type="button"
