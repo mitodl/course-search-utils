@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.1.2
+Version 3.1.2 (Released June 17, 2024)
 -------------
 
 - changes for search styling (#110)
