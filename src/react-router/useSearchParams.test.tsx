@@ -4,7 +4,10 @@ import { MemoryRouter, useNavigate } from "react-router"
 import type { MemoryRouterProps, NavigateFunction } from "react-router"
 import useSearchParams from "./useSearchParams"
 
-const setupTest = (initialEntries?: MemoryRouterProps["initialEntries"]) => {
+const setupTest = <TProps, TResult>(
+  hook: (props: TProps) => TResult,
+  initialEntries?: MemoryRouterProps["initialEntries"]
+) => {
   let navigate: NavigateFunction = () => {
     throw new Error("Not yet assigned")
   }
@@ -13,7 +16,7 @@ const setupTest = (initialEntries?: MemoryRouterProps["initialEntries"]) => {
     navigate = navigateFunc
     return null
   }
-  const Wrapper = ({ children }: { children: React.ReactNode }) => {
+  const Wrapper = ({ children }: { children?: React.ReactNode }) => {
     return (
       <MemoryRouter initialEntries={initialEntries}>
         <Navigator />
@@ -22,14 +25,14 @@ const setupTest = (initialEntries?: MemoryRouterProps["initialEntries"]) => {
     )
   }
   return {
-    ...renderHook(() => useSearchParams(), { wrapper: Wrapper }),
+    ...renderHook(hook, { wrapper: Wrapper }),
     navigate
   }
 }
 
 describe("useSearchParams", () => {
   it("allows setting searchParams with an instance", async () => {
-    const { result } = setupTest()
+    const { result } = setupTest(useSearchParams)
     const [_searchParams, setSearchParams] = result.current
     act(() => {
       setSearchParams(new URLSearchParams("cat=meow"))
@@ -38,7 +41,7 @@ describe("useSearchParams", () => {
   })
 
   it("allows setting searchParams with a function", () => {
-    const { result } = setupTest()
+    const { result } = setupTest(useSearchParams)
     const [_searchParams, setSearchParams] = result.current
     act(() => {
       setSearchParams(prev => {
@@ -51,7 +54,7 @@ describe("useSearchParams", () => {
   })
 
   it("Take into account the current value of searchParams", () => {
-    const { result } = setupTest(["/?cat=meow"])
+    const { result } = setupTest(useSearchParams, ["/?cat=meow"])
     const [_searchParams, setSearchParams] = result.current
     expect(result.current[0].toString()).toBe("cat=meow")
     act(() => {
@@ -65,7 +68,7 @@ describe("useSearchParams", () => {
   })
 
   it("External navigations update searchParams", () => {
-    const { result, navigate } = setupTest()
+    const { result, navigate } = setupTest(useSearchParams)
     act(() => {
       navigate("/?cat=meow")
     })
@@ -73,7 +76,7 @@ describe("useSearchParams", () => {
   })
 
   it("Uses current value in updater function", () => {
-    const { result } = setupTest()
+    const { result } = setupTest(useSearchParams)
     const [_searchParams, setSearchParams] = result.current
     act(() => {
       setSearchParams(prev => {
@@ -91,7 +94,7 @@ describe("useSearchParams", () => {
   })
 
   test("Multiple searchParam updates only trigger one history stack update", () => {
-    const { result, navigate } = setupTest()
+    const { result, navigate } = setupTest(useSearchParams)
     const [_searchParams, setSearchParams] = result.current
 
     act(() => {
@@ -135,5 +138,25 @@ describe("useSearchParams", () => {
       navigate(-1)
     })
     expect(result.current[0].toString()).toBe("")
+  })
+
+  test("Multiple instances of useSearchParams both use current value", () => {
+    const useSearchParams2 = () => {
+      const a = useSearchParams()
+      const b = useSearchParams()
+      return { a, b }
+    }
+    const { result } = setupTest(useSearchParams2)
+    act(() => {
+      result.current.a[1](new URLSearchParams("a=1"))
+      result.current.b[1](current => {
+        const copy = new URLSearchParams(current)
+        copy.set("b", "2")
+        return copy
+      })
+    })
+
+    // Fails currently. Only shows b=2.
+    expect(result.current.a[0].toString()).toBe("a=1&b=2")
   })
 })
