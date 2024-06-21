@@ -18,7 +18,15 @@ interface Props {
 }
 
 function SearchFacet(props: Props) {
-  const { name, title, results, selected, onUpdate, expandedOnLoad, preserveItems } = props
+  const {
+    name,
+    title,
+    results,
+    selected,
+    onUpdate,
+    expandedOnLoad,
+    preserveItems
+  } = props
 
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
   const [showAllFacets, setShowAllFacets] = useState(false)
