@@ -45,7 +45,7 @@ function FilterableFacet(props: Props) {
 
   const buckets = (filteredResults || results) ?? []
   return results && results.length === 0 ? null : (
-    <div className="facets filterable-facet">
+    <div className={`facets filterable-facet${showFacetList ? " facets-expanded" : ""}`}>
       <button
         className="filter-section-button"
         type="button"
