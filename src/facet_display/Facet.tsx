@@ -25,7 +25,9 @@ function SearchFacet(props: Props) {
   const titleLineIcon = showFacetList ? "expand_less" : "expand_more"
 
   return results && results.length === 0 ? null : (
-    <div className={`facets base-facet${showFacetList ? " facets-expanded" : ""}`}>
+    <div
+      className={`facets base-facet${showFacetList ? " facets-expanded" : ""}`}
+    >
       <button
         className="filter-section-button"
         type="button"
