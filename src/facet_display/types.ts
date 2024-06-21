@@ -23,6 +23,7 @@ export type SingleFacetOptions = {
   name: FacetKey
   title: string
   expandedOnLoad: boolean
+  preserveItems?: boolean
   labelFunction?: ((value: string) => string) | null
 }
 

@@ -129,6 +129,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
               }
               selected={activeFacets[facetSettings.name] || []}
               expandedOnLoad={facetSettings.expandedOnLoad}
+              preserveItems={facetSettings.preserveItems}
             />
           )
         } else if (facetSettings.type === "filterable") {
@@ -146,6 +147,7 @@ const AvailableFacets: React.FC<Omit<FacetDisplayProps, "clearAllFilters">> = ({
               }
               selected={activeFacets[facetSettings.name] || []}
               expandedOnLoad={facetSettings.expandedOnLoad}
+              preserveItems={facetSettings.preserveItems}
             />
           )
         } else if (facetSettings.type === "group") {

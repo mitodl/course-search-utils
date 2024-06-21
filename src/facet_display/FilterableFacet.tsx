@@ -18,10 +18,11 @@ interface Props {
   selected: string[]
   onUpdate: React.ChangeEventHandler<HTMLInputElement>
   expandedOnLoad: boolean
+  preserveItems?: boolean
 }
 
 function FilterableFacet(props: Props) {
-  const { name, title, results, selected, onUpdate, expandedOnLoad } = props
+  const { name, title, results, selected, onUpdate, expandedOnLoad, preserveItems } = props
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
 
   const [filterText, setFilterText] = useState("")
@@ -61,7 +62,7 @@ function FilterableFacet(props: Props) {
           {titleLineIcon}
         </i>
       </button>
-      {showFacetList ? (
+      {showFacetList || preserveItems ? (
         <>
           <div className="input-wrapper">
             <input

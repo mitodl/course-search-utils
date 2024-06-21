@@ -14,10 +14,11 @@ interface Props {
   selected: string[]
   onUpdate: React.ChangeEventHandler<HTMLInputElement>
   expandedOnLoad: boolean
+  preserveItems?: boolean
 }
 
 function SearchFacet(props: Props) {
-  const { name, title, results, selected, onUpdate, expandedOnLoad } = props
+  const { name, title, results, selected, onUpdate, expandedOnLoad, preserveItems } = props
 
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
   const [showAllFacets, setShowAllFacets] = useState(false)
@@ -39,7 +40,7 @@ function SearchFacet(props: Props) {
           {titleLineIcon}
         </i>
       </button>
-      {showFacetList ? (
+      {showFacetList || preserveItems ? (
         <>
           {results ?
             results.map((bucket, i) =>
