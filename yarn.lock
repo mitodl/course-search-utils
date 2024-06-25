@@ -762,10 +762,10 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@^2024.6.4":
-  version "2024.6.4"
-  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.6.4.tgz#e906b764b115665858570f4bbf04bc065a2eeb4f"
-  integrity sha512-oJ3AwyDTrHOQXairhtqHyBHb9CzIf7En2gV7y6BANDKXhYGXKOVvxqWtvV+1jsCzgGWT6A2nBXYsKuVIGoAP6w==
+"@mitodl/open-api-axios@^2024.6.20":
+  version "2024.6.20"
+  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.6.20.tgz#506d0e9bf400d157b0d756c5bcc4a8a517fa87bd"
+  integrity sha512-GOLo/E9uzQrydpUwlyKVmXUT09mPNEFDsLdm1vQjxOqt5D206kFoaD25dheVTMFqYpOm7DPX/FKyTujXlhLZSw==
   dependencies:
     "@types/node" "^20.11.19"
     axios "^1.6.5"
@@ -1159,9 +1159,9 @@
   integrity sha512-LhF+9fbIX4iPzhsRLpK5H7iPdvW8L4IwGciXQIOEcuF62+9nw/VQVsOViAOOGxY3OlOKGLFv0sWwJXdwQeTn6A==
 
 "@types/node@^20.11.19":
-  version "20.12.9"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.12.9.tgz#d7234f2e7839b55fcab5048404aef0195684adff"
-  integrity sha512-o93r47yu04MHumPBCFg0bMPBMNgtMg3jzbhl7e68z50+BMHmRMGDJv13eBlUgOdc9i/uoJXGMGYLtJV4ReTXEg==
+  version "20.14.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.6.tgz#f3c19ffc98c2220e18de259bb172dd4d892a6075"
+  integrity sha512-JbA0XIJPL1IiNnU7PFxDXyfAwcwVVrOoqyzzyQTyMeVhBzkJVMSkC1LlVsRQ2lpqiY4n6Bb9oCS6lzDKVQxbZw==
   dependencies:
     undici-types "~5.26.4"
 
@@ -1648,9 +1648,9 @@ available-typed-arrays@^1.0.7:
     possible-typed-array-names "^1.0.0"
 
 axios@^1.6.5:
-  version "1.6.8"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.8.tgz#66d294951f5d988a00e87a0ffb955316a619ea66"
-  integrity sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.2.tgz#b625db8a7051fbea61c35a3cbb3a1daa7b9c7621"
+  integrity sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
