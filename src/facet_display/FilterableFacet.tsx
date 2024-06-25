@@ -18,10 +18,19 @@ interface Props {
   selected: string[]
   onUpdate: React.ChangeEventHandler<HTMLInputElement>
   expandedOnLoad: boolean
+  preserveItems?: boolean
 }
 
 function FilterableFacet(props: Props) {
-  const { name, title, results, selected, onUpdate, expandedOnLoad } = props
+  const {
+    name,
+    title,
+    results,
+    selected,
+    onUpdate,
+    expandedOnLoad,
+    preserveItems
+  } = props
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
 
   const [filterText, setFilterText] = useState("")
@@ -45,7 +54,11 @@ function FilterableFacet(props: Props) {
 
   const buckets = (filteredResults || results) ?? []
   return results && results.length === 0 ? null : (
-    <div className="facets filterable-facet">
+    <div
+      className={`facets filterable-facet${
+        showFacetList ? " facets-expanded" : ""
+      }`}
+    >
       <button
         className="filter-section-button"
         type="button"
@@ -57,7 +70,7 @@ function FilterableFacet(props: Props) {
           {titleLineIcon}
         </i>
       </button>
-      {showFacetList ? (
+      {showFacetList || preserveItems ? (
         <>
           <div className="input-wrapper">
             <input
