@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.1.3
+Version 3.1.3 (Released June 25, 2024)
 -------------
 
 - Add an expanded classname to the facet container (#114)
