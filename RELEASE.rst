@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.1.4
+Version 3.1.4 (Released July 02, 2024)
 -------------
 
 - resource category (#117)
