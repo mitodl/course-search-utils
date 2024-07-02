@@ -9,6 +9,7 @@ const {
   LearningResourcesSearchRetrieveSortbyEnum: SortByEnum,
   LearningResourcesSearchRetrieveAggregationsEnum: AggregationsEnum,
   LearningResourcesSearchRetrieveLearningFormatEnum: LearningFormatEnum,
+  LearningResourcesSearchRetrieveResourceCategoryEnum: ResourceCategoryEnum,
   CertificationTypeEnum,
   ContentFileSearchRetrieveSortbyEnum,
   ContentFileSearchRetrieveAggregationsEnum
@@ -57,7 +58,8 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   id:                 numbers,
   free:               firstBoolean,
   learning_format:    withinEnum(Object.values(LearningFormatEnum)),
-  certification_type: withinEnum(Object.values(CertificationTypeEnum))
+  certification_type: withinEnum(Object.values(CertificationTypeEnum)),
+  resource_category:  withinEnum(Object.values(ResourceCategoryEnum))
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =

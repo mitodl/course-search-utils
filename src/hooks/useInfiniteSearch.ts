@@ -7,7 +7,7 @@ type ResourceSearchRequest =
   v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
 type ContentFileSearchRequest =
   v1.ContentFileSearchApiContentFileSearchRetrieveRequest
-type SearchResponse = v1.LearningResourceSearchResponse
+type SearchResponse = v1.LearningResourcesSearchResponse
 
 type Status = "pending" | "error" | "success"
 
