@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 3.1.5
+-------------
+
+- update @mitodl/open-api-axios (#120)
+- Update dependency axios to v1.7.4 [SECURITY] (#119)
+
 Version 3.1.4 (Released July 02, 2024)
 -------------
 
