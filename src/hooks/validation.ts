@@ -36,30 +36,36 @@ const numbers = (values: string[]) =>
   values.map(v => parseInt(v)).filter(Number.isNaN)
 const firstNumber = (values: string[]) => numbers(values)[0]
 
+const floats = (values: string[]) =>
+  values.map(v => parseFloat(v)).filter(Number.isNaN)
+const firstFloat = (values: string[]) => floats(values)[0]
+
 type QueryParamValidators<ReqParams> = {
   [k in keyof Required<ReqParams>]: (v: string[]) => ReqParams[k]
 }
 
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
-  resource_type:      withinEnum(Object.values(ResourceTypeEnum)),
-  department:         withinEnum(Object.values(DepartmentEnum)),
-  level:              withinEnum(Object.values(LevelEnum)),
-  platform:           withinEnum(Object.values(PlatformEnum)),
-  offered_by:         withinEnum(Object.values(OfferedByEnum)),
-  sortby:             values => withinEnum(Object.values(SortByEnum))(values)[0],
-  q:                  first,
-  topic:              identity,
-  certification:      firstBoolean,
-  professional:       firstBoolean,
-  aggregations:       withinEnum(Object.values(AggregationsEnum)),
-  course_feature:     identity,
-  limit:              firstNumber,
-  offset:             firstNumber,
-  id:                 numbers,
-  free:               firstBoolean,
-  learning_format:    withinEnum(Object.values(LearningFormatEnum)),
-  certification_type: withinEnum(Object.values(CertificationTypeEnum)),
-  resource_category:  withinEnum(Object.values(ResourceCategoryEnum))
+  resource_type:        withinEnum(Object.values(ResourceTypeEnum)),
+  department:           withinEnum(Object.values(DepartmentEnum)),
+  level:                withinEnum(Object.values(LevelEnum)),
+  platform:             withinEnum(Object.values(PlatformEnum)),
+  offered_by:           withinEnum(Object.values(OfferedByEnum)),
+  sortby:               values => withinEnum(Object.values(SortByEnum))(values)[0],
+  q:                    first,
+  topic:                identity,
+  certification:        firstBoolean,
+  professional:         firstBoolean,
+  aggregations:         withinEnum(Object.values(AggregationsEnum)),
+  course_feature:       identity,
+  limit:                firstNumber,
+  offset:               firstNumber,
+  id:                   numbers,
+  free:                 firstBoolean,
+  learning_format:      withinEnum(Object.values(LearningFormatEnum)),
+  certification_type:   withinEnum(Object.values(CertificationTypeEnum)),
+  resource_category:    withinEnum(Object.values(ResourceCategoryEnum)),
+  yearly_decay_percent: firstFloat,
+  dev_mode:             firstBoolean
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
@@ -78,7 +84,8 @@ const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
     sortby: values =>
       withinEnum(Object.values(ContentFileSearchRetrieveSortbyEnum))(values)[0],
     resource_id: numbers,
-    run_id:      numbers
+    run_id:      numbers,
+    dev_mode:    firstBoolean
   }
 
 export { resourceSearchValidators, contentSearchValidators }
