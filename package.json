@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/mitodl/course-search-utils#readme",
   "dependencies": {
-    "@mitodl/open-api-axios": "^2024.7.2",
+    "@mitodl/open-api-axios": "^2024.8.21",
     "axios": "^1.6.7",
     "fuse.js": "^7.0.0",
     "query-string": "^6.13.1",
