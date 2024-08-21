@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.1.5
+Version 3.1.5 (Released August 21, 2024)
 -------------
 
 - update @mitodl/open-api-axios (#120)
