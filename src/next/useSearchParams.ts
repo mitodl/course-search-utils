@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef } from "react"
-import { usePathname, useSearchParams as useNextSearchParams, useRouter } from "next/navigation"
+import {
+  usePathname,
+  useSearchParams as useNextSearchParams,
+  useRouter
+} from "next/navigation"
 
 type SearchParamsSetterValue =
   | URLSearchParams
