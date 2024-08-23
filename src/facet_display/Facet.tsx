@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { contains } from "ramda"
 
 import { SearchFacetItem } from "./SearchFacetItem"
 import { BucketWithLabel } from "./types"
@@ -58,7 +57,7 @@ function SearchFacet(props: Props) {
                   <SearchFacetItem
                     key={`${name}-${bucket.key}`}
                     bucket={bucket}
-                    isChecked={contains(bucket.key, selected || [])}
+                    isChecked={(selected || []).includes(bucket.key)}
                     onUpdate={onUpdate}
                     name={name}
                     displayKey={bucket.label}

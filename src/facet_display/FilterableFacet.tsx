@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from "react"
-import { contains } from "ramda"
 import Fuse from "fuse.js"
 
 import { SearchFacetItem } from "./SearchFacetItem"
@@ -106,7 +105,7 @@ function FilterableFacet(props: Props) {
               <SearchFacetItem
                 key={`${name}-${bucket.key}`}
                 bucket={bucket}
-                isChecked={contains(bucket.key, selected || [])}
+                isChecked={(selected || []).includes(bucket.key)}
                 onUpdate={onUpdate}
                 name={name}
                 displayKey={bucket.label}

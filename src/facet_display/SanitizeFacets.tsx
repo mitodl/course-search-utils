@@ -1,5 +1,6 @@
 import { Facets } from "./types"
 import { LEVELS, DEPARTMENTS } from "../constants"
+
 const reverseObject = (
   stringObject: Record<string, string>
 ): Record<string, string> => {
