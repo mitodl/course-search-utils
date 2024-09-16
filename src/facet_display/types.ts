@@ -53,7 +53,7 @@ export interface Facets {
   course_feature?: string[]
   resource_type?: string[]
   content_feature_type?: string[]
-  learning_format?: string[]
+  delivery?: string[]
   certification_type?: string[]
   resource_category?: string[]
 }
