@@ -11,29 +11,6 @@ type SearchParamsSetterValue =
 
 type SetSearchParams = (newSearchParams: SearchParamsSetterValue) => void
 
-/**
- * A hook for getting and setting URL Search Parameters with React Router.
- *
- * NOTE: React Router v6 has a built-in hook for this, but it has an issue with
- * multiple updates.
- *
- * With React's own `useState` hook, updater functions are passed the CURRENT
- * value. For example:
- * ```ts
- * const [count, setCount] = useState(0)
- * const incrementBy2 = () => {
- *    setCount((prevCount) => prevCount + 1)
- *    setCount((prevCount) => prevCount + 1)
- * }
- * ```
- * Calling `incrementBy2` will increment `count` by 2: the second call to
- * `setCount` will use the updated value from the first call.
- *
- * React Router's own `useSearchParams` hook does not have this behavior: it
- * uses outdated values when multiple updates occur in a row. This inhibits
- * the ability independently update multiple search params in a single render
- * cycle.
- */
 const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
   const pathname = usePathname()
   const router = useRouter()
