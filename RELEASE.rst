@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.1.6 (Released September 18, 2024)
+-------------
+
+- Add delivery as a query/facet option (#123)
+
 Version 3.1.5 (Released August 21, 2024)
 -------------
 

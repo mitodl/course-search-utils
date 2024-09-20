@@ -1,6 +1,6 @@
 {
   "name": "@mitodl/course-search-utils",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "description": "JS utils for interacting with MIT Open Course search",
   "main": "dist/index.js",
   "files": [
@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/mitodl/course-search-utils#readme",
   "dependencies": {
-    "@mitodl/open-api-axios": "^2024.8.21",
+    "@mitodl/open-api-axios": "^2024.9.16",
     "axios": "^1.6.7",
     "fuse.js": "^7.0.0",
     "query-string": "^6.13.1"
