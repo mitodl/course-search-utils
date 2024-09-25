@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.2.0
+Version 3.2.0 (Released September 25, 2024)
 -------------
 
 - Update dependency next to ^14.2.11 [SECURITY] (#126)
