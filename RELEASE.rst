@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 3.2.0
+-------------
+
+- Update dependency next to ^14.2.11 [SECURITY] (#126)
+- Update all non-major dev-dependencies (#85)
+- Update dependency next to ^14.2.10 [SECURITY] (#125)
+- Add support for Next.js (#122)
+
 Version 3.1.6 (Released September 18, 2024)
 -------------
 
