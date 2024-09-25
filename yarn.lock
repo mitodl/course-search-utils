@@ -762,7 +762,7 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@^2024.9.16":
+"@mitodl/open-api-axios@2024.9.16":
   version "2024.9.16"
   resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.9.16.tgz#198dd88fb8f6aab4780e14e295a80453e622ff72"
   integrity sha512-me0/zMJnZN2rbUnaVICER4zQtewL45rUjdKkjVZBjz+DKLyl7Qe68pn0C3XLXuiM6HjFuF9CL8Mc4vj4+EVWWg==
