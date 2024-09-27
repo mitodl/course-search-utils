@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react"
 import Fuse from "fuse.js"
-import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react"
+import { RiArrowDownSLine, RiArrowUpSLine } from "@remixicon/react"
 import { SearchFacetItem } from "./SearchFacetItem"
 import { BucketWithLabel } from "./types"
 
@@ -63,7 +63,7 @@ function FilterableFacet(props: Props) {
         onClick={() => setShowFacetList(!showFacetList)}
       >
         {title}
-        {showFacetList ? <RiArrowUpLine /> : <RiArrowDownLine />}
+        <i>{showFacetList ? <RiArrowUpSLine /> : <RiArrowDownSLine />}</i>
       </button>
       {showFacetList || preserveItems ? (
         <>
