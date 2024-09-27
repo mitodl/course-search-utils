@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react"
 import Fuse from "fuse.js"
-
+import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react"
 import { SearchFacetItem } from "./SearchFacetItem"
 import { BucketWithLabel } from "./types"
 
@@ -40,8 +40,6 @@ function FilterableFacet(props: Props) {
     setFilterText(filterText)
   }, [])
 
-  const titleLineIcon = showFacetList ? "expand_less" : "expand_more"
-
   const filteredResults = useMemo(() => {
     return filterText ?
       runSearch(
@@ -65,9 +63,7 @@ function FilterableFacet(props: Props) {
         onClick={() => setShowFacetList(!showFacetList)}
       >
         {title}
-        <i className={`material-icons ${titleLineIcon}`} aria-hidden="true">
-          {titleLineIcon}
-        </i>
+        {showFacetList ? <RiArrowUpLine /> : <RiArrowDownLine />}
       </button>
       {showFacetList || preserveItems ? (
         <>

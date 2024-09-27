@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-
+import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react"
 import { SearchFacetItem } from "./SearchFacetItem"
 import { BucketWithLabel } from "./types"
 
@@ -30,8 +30,6 @@ function SearchFacet(props: Props) {
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
   const [showAllFacets, setShowAllFacets] = useState(false)
 
-  const titleLineIcon = showFacetList ? "expand_less" : "expand_more"
-
   return results && results.length === 0 ? null : (
     <div
       className={`facets base-facet${showFacetList ? " facets-expanded" : ""}`}
@@ -43,9 +41,7 @@ function SearchFacet(props: Props) {
         onClick={() => setShowFacetList(!showFacetList)}
       >
         {title}
-        <i className={`material-icons ${titleLineIcon}`} aria-hidden="true">
-          {titleLineIcon}
-        </i>
+        {showFacetList ? <RiArrowUpLine /> : <RiArrowDownLine />}
       </button>
       {showFacetList || preserveItems ? (
         <>
