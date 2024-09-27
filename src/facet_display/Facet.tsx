@@ -41,7 +41,9 @@ function SearchFacet(props: Props) {
         onClick={() => setShowFacetList(!showFacetList)}
       >
         {title}
-        <i>{showFacetList ? <RiArrowUpSLine /> : <RiArrowDownSLine />}</i>
+        <i aria-hidden="true">
+          {showFacetList ? <RiArrowUpSLine /> : <RiArrowDownSLine />}
+        </i>
       </button>
       {showFacetList || preserveItems ? (
         <>
