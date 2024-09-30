@@ -1,4 +1,5 @@
 import React from "react"
+import { RiCloseLine } from "@remixicon/react"
 
 interface FilterIndicatorProps {
   label: string
@@ -20,9 +21,7 @@ export default function FilterIndicator(props: FilterIndicatorProps) {
         onClick={onClick}
         aria-label="clear filter"
       >
-        <span className="material-icons" aria-hidden="true">
-          close
-        </span>
+        <RiCloseLine />
       </button>
     </div>
   )
