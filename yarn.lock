@@ -937,10 +937,10 @@
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.15.2.tgz#35726510d332ba5349c6398d13259d5da184553d"
   integrity sha512-+Rnav+CaoTE5QJc4Jcwh5toUpnVLKYbpU6Ys0zqbakqbaLQHeglLVHPfxOiQqdNmUy5C2lXz5dwC6tQNX2JW2Q==
 
-"@remixicon/react@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@remixicon/react/-/react-4.2.0.tgz#9093ea394e288ee9a88d0613bd38739c728f02ac"
-  integrity sha512-eGhKpZ88OU0qkcY9pJu6khBmItDV82nU130E6C68yc+FbljueHlUYy/4CrJsmf860RIDMay2Rpzl27OSJ81miw==
+"@remixicon/react@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@remixicon/react/-/react-4.0.1.tgz#9bfa7badfda8c3071e58217dcc10d44a8d09ff64"
+  integrity sha512-niVlYRO9RlUdL6kan2JGcph5XHK8F58g0uezAq+vCdY7mQRWNN4+E2AoeY56zYnQD+NnqEXh1CoyBJUccP8CTw==
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.41"
