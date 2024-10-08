@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 3.2.1
+-------------
+
+- Add Next.js as a dev dependency and pin @remixicon/react (#134)
+- Replace icons with Remixicon SVGs (#131)
+- Update dependency @types/react to v16.14.62 (#132)
+
 Version 3.2.0 (Released September 25, 2024)
 -------------
 
