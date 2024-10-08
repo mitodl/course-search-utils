@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.2.1
+Version 3.2.1 (Released October 08, 2024)
 -------------
 
 - Add Next.js as a dev dependency and pin @remixicon/react (#134)
