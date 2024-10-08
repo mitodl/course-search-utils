@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.2.2
+Version 3.2.2 (Released October 08, 2024)
 -------------
 
 - Allow legacy peer dependencies (#136)
