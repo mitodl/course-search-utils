@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.2.3
+-------------
+
+- Upgrade React to v18 (#138)
+
 Version 3.2.2 (Released October 08, 2024)
 -------------
 
