@@ -62,7 +62,6 @@
     "@typescript-eslint/parser": "^7.0.1",
     "babel-eslint": "10.x",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.8",
     "eslint": "^8.56.0",
     "eslint-config-google": "0.x",
     "eslint-config-mitodl": "^2.0.0",
