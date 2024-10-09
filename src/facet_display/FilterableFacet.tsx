@@ -39,11 +39,14 @@ function FilterableFacet(props: Props) {
 
   const [filterText, setFilterText] = useState("")
 
-  const handleFilterInput = useCallback(e => {
-    e.preventDefault()
-    const filterText = e.target.value || ""
-    setFilterText(filterText)
-  }, [])
+  const handleFilterInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault()
+      const filterText = e.target.value || ""
+      setFilterText(filterText)
+    },
+    []
+  )
 
   const filteredResults = useMemo(() => {
     return filterText ?
