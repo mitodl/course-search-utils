@@ -48,9 +48,9 @@ const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
       searchParamsRef.current = newParams
 
       if (hasNavigatedRef.current) {
-        router.replace(`${pathname}?${newParams}`)
+        router.replace(`${pathname}?${newParams}`, {scroll: false})
       } else {
-        router.push(`${pathname}?${newParams}`)
+        router.push(`${pathname}?${newParams}`, {scroll: false})
       }
 
       hasNavigatedRef.current = true
