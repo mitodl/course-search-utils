@@ -1,9 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef } from "react"
-import {
-  usePathname,
-  useSearchParams as useNextSearchParams,
-  useRouter
-} from "next/navigation"
+import { useCallback, useEffect, useRef } from "react"
+import { useSearchParams as useNextSearchParams } from "next/navigation"
 
 type SearchParamsSetterValue =
   | URLSearchParams
@@ -11,53 +7,60 @@ type SearchParamsSetterValue =
 
 type SetSearchParams = (newSearchParams: SearchParamsSetterValue) => void
 
-const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
-  const pathname = usePathname()
-  const router = useRouter()
-  const search = useNextSearchParams()
-
+/**
+ * Returns a function for setting search params in the browser URL.
+ *  - the first call within a single render cycle will add a new entry in the
+ *   history stack via pushState
+ *  - subsequent calls will replace the previous entry in the history stack
+ *    and will receive the previously updated value in setter function
+ *
+ * NOTE: This is intended for use with NextJS, but could work with any framework
+ * that supports direct usage of window.history.pushState / replaceState.
+ */
+const useSetSearchParams = (): SetSearchParams => {
   /**
    * Keep track of whether navigate has been called in the current render cycle
    * to avoid adding extra entries in the history stack.
    */
   const hasNavigatedRef = useRef(false)
-  const searchParams = useMemo(() => new URLSearchParams(search), [search])
-  /**
-   * Keep track of the current searchParams value so that updater functions can
-   * use the current value rather than value from previous render.
-   */
-  const searchParamsRef = useRef(searchParams)
 
   useEffect(() => {
     hasNavigatedRef.current = false
-    /**
-     * Each render, sync the ref with the current state value.
-     * This is necessary in case search params has changed via some source other
-     * than this hook (e.g., browser navigation).
-     */
-    searchParamsRef.current = searchParams
   })
 
-  const setSearchParams: SetSearchParams = useCallback(
-    nextValue => {
-      const newParams =
-        typeof nextValue === "function" ?
-          nextValue(searchParamsRef.current) :
-          nextValue
+  const setSearchParams: SetSearchParams = useCallback(nextValue => {
+    const newParams =
+      typeof nextValue === "function" ?
+        nextValue(new URLSearchParams(window.location.search)) :
+        nextValue
 
-      searchParamsRef.current = newParams
+    if (hasNavigatedRef.current) {
+      window.history.replaceState({}, "", `?${newParams}`)
+    } else {
+      window.history.pushState({}, "", `?${newParams}`)
+    }
 
-      if (hasNavigatedRef.current) {
-        router.replace(`${pathname}?${newParams}`, { scroll: false })
-      } else {
-        router.push(`${pathname}?${newParams}`, { scroll: false })
-      }
+    hasNavigatedRef.current = true
+  }, [])
+  return setSearchParams
+}
 
-      hasNavigatedRef.current = true
-    },
-    [pathname, router]
-  )
-  return [searchParams, setSearchParams]
+/**
+ * Like react `useState`, but for getting/setting search params in NextJS
+ * App Router. The setter is client-side only and will not trigger a call
+ * to the server. (Uses `window.history.pushState` internally, not `useRouter`).
+ *
+ * ```ts
+ * const [searchParams, setSearchParams] = useSearchParams();
+ * ```
+ * Where:
+ * - `searchParams` is the search params objet from `next/navigation`'s useSearchParams
+ * - `setSearchParams` is like React's `useState` setter:
+ *    - arg can be a single value or function (current => next)
+ *    - multiple synchronous calls to setSearchParams trigger only one pushState
+ */
+const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
+  return [useNextSearchParams(), useSetSearchParams()]
 }
 
 export default useSearchParams
