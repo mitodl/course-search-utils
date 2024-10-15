@@ -1,6 +1,6 @@
 {
   "name": "@mitodl/course-search-utils",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "JS utils for interacting with MIT Open Course search",
   "main": "dist/index.js",
   "files": [

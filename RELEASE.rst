@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 3.2.4
+-------------
+
+- Lock file maintenance (#144)
+- Fix history stack / client side nav (#140)
+- Lock file maintenance (#115)
+
 Version 3.2.3 (Released October 09, 2024)
 -------------
 
