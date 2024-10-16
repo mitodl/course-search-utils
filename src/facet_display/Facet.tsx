@@ -29,16 +29,21 @@ function SearchFacet(props: Props) {
 
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
   const [showAllFacets, setShowAllFacets] = useState(false)
+  const [transitioning, setTransitioning] = useState(false)
 
   return results && results.length === 0 ? null : (
     <div
-      className={`facets base-facet${showFacetList ? " facets-expanded" : ""}`}
+      className={`facets base-facet${showFacetList ? " facets-expanded" : (transitioning ? " facets-transitioning" : "")}`}
+      onTransitionEnd={() => setTransitioning(false)}
     >
       <button
         className="filter-section-button"
         type="button"
         aria-expanded={showFacetList ? "true" : "false"}
-        onClick={() => setShowFacetList(!showFacetList)}
+        onClick={() => {
+          setTransitioning(true)
+          setShowFacetList(!showFacetList)
+        }}
       >
         {title}
         <i aria-hidden="true">
