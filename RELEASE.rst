@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.2.5
+Version 3.2.5 (Released October 16, 2024)
 -------------
 
 - add facet-transitioning class (#146)
