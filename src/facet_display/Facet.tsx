@@ -33,7 +33,7 @@ function SearchFacet(props: Props) {
 
   return results && results.length === 0 ? null : (
     <div
-      className={`facets base-facet${showFacetList ? " facets-expanded" : (transitioning ? " facets-transitioning" : "")}`}
+      className={`facets base-facet${showFacetList ? " facets-expanded" : transitioning ? " facets-transitioning" : ""}`}
       onTransitionEnd={() => setTransitioning(false)}
     >
       <button
