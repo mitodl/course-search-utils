@@ -36,8 +36,8 @@ function FilterableFacet(props: Props) {
     preserveItems
   } = props
   const [showFacetList, setShowFacetList] = useState(expandedOnLoad)
-
   const [filterText, setFilterText] = useState("")
+  const [transitioning, setTransitioning] = useState(false)
 
   const handleFilterInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,14 +61,22 @@ function FilterableFacet(props: Props) {
   return results && results.length === 0 ? null : (
     <div
       className={`facets filterable-facet${
-        showFacetList ? " facets-expanded" : ""
+        showFacetList ?
+          " facets-expanded" :
+          transitioning ?
+            " facets-transitioning" :
+            ""
       }`}
+      onTransitionEnd={() => setTransitioning(false)}
     >
       <button
         className="filter-section-button"
         type="button"
         aria-expanded={showFacetList ? "true" : "false"}
-        onClick={() => setShowFacetList(!showFacetList)}
+        onClick={() => {
+          setTransitioning(true)
+          setShowFacetList(!showFacetList)
+        }}
       >
         {title}
         <i aria-hidden="true">
