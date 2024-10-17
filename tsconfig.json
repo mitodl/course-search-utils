@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "es5",
-    "module": "commonjs",
+    "module": "ES2015",
     "lib": [
       "es2020",
       "dom"
@@ -11,7 +11,7 @@
     "checkJs": true,
     "jsx": "react",
     "declaration": true,
-    "outDir": "./dist/",
+    "outDir": "./dist/esm/",
     "tsBuildInfoFile": ".tsbuildinfo",
     "strict": true,
     "noUnusedLocals": true,
