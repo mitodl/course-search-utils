@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 3.3.0
+-------------
+
+- build esm and cjs both (#148)
+- Lock file maintenance (#149)
+- Update actions/cache action to v4 (#87)
+- Update actions/checkout action to v4 (#88)
+
 Version 3.2.5 (Released October 16, 2024)
 -------------
 
