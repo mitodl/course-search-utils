@@ -36,4 +36,4 @@ jobs:
         run: yarn fmt:check
 
       - name: Typescript build
-        run: yarn typescript
+        run: yarn build

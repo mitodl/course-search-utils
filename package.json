@@ -7,9 +7,21 @@
     "dist/"
   ],
   "exports": {
-    ".": "./dist/index.js",
-    "./react-router": "./dist/react-router/index.js",
-    "./next": "./dist/next/index.js"
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js"
+    },
+    "./react-router": {
+      "import": "./dist/esm/react-router/index.js",
+      "require": "./dist/cjs/react-router/index.js",
+      "default": "./dist/esm/react-router/index.js"
+    },
+    "./next": {
+      "import": "./dist/esm/next/index.js",
+      "require": "./dist/cjs/next/index.js",
+      "default": "./dist/esm/next/index.js"
+    }
   },
   "scripts": {
     "test": "jest",
@@ -18,10 +30,12 @@
     "lint:cache": "eslint src --ext .js,.jsx,.ts,.tsx --cache",
     "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi $PWD/'src/**/*.ts' $PWD/'src/**/*.tsx'",
     "fmt:check": "LOG_LEVEL= prettier-eslint --list-different --no-semi $PWD/'src/**/*.ts' $PWD/'src/**/*.tsx'",
-    "typescript": "rm -rf dist && rm -f .tsbuildinfo && tsc",
     "typecheck": "tsc --noEmit",
-    "prepack": "npm run typescript",
-    "repl": "ts-node"
+    "prepack": "npm run build",
+    "repl": "ts-node",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "build": "rm -rf dist && rm -f .tsbuildinfo && npm run build:esm && npm run build:cjs"
   },
   "repository": {
     "type": "git",
