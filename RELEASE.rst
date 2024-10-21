@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.3.0
+Version 3.3.0 (Released October 21, 2024)
 -------------
 
 - build esm and cjs both (#148)
