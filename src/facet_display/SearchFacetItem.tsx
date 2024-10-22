@@ -1,25 +1,25 @@
-import React from "react";
-import { Bucket } from "./types";
+import React from "react"
+import { Bucket } from "./types"
 
 interface Props {
-  bucket: Bucket;
-  isChecked: boolean;
-  onUpdate: React.ChangeEventHandler<HTMLInputElement>;
-  name: string;
-  displayKey: string | null;
+  bucket: Bucket
+  isChecked: boolean
+  onUpdate: React.ChangeEventHandler<HTMLInputElement>
+  name: string
+  displayKey: string | null
 }
 
 export const slugify = (text: string) =>
   text
     .split(" ")
-    .map((subString) => subString.toLowerCase())
+    .map(subString => subString.toLowerCase())
     .join("-")
-    .replace(/[\W_]/g, "-");
+    .replace(/[\W_]/g, "-")
 
 export function SearchFacetItem(props: Props) {
-  const { bucket, isChecked, onUpdate, name, displayKey } = props;
+  const { bucket, isChecked, onUpdate, name, displayKey } = props
 
-  const facetId = slugify(`${name}-${bucket.key}`);
+  const facetId = slugify(`${name}-${bucket.key}`)
   return (
     <div className={isChecked ? "facet-visible checked" : "facet-visible"}>
       <input
@@ -35,5 +35,5 @@ export function SearchFacetItem(props: Props) {
         <span className="facet-count">{bucket.doc_count}</span>
       </label>
     </div>
-  );
+  )
 }
