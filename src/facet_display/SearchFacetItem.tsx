@@ -30,12 +30,10 @@ export function SearchFacetItem(props: Props) {
         checked={isChecked}
         onChange={onUpdate}
       />
-      <div className="facet-label">
-        <label htmlFor={facetId} className={"facet-key"}>
-          {displayKey ?? ""}
-        </label>
-        <div className="facet-count">{bucket.doc_count}</div>
-      </div>
+      <label htmlFor={facetId} className="facet-label">
+        <span className="facet-text">{displayKey ?? ""}</span>
+        <span className="facet-count">{bucket.doc_count}</span>
+      </label>
     </div>
   )
 }

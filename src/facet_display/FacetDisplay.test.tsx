@@ -143,7 +143,7 @@ describe.each([undefined, "static", "filterable"] as const)(
           }
         ]
       })
-      await user.click(screen.getByRole("checkbox", { name: "Cats" }))
+      await user.click(screen.getByRole("checkbox", { name: "Cats 10" }))
       expect(spies.onFacetChange).toHaveBeenCalledWith("topic", "Cats", true)
     })
 
@@ -158,10 +158,10 @@ describe.each([undefined, "static", "filterable"] as const)(
         ]
       })
       screen.getByRole("checkbox", {
-        name: "Civil and Environmental Engineering"
+        name: "Civil and Environmental Engineering 100"
       })
       screen.getByRole("checkbox", {
-        name: "Mechanical Engineering"
+        name: "Mechanical Engineering 200"
       })
     })
 
@@ -180,16 +180,16 @@ describe.each([undefined, "static", "filterable"] as const)(
       })
       const checkboxCount = () => screen.getAllByRole("checkbox").length
       expect(checkboxCount()).toBe(3)
-      screen.getByRole("checkbox", { name: "Cats" })
-      screen.getByRole("checkbox", { name: "Dogs" })
-      screen.getByRole("checkbox", { name: "Donkeys" })
+      screen.getByRole("checkbox", { name: "Cats 10" })
+      screen.getByRole("checkbox", { name: "Dogs 20" })
+      screen.getByRole("checkbox", { name: "Donkeys 30" })
       rerender({
         activeFacets: {
           topic: ["Cats", "Dragons"]
         }
       })
       expect(checkboxCount()).toBe(4)
-      screen.getByRole("checkbox", { name: "Dragons" })
+      screen.getByRole("checkbox", { name: "Dragons 0" })
     })
 
     test("Displays filterable facet if type='filterable'", async () => {
@@ -200,9 +200,9 @@ describe.each([undefined, "static", "filterable"] as const)(
       expect(screen.getAllByRole("checkbox")).toHaveLength(3)
       invariant(textbox, "Expected textbox to exist")
       await user.type(textbox, "D")
-      const box0 = screen.queryByRole("checkbox", { name: "Cats" })
-      const box1 = screen.queryByRole("checkbox", { name: "Dogs" })
-      const box2 = screen.queryByRole("checkbox", { name: "Donkeys" })
+      const box0 = screen.queryByRole("checkbox", { name: "Cats 10" })
+      const box1 = screen.queryByRole("checkbox", { name: "Dogs 20" })
+      const box2 = screen.queryByRole("checkbox", { name: "Donkeys 30" })
       expect(!!box0).toBe(false)
       expect(!!box1).toBe(true)
       expect(!!box2).toBe(true)
@@ -242,26 +242,24 @@ describe("FacetDisplay with type='group' facet", () => {
     setup()
     const checkboxes = screen.getAllByRole("checkbox")
     const withCerts = screen.getByRole("checkbox", {
-      name: "With Certificate"
+      name: "With Certificate 20"
     })
-    const free = screen.getByRole("checkbox", { name: "Free Stuff" })
+    const free = screen.getByRole("checkbox", { name: "Free Stuff 30" })
     expect(checkboxes).toEqual([withCerts, free])
-
-    const labels = document.querySelectorAll(".facet-label")
-    expect(labels[0].textContent).toBe("With Certificate20")
-    expect(labels[1].textContent).toBe("Free Stuff30")
   })
 
   test("Clicking a checkbox calls onFacetChange", async () => {
     const { spies } = setup()
-    await user.click(screen.getByRole("checkbox", { name: "With Certificate" }))
+    await user.click(
+      screen.getByRole("checkbox", { name: "With Certificate 20" })
+    )
     expect(spies.onFacetChange).toHaveBeenCalledWith(
       "certification",
       "true",
       true
     )
 
-    await user.click(screen.getByRole("checkbox", { name: "Free Stuff" }))
+    await user.click(screen.getByRole("checkbox", { name: "Free Stuff 30" }))
     expect(spies.onFacetChange).toHaveBeenCalledWith("free", "false", true)
   })
 
@@ -290,7 +288,9 @@ describe("FacetDisplay with type='group' facet", () => {
         certification: true
       }
     })
-    const checkbox = screen.getByRole("checkbox", { name: "With Certificate" })
+    const checkbox = screen.getByRole("checkbox", {
+      name: "With Certificate 0"
+    })
     expect(checkbox).toBeTruthy()
   })
 })
