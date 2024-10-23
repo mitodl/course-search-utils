@@ -751,10 +751,10 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@2024.9.16":
-  version "2024.9.16"
-  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.9.16.tgz#198dd88fb8f6aab4780e14e295a80453e622ff72"
-  integrity sha512-me0/zMJnZN2rbUnaVICER4zQtewL45rUjdKkjVZBjz+DKLyl7Qe68pn0C3XLXuiM6HjFuF9CL8Mc4vj4+EVWWg==
+"@mitodl/open-api-axios@2024.10.15":
+  version "2024.10.15"
+  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.10.15.tgz#3f2ec63a54622331b17f4e57b3e7a9fcde577a0a"
+  integrity sha512-Pshk60J4hqnK5DDhVrbAi08pQnItmwRcDc1Ova4jUCoHZkc1nSyid3Xq4jmoq3zXkSa/zHoXSjVb81OivTUZGQ==
   dependencies:
     "@types/node" "^20.11.19"
     axios "^1.6.5"
