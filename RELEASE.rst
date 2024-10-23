@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 3.3.1
+-------------
+
+- Put count inside `label`  (#151)
+
 Version 3.3.0 (Released October 21, 2024)
 -------------
 
