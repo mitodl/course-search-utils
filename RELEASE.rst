@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.3.2
+Version 3.3.2 (Released November 22, 2024)
 -------------
 
 - Export validation for reuse in server rendering (#159)
