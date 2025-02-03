@@ -852,12 +852,12 @@
   dependencies:
     make-plural "^7.0.0"
 
-"@mitodl/open-api-axios@2024.9.16":
-  version "2024.9.16"
-  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.9.16.tgz#198dd88fb8f6aab4780e14e295a80453e622ff72"
-  integrity sha512-me0/zMJnZN2rbUnaVICER4zQtewL45rUjdKkjVZBjz+DKLyl7Qe68pn0C3XLXuiM6HjFuF9CL8Mc4vj4+EVWWg==
+"@mitodl/open-api-axios@2024.11.14":
+  version "2024.11.14"
+  resolved "https://registry.yarnpkg.com/@mitodl/open-api-axios/-/open-api-axios-2024.11.14.tgz#a1b83d8c7069fb9822350765b23f9d912ec6537a"
+  integrity sha512-uw9tmGOsVJgAydERZNRjqv+4pS5S2SDfsE6Rljk5dDvzPhhQ/0KMN8roIh/JWSdjj1pGP21cnkUjSdgH8zeWKw==
   dependencies:
-    "@types/node" "^20.11.19"
+    "@types/node" "^22.0.0"
     axios "^1.6.5"
 
 "@next/env@14.2.23":
@@ -1281,19 +1281,12 @@
   dependencies:
     next "*"
 
-"@types/node@*":
+"@types/node@*", "@types/node@^22.0.0":
   version "22.13.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.0.tgz#d376dd9a0ee2f9382d86c2d5d7beb4d198b4ea8c"
   integrity sha512-ClIbNe36lawluuvq3+YYhnIN2CELi+6q8NpnM7PYp4hBn/TatfboPgVSm2rwKRfnV2M+Ty9GWDFI64KEe+kysA==
   dependencies:
     undici-types "~6.20.0"
-
-"@types/node@^20.11.19":
-  version "20.17.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.17.16.tgz#b33b0edc1bf925b27349e494b871ca4451fabab4"
-  integrity sha512-vOTpLduLkZXePLxHiHsBLp98mHGnl8RptV4YAO3HfKO5UHjDvySGbxKtpYfy8Sx5+WKcgc45qNreJJRVM3L6mw==
-  dependencies:
-    undici-types "~6.19.2"
 
 "@types/prop-types@*":
   version "15.7.14"
@@ -5126,11 +5119,6 @@ unbox-primitive@^1.1.0:
     has-bigints "^1.0.2"
     has-symbols "^1.1.0"
     which-boxed-primitive "^1.1.1"
-
-undici-types@~6.19.2:
-  version "6.19.8"
-  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
-  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 undici-types@~6.20.0:
   version "6.20.0"
