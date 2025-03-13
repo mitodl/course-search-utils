@@ -76,7 +76,7 @@
   "peerDependencies": {
     "@types/history": "^4.9",
     "history": "^4.9 || ^5.0.0",
-    "react": "^16.13.1"
+    "react": "^16.13.1 || ^17.0.0 || ^18.0.0"
   },
   "peerDependenciesMeta": {
     "history": {
