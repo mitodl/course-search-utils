@@ -6,3 +6,12 @@ dist/*
 # typescript writes this file for incremental compilation
 .tsbuildinfo
 .DS_Store
+
+# Yarn v4
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
