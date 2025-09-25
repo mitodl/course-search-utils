@@ -11,20 +11,22 @@ jobs:
         with:
           node-version: 20.19.5
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Enable Corepack
+        run: corepack enable
 
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          path: |
+            .yarn/cache
+            .yarn/unplugged
+            .yarn/install-state.gz
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-engines --prefer-offline
+        run: yarn install --immutable
 
       - name: Lint
         run: yarn lint
