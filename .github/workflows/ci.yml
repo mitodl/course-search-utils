@@ -9,7 +9,7 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 20.11.1
+          node-version: 20.19.5
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
