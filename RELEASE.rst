@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.4.0
+Version 3.4.0 (Released October 21, 2025)
 -------------
 
 - add article resource type to learning resources (#193)
