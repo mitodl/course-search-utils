@@ -1,6 +1,29 @@
 Release Notes
 =============
 
+Version 3.4.0
+-------------
+
+- add article resource type to learning resources (#193)
+- Update yarn to v4 (#185)
+- Update actions/checkout digest to 08eba0b (#154)
+- Update dependency node to v20.19.5 (#180)
+- Update actions/cache digest to 0057852 (#153)
+- Lock file maintenance (#175)
+- Lock file maintenance (#174)
+- Lock file maintenance (#173)
+- Lock file maintenance (#172)
+- Lock file maintenance (#171)
+- Lock file maintenance (#170)
+- Lock file maintenance (#169)
+- Lock file maintenance (#168)
+- Lock file maintenance (#167)
+- Lock file maintenance (#166)
+- Lock file maintenance (#165)
+- Lock file maintenance (#164)
+- Lock file maintenance (#163)
+- Lock file maintenance (#162)
+
 Version 3.3.2 (Released November 22, 2024)
 -------------
 
