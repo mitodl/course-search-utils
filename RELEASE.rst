@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.4.1
+Version 3.4.1 (Released October 21, 2025)
 -------------
 
 - Update Yarn to v4.10.3 (#191)
