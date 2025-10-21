@@ -46,8 +46,14 @@ type QueryParamValidators<ReqParams> = {
   [k in keyof Required<ReqParams>]: (v: string[]) => ReqParams[k]
 }
 
+const PATCHED_RESOURCE_TYPE_VALUES = [
+  ...Object.values(ResourceTypeEnum),
+  "article"
+] as const
+
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
-  resource_type:              withinEnum(Object.values(ResourceTypeEnum)),
+  // @ts-expect-error We added "article" enum values and haven't published an openapi release yet.
+  resource_type:              withinEnum(Object.values(PATCHED_RESOURCE_TYPE_VALUES)),
   department:                 withinEnum(Object.values(DepartmentEnum)),
   level:                      withinEnum(Object.values(LevelEnum)),
   platform:                   withinEnum(Object.values(PlatformEnum)),
