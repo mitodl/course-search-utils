@@ -79,7 +79,8 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   min_score:                  firstFloat,
   search_mode:                values => withinEnum(Object.values(SearchModeEnum))(values)[0],
   slop:                       firstNumber,
-  use_dfs_query_then_fetch:   firstBoolean
+  use_dfs_query_then_fetch:   firstBoolean,
+  use_hybrid_search:          firstBoolean
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
