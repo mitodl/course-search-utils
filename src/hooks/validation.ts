@@ -45,13 +45,8 @@ type QueryParamValidators<ReqParams> = {
   [k in keyof Required<ReqParams>]: (v: string[]) => ReqParams[k]
 }
 
-const PATCHED_RESOURCE_TYPE_VALUES = [
-  ...Object.values(ResourceTypeEnum),
-  "article"
-] as const
-
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
-  resource_type:              withinEnum(Object.values(PATCHED_RESOURCE_TYPE_VALUES)),
+  resource_type:              withinEnum(Object.values(ResourceTypeEnum)),
   department:                 withinEnum(Object.values(DepartmentEnum)),
   level:                      withinEnum(Object.values(LevelEnum)),
   platform:                   withinEnum(Object.values(PlatformEnum)),
