@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.5.0
+Version 3.5.0 (Released October 29, 2025)
 -------------
 
 - update course-search-utils to use mit-learn-api-axios (#197)
