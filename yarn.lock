@@ -1226,7 +1226,7 @@ __metadata:
   resolution: "@mitodl/course-search-utils@workspace:."
   dependencies:
     "@babel/preset-typescript": "npm:^7.25.7"
-    "@mitodl/open-api-axios": "npm:2024.9.16"
+    "@mitodl/open-api-axios": "npm:2024.11.14"
     "@remixicon/react": "npm:^4.2.0"
     "@swc/core": "npm:^1.5.7"
     "@swc/jest": "npm:^0.2.36"
@@ -1270,13 +1270,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mitodl/open-api-axios@npm:2024.9.16":
-  version: 2024.9.16
-  resolution: "@mitodl/open-api-axios@npm:2024.9.16"
+"@mitodl/open-api-axios@npm:2024.11.14":
+  version: 2024.11.14
+  resolution: "@mitodl/open-api-axios@npm:2024.11.14"
   dependencies:
-    "@types/node": "npm:^20.11.19"
+    "@types/node": "npm:^22.0.0"
     axios: "npm:^1.6.5"
-  checksum: 10/ff40f62d087e3168e1d9ba0887cc41d3db4d2eb868e43317feb18510cf1f7d9b535d32acd478b9dd1bacfee8ea7e4967d2ed84499f5bf431317c614555f19416
+  checksum: 10/cdde91b4f3c1fbc8eebeb9ba6f1e2a5a26e5da0b25db634432b59bbb03d3416243f30f9b9d817f8e234282ef957eec2ed51a024a830196f77f89e7be846dbc2b
   languageName: node
   linkType: hard
 
@@ -1917,12 +1917,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.11.19":
-  version: 20.19.17
-  resolution: "@types/node@npm:20.19.17"
+"@types/node@npm:^22.0.0":
+  version: 22.18.13
+  resolution: "@types/node@npm:22.18.13"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/66e240c06a94859d0e1dce76b2055501cb9ec386c0028e687479625a2f1cd3dda0b089278b2767044dff51b07beaf439df6b8b3ce99d5cbeacf243988bd7aa86
+  checksum: 10/a0e8632a3eeeed3986f3b0b170187f67c0f0bb0d4fbbf9627af5c9bf81e2836bb64aa6f3bdab1c00658cb7911d8c231d7d6db853ae643edcd41f383c86f349e6
   languageName: node
   linkType: hard
 

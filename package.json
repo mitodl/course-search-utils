@@ -52,7 +52,7 @@
   },
   "homepage": "https://github.com/mitodl/course-search-utils#readme",
   "dependencies": {
-    "@mitodl/open-api-axios": "2024.9.16",
+    "@mitodl/open-api-axios": "2024.11.14",
     "@remixicon/react": "^4.2.0",
     "axios": "^1.6.7",
     "fuse.js": "^7.0.0"
