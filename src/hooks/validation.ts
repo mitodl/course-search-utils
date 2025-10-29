@@ -1,4 +1,4 @@
-import { v1 } from "@mitodl/open-api-axios"
+import { v1 } from "@mitodl/mit-learn-api-axios"
 
 const {
   ResourceTypeEnum,
@@ -8,7 +8,6 @@ const {
   LearningResourcesSearchRetrieveOfferedByEnum: OfferedByEnum,
   LearningResourcesSearchRetrieveSortbyEnum: SortByEnum,
   LearningResourcesSearchRetrieveAggregationsEnum: AggregationsEnum,
-  LearningResourcesSearchRetrieveLearningFormatEnum: LearningFormatEnum,
   LearningResourcesSearchRetrieveDeliveryEnum: DeliveryEnum,
   LearningResourcesSearchRetrieveResourceCategoryEnum: ResourceCategoryEnum,
   LearningResourcesSearchRetrieveSearchModeEnum: SearchModeEnum,
@@ -46,14 +45,8 @@ type QueryParamValidators<ReqParams> = {
   [k in keyof Required<ReqParams>]: (v: string[]) => ReqParams[k]
 }
 
-const PATCHED_RESOURCE_TYPE_VALUES = [
-  ...Object.values(ResourceTypeEnum),
-  "article"
-] as const
-
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
-  // @ts-expect-error We added "article" enum values and haven't published an openapi release yet.
-  resource_type:              withinEnum(Object.values(PATCHED_RESOURCE_TYPE_VALUES)),
+  resource_type:              withinEnum(Object.values(ResourceTypeEnum)),
   department:                 withinEnum(Object.values(DepartmentEnum)),
   level:                      withinEnum(Object.values(LevelEnum)),
   platform:                   withinEnum(Object.values(PlatformEnum)),
@@ -69,7 +62,6 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   offset:                     firstNumber,
   id:                         numbers,
   free:                       firstBoolean,
-  learning_format:            withinEnum(Object.values(LearningFormatEnum)),
   delivery:                   withinEnum(Object.values(DeliveryEnum)),
   certification_type:         withinEnum(Object.values(CertificationTypeEnum)),
   resource_category:          withinEnum(Object.values(ResourceCategoryEnum)),
@@ -79,7 +71,8 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   min_score:                  firstFloat,
   search_mode:                values => withinEnum(Object.values(SearchModeEnum))(values)[0],
   slop:                       firstNumber,
-  use_dfs_query_then_fetch:   firstBoolean
+  content_file_score_weight:  firstFloat,
+  ocw_topic:                  identity
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
@@ -97,10 +90,10 @@ const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
     ),
     sortby: values =>
       withinEnum(Object.values(ContentFileSearchRetrieveSortbyEnum))(values)[0],
-    resource_id:              numbers,
-    run_id:                   numbers,
-    dev_mode:                 firstBoolean,
-    use_dfs_query_then_fetch: firstBoolean
+    resource_id: numbers,
+    run_id:      numbers,
+    dev_mode:    firstBoolean,
+    ocw_topic:   identity
   }
 
 export { resourceSearchValidators, contentSearchValidators }

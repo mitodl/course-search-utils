@@ -1,6 +1,6 @@
 import { contentSearchValidators, resourceSearchValidators } from "./validation"
 import type { QueryParamValidators } from "./validation"
-import type { v1 } from "@mitodl/open-api-axios"
+import type { v1 } from "@mitodl/mit-learn-api-axios"
 import { useCallback, useMemo, useState } from "react"
 
 type ResourceSearchRequest =

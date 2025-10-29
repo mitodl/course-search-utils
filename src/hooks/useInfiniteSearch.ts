@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getSearchUrl } from "./util"
 import type { Endpoint } from "./util"
-import type { v1 } from "@mitodl/open-api-axios"
+import type { v1 } from "@mitodl/mit-learn-api-axios"
 
 type ResourceSearchRequest =
   v1.LearningResourcesSearchApiLearningResourcesSearchRetrieveRequest
