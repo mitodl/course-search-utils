@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.5.1
+Version 3.5.1 (Released March 02, 2026)
 -------------
 
 - rename resource_category to resource_type_group (#205)
