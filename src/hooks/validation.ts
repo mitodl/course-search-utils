@@ -9,7 +9,6 @@ const {
   LearningResourcesSearchRetrieveSortbyEnum: SortByEnum,
   LearningResourcesSearchRetrieveAggregationsEnum: AggregationsEnum,
   LearningResourcesSearchRetrieveDeliveryEnum: DeliveryEnum,
-  LearningResourcesSearchRetrieveResourceCategoryEnum: ResourceCategoryEnum,
   LearningResourcesSearchRetrieveSearchModeEnum: SearchModeEnum,
   CertificationTypeEnum,
   ContentFileSearchRetrieveSortbyEnum,
@@ -64,7 +63,8 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   free:                       firstBoolean,
   delivery:                   withinEnum(Object.values(DeliveryEnum)),
   certification_type:         withinEnum(Object.values(CertificationTypeEnum)),
-  resource_category:          withinEnum(Object.values(ResourceCategoryEnum)),
+  // @ts-expect-error mit-learn-api-axios doesn't have resource_type_group field yet
+  resource_type_group:        identity,
   yearly_decay_percent:       firstFloat,
   dev_mode:                   firstBoolean,
   max_incompleteness_penalty: firstFloat,
