@@ -72,7 +72,8 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   search_mode:                values => withinEnum(Object.values(SearchModeEnum))(values)[0],
   slop:                       firstNumber,
   content_file_score_weight:  firstFloat,
-  ocw_topic:                  identity
+  ocw_topic:                  identity,
+  show_ocw_files:             firstBoolean
 }
 
 const contentSearchValidators: QueryParamValidators<ContentFileSearchRequest> =
