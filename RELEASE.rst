@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.5.2
+Version 3.5.2 (Released March 06, 2026)
 -------------
 
 - add resource_category, show_ocw_files (#207)
