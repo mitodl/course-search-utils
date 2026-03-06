@@ -55,6 +55,7 @@ export interface Facets {
   content_feature_type?: string[]
   delivery?: string[]
   certification_type?: string[]
+  resource_category?: string[]
   resource_type_group?: string[]
 }
 

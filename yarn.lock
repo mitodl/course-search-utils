@@ -1226,7 +1226,7 @@ __metadata:
   resolution: "@mitodl/course-search-utils@workspace:."
   dependencies:
     "@babel/preset-typescript": "npm:^7.25.7"
-    "@mitodl/mit-learn-api-axios": "npm:2025.10.28"
+    "@mitodl/mit-learn-api-axios": "npm:^2026.3.4"
     "@remixicon/react": "npm:^4.2.0"
     "@swc/core": "npm:^1.5.7"
     "@swc/jest": "npm:^0.2.36"
@@ -1270,13 +1270,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mitodl/mit-learn-api-axios@npm:2025.10.28":
-  version: 2025.10.28
-  resolution: "@mitodl/mit-learn-api-axios@npm:2025.10.28"
+"@mitodl/mit-learn-api-axios@npm:^2026.3.4":
+  version: 2026.3.4
+  resolution: "@mitodl/mit-learn-api-axios@npm:2026.3.4"
   dependencies:
     "@types/node": "npm:^22.0.0"
     axios: "npm:^1.6.5"
-  checksum: 10/0832d24ab89078c315dc01ce40a3350752dee76a1a26649807c846858365e13834dc2ba76c8f4324667f5982690675445ad7c1b44e9d847bccfd7290b29df9b6
+  checksum: 10/1617b281821aaee9f44a4a1e6632cd8a2441277d17044265f2004f6e0ec1532095e5a85d334dc9666737ebdbe44144bb4690c4cc9d033a9e065c4bcf66f648c3
   languageName: node
   linkType: hard
 
@@ -1918,11 +1918,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.0.0":
-  version: 22.18.13
-  resolution: "@types/node@npm:22.18.13"
+  version: 22.19.15
+  resolution: "@types/node@npm:22.19.15"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/a0e8632a3eeeed3986f3b0b170187f67c0f0bb0d4fbbf9627af5c9bf81e2836bb64aa6f3bdab1c00658cb7911d8c231d7d6db853ae643edcd41f383c86f349e6
+  checksum: 10/c75bc9a8dbc49a61f3e6f49304cf7b1c05e818a1071b46e9effd1a51af7a1b5c10fd2e04f314b74ce78f4ca7e3ddc1d6e61c94c2e3354c8be9f9f7ee5e79e23c
   languageName: node
   linkType: hard
 
@@ -2481,7 +2481,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.5, axios@npm:^1.6.7":
+"axios@npm:^1.6.5":
+  version: 1.13.6
+  resolution: "axios@npm:1.13.6"
+  dependencies:
+    follow-redirects: "npm:^1.15.11"
+    form-data: "npm:^4.0.5"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/a7ed83c2af3ef21d64609df0f85e76893a915a864c5934df69241001d0578082d6521a0c730bf37518ee458821b5695957cb10db9fc705f2a8996c8686ea7a89
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.7":
   version: 1.12.2
   resolution: "axios@npm:1.12.2"
   dependencies:
@@ -3810,7 +3821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.6":
+"follow-redirects@npm:^1.15.11, follow-redirects@npm:^1.15.6":
   version: 1.15.11
   resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
@@ -3849,6 +3860,19 @@ __metadata:
     hasown: "npm:^2.0.2"
     mime-types: "npm:^2.1.12"
   checksum: 10/a4b62e21932f48702bc468cc26fb276d186e6b07b557e3dd7cc455872bdbb82db7db066844a64ad3cf40eaf3a753c830538183570462d3649fdfd705601cbcfb
+  languageName: node
+  linkType: hard
+
+"form-data@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "form-data@npm:4.0.5"
+  dependencies:
+    asynckit: "npm:^0.4.0"
+    combined-stream: "npm:^1.0.8"
+    es-set-tostringtag: "npm:^2.1.0"
+    hasown: "npm:^2.0.2"
+    mime-types: "npm:^2.1.12"
+  checksum: 10/52ecd6e927c8c4e215e68a7ad5e0f7c1031397439672fd9741654b4a94722c4182e74cc815b225dcb5be3f4180f36428f67c6dd39eaa98af0dcfdd26c00c19cd
   languageName: node
   linkType: hard
 
