@@ -45,18 +45,16 @@ type QueryParamValidators<ReqParams> = {
   [k in keyof Required<ReqParams>]: (v: string[]) => ReqParams[k]
 }
 
+// "21T" (Theater Arts) isn't in the published mit-learn-api-axios DepartmentEnum yet,
+// so it's added here and cast to the enum value type. Remove once the openapi release ships.
 const PATCHED_DEPARTMENT_VALUES = [
   ...Object.values(DepartmentEnum),
   "21T"
-] as const
+] as (typeof DepartmentEnum)[keyof typeof DepartmentEnum][]
 
 const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   resource_type:              withinEnum(Object.values(ResourceTypeEnum)),
-  // "21T" (Theater Arts) isn't in the published mit-learn-api-axios DepartmentEnum yet,
-  // so cast to the expected validator type. Remove once the openapi release ships.
-  department: withinEnum(
-    Object.values(PATCHED_DEPARTMENT_VALUES)
-  ) as QueryParamValidators<ResourceSearchRequest>["department"],
+  department:                 withinEnum(Object.values(PATCHED_DEPARTMENT_VALUES)),
   level:                      withinEnum(Object.values(LevelEnum)),
   platform:                   withinEnum(Object.values(PlatformEnum)),
   offered_by:                 withinEnum(Object.values(OfferedByEnum)),
