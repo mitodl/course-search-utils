@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 3.5.3
+-------------
+
+- Add department 21T (Theater Arts) to DEPARTMENTS (#212)
+- Add zizmor GitHub Actions static analysis (#214)
+- Update dependency node to v20.20.2 (#210)
+
 Version 3.5.2 (Released March 06, 2026)
 -------------
 
