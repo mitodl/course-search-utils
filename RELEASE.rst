@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.5.3
+Version 3.5.3 (Released August 18, 2026)
 -------------
 
 - Add department 21T (Theater Arts) to DEPARTMENTS (#212)
