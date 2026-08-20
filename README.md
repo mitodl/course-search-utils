@@ -21,21 +21,22 @@ npm run typecheck
 
 ## publishing
 
-All PR titles and commits to `main` should use the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format. During release, the types of commits included since the last release inform what sort of version bump should be made. For example, bugfixes yield a new patch version, whereas breaking changes trigger a major version bump.
+We squash-merge, so **your PR title sets the version bump** ([conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), enforced by the `Validate PR title` check):
 
-To trigger a release, use the "Releases (Semantic & Pre-release)" GitHub action (`release.yml`). This action will perform a semantic release or pre-release based on the `release-type` input.
+| PR title | Bump |
+| --- | --- |
+| `fix:` / `perf:` | patch |
+| `feat:` | minor |
+| `feat!:` (or a `BREAKING CHANGE:` footer) | major |
+| `chore:` `docs:` `ci:` `test:` `refactor:` | **nothing is published** |
 
-**Pre-releases:** The action will (1) publish the latest commit on the specified branch to NPM, with a version `0.0.0-<git-short-sha>`, e.g. `0.0.0-7bc0c0f`; and (2) leave a comment on the branch's PR indicating the released version number, if such a PR is open.
+⚠️ If your change should reach consumers, title it `fix:` or `feat:`. A user-facing change titled `refactor:` or `chore:` silently never ships.
 
-**Semantic Release:** The action will:
+**To release:** Actions → "Releases (Semantic & Pre-release)" → Run workflow → `main` → `release-type: semantic-release`. Merging alone does not publish; someone has to dispatch this.
 
-1. Inspect the commit history since the previous release for [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
-2. Determine whether the version bump should be major, minor, or patch based on commit types. Breaking changes (e.g. `feat!: remove useCourseSearch`) will result in major version bumps.
-3. Publish the package to NPM and the repository's [GitHub Releases](https://github.com/mitodl/course-search-utils/releases).
+**To test in a consuming app:** run that action against your branch with `release-type: pre-release`. It publishes `0.0.0-<short-sha>` under the `preview` tag, never touching `latest`, and comments the version on your PR.
 
-The `version` field in `package.json` is deliberately pinned at `0.0.0`; git tags and the npm registry are the source of truth for released versions.
-
-Publishing uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) via GitHub Actions OIDC, so no npm tokens are stored in this repository. Release notes for versions up to 3.6.0 are archived in [`RELEASE.rst`](./RELEASE.rst); newer releases are documented in GitHub Releases.
+Don't edit `version` in `package.json` — it stays `0.0.0`; git tags and npm are the source of truth. Publishing uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) via GitHub Actions OIDC, so no npm tokens are stored here. Notes through 3.6.0 are archived in [`RELEASE.rst`](./RELEASE.rst); newer ones are in [GitHub Releases](https://github.com/mitodl/course-search-utils/releases).
 
 ## Usage
 
