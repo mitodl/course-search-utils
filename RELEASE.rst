@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 3.6.0
+Version 3.6.0 (Released August 20, 2026)
 -------------
 
 - fix: npm publishing (#216)
