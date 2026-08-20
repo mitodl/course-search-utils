@@ -1226,7 +1226,7 @@ __metadata:
   resolution: "@mitodl/course-search-utils@workspace:."
   dependencies:
     "@babel/preset-typescript": "npm:^7.25.7"
-    "@mitodl/mit-learn-api-axios": "npm:^2026.3.4"
+    "@mitodl/mit-learn-api-axios": "npm:^2026.8.19"
     "@remixicon/react": "npm:^4.2.0"
     "@swc/core": "npm:^1.5.7"
     "@swc/jest": "npm:^0.2.36"
@@ -1270,13 +1270,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mitodl/mit-learn-api-axios@npm:^2026.3.4":
-  version: 2026.3.4
-  resolution: "@mitodl/mit-learn-api-axios@npm:2026.3.4"
+"@mitodl/mit-learn-api-axios@npm:^2026.8.19":
+  version: 2026.8.19
+  resolution: "@mitodl/mit-learn-api-axios@npm:2026.8.19"
   dependencies:
     "@types/node": "npm:^22.0.0"
     axios: "npm:^1.6.5"
-  checksum: 10/1617b281821aaee9f44a4a1e6632cd8a2441277d17044265f2004f6e0ec1532095e5a85d334dc9666737ebdbe44144bb4690c4cc9d033a9e065c4bcf66f648c3
+  checksum: 10/b8d7c058504e4cc04ecc41e0ecffd9e5cbbe20c7fe1cfd013530f49950d1d3c4652edb83933179190724c8173ba1f4b2e6a8fc122ffb7062661c3704ad40a829
   languageName: node
   linkType: hard
 
