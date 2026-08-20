@@ -71,7 +71,6 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   free:                       firstBoolean,
   delivery:                   withinEnum(Object.values(DeliveryEnum)),
   certification_type:         withinEnum(Object.values(CertificationTypeEnum)),
-  //@ts-expect-error the field isn't in mit-learn-api-axios yet
   resource_category:          identity,
   resource_type_group:        withinEnum(Object.values(ResourceTypeGroupEnum)),
   yearly_decay_percent:       firstFloat,
@@ -79,6 +78,7 @@ const resourceSearchValidators: QueryParamValidators<ResourceSearchRequest> = {
   max_incompleteness_penalty: firstFloat,
   min_score:                  firstFloat,
   search_mode:                values => withinEnum(Object.values(SearchModeEnum))(values)[0],
+  show_ocw_files:             firstBoolean,
   slop:                       firstNumber,
   content_file_score_weight:  firstFloat,
   ocw_topic:                  identity
