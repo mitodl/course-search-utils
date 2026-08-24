@@ -1,1 +1,4 @@
-export { default as useSearchParams } from "./useSearchParams"
+export {
+  default as useSearchParams,
+  useSetSearchParams
+} from "./useSearchParams"

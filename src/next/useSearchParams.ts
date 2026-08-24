@@ -17,7 +17,7 @@ type SetSearchParams = (newSearchParams: SearchParamsSetterValue) => void
  * NOTE: This is intended for use with NextJS, but could work with any framework
  * that supports direct usage of window.history.pushState / replaceState.
  */
-const useSetSearchParams = (): SetSearchParams => {
+export const useSetSearchParams = (): SetSearchParams => {
   /**
    * Keep track of whether navigate has been called in the current render cycle
    * to avoid adding extra entries in the history stack.
