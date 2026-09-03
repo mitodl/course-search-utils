@@ -21,7 +21,7 @@ export const DEPARTMENTS = {
   "21G":   "Global Studies and Languages",
   "21H":   "History",
   "21L":   "Literature",
-  "21M":   "Music and Theater Arts",
+  "21M":   "Music",
   "21T":   "Theater Arts",
   22:      "Nuclear Science and Engineering",
   24:      "Linguistics and Philosophy",
